@@ -1,54 +1,60 @@
 {
-    "name" : "PySnip server",
+    "name" : "Grenade Launchers | Classic Maps | Territorial Control | v0.0.1 (PoC)",
     "motd" : [
         "Welcome to %(server_name)s",
         "Map: %(map_name)s by %(map_author)s",
         "Game mode: %(game_mode)s",
-        "Server powered by PySnip and BuildAndShoot.com"
+        "Your gun is now a GRENADE LAUNCHER with INFINITE ammo!",
+		"Use your grenade launcher to defeat the enemy and capture all objectives!",
+		"You cannot damage yourself or your teammates! Leverage this to dig huge caves!",
+		"Oh, and feel free to destroy everything on the map with SMG if you wish!",
+		"Performance note: this runs better on lower-end clients like Build&Shoot!",
+		"Note: this is an ealy proof of concept. Updates are planned for future!"
     ],
     "help" : [
         "Server name: %(server_name)s",
         "Map: %(map_name)s by %(map_author)s",
         "Game mode: %(game_mode)s",
-        "/STREAK    Shows how many kills in a row you got without dying",
-        "/INTEL     Tells you who's got the enemy intel",
         "/VOTEKICK  Start a vote to temporarily ban a disruptive player",
-        "/TIME      Remaining time until forced map reset"
+        "/TIME      Remaining time until forced map reset",
+		"/STREAK    Shows how many kills in a row you got without dying"
     ],
     "tips" : [
         "You are playing %(game_mode)s on %(server_name)s",
+		"Your gun is now a GRENADE LAUNCHER with INFINITE ammo!",
+		"Use your grenade launcher to defeat the enemy and capture all objectives!",
         "Type /help for info & commands"
     ],
     "tip_frequency" : 5,
     "rules" : [
         "Cheating isn't welcome. Griefing is frowned upon. Have fun!"
     ],
-    "master" : true,
+    "master" : false,
     "max_players" : 32,
-    "max_connections_per_ip" : 3,
+    "max_connections_per_ip" : 2,
     "port" : 32887,
     "network_interface" : "",
 
-    "game_mode" : "ctf",
+    "game_mode" : "tc",
     "cap_limit" : 10,
     "default_time_limit" : 120,
     "advance_on_win" : true,
-    "maps" : ["classicgen", "random"],
+    "maps" : ["burbs", "scandinavia", "normandie", "classicgen"],
     "random_rotation" : false,
 
-    "respawn_time" : 16,
+    "respawn_time" : 10,
     "respawn_waves" : true,
-    "friendly_fire" : "on_grief",
+    "friendly_fire" : "False",
     "grief_friendly_fire_time" : 5,
     "spade_teamkills_on_grief" : false,
     "balanced_teams" : 2,
     "teamswitch_interval" : 0,
 
     "speedhack_detect" : false,
-    "votekick_percentage" : 35,
+    "votekick_percentage" : 60,
     "votekick_ban_duration" : 30,
     "votekick_public_votes" : true,
-    "votemap_public_votes" : true,
+    "votemap_public_votes" : false,
     "votemap_extension_time" : 15,
     "votemap_player_driven" : false,
     "votemap_autoschedule" : false,
@@ -58,11 +64,10 @@
     "melee_damage" : 80,
     "fall_damage" : true,
     "user_blocks_only" : false,
-    "set_god_build" : false,
+    "set_god_build" : true,
     "server_prefix" : "",
-    "time_announcements" : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 30, 60, 120, 180,
-                            240, 300, 600, 900, 1200, 1800, 2400, 3000],
-    "login_retries" : 3,
+    "time_announcements" : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 30, 60, 120],
+    "login_retries" : 2,
     "default_ban_duration" : 1440,
 
     "logfile" : "./logs/log.txt",
@@ -79,10 +84,10 @@
         "color" : [0, 255, 0]
     },
    "passwords" : {
-        "admin" : ["adminpass1", "adminpass2", "adminpass3"],
-        "moderator" : ["modpass"],
-        "guard" : ["guardpass"],
-        "trusted" : ["trustedpass"]
+        "admin" : ["replaceme"],
+        "moderator" : ["replaceme"],
+        "guard" : ["replaceme"],
+        "trusted" : ["replaceme"]
     },
     "rights" : {
         "moderator" : ["advance", "cancel", "dban", "fog", "from", "goto", "hackinfo", "hban", "invisible", "ip", "kick", "kickafk", "kill", "map", "master", "move", "mute", "resetgame", "switch", "teleport", "teleport_other", "tpsilent", "togglebuild", "togglekill", "togglevotekick", "trust", "undoban", "unmute", "unstick", "where", "whowas"],
@@ -122,8 +127,8 @@
         "chatprefix" : "."
     },
     "scripts" : [
-        "rollback",
-        "protect",
+	    "grenade_launchers",
+		"spawn_protect",
         "map_extensions",
         "disco",
         "votekick",
@@ -131,7 +136,8 @@
         "ratio",
         "passreload",
         "blockinfo",
-        "afk"
+        "afk",
+		"daycycle"
     ],
 
     "squad_respawn_time" : 32,
@@ -139,5 +145,6 @@
     "auto_squad" : false,
     "load_saved_map" : false,
     "rollback_on_game_end" : false,
-    "afk_time_limit" : 30
+    "afk_time_limit" : 10,
+	"spawn_protect_time" : 5
 }
