@@ -137,7 +137,8 @@
         "passreload",
         "blockinfo",
         "afk",
-		"daycycle"
+		"daycycle",
+		"votenext"
     ],
 
     "squad_respawn_time" : 32,
