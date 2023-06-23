@@ -15,6 +15,7 @@
         "Server name: %(server_name)s",
         "Map: %(map_name)s by %(map_author)s",
         "Game mode: %(game_mode)s",
+        "/ADMIN     Send a message to admins",
 		"/NEXT      Start a vote to advance to the next map",
         "/VOTEKICK  Start a vote to temporarily ban a disruptive player",
         "/TIME      Remaining time until forced map reset",
@@ -22,9 +23,9 @@
     ],
     "tips" : [
         "You are playing %(game_mode)s on %(server_name)s",
+        "Type /help for info & commands",
 		"Your gun is now a GRENADE LAUNCHER with INFINITE ammo!",
-		"Use your grenade launcher to defeat the enemy and capture all objectives!",
-        "Type /help for info & commands"
+		"Use your grenade launcher to defeat the enemy and capture all objectives!"
     ],
     "tip_frequency" : 5,
     "rules" : [
