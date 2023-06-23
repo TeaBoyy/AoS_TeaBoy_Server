@@ -15,7 +15,7 @@ from commands import add
 VOTE_PERCENTAGE = 80  # percent
 
 # How long players have to wait to be able to vote on a newly loaded map
-MIN_MAP_UPTIME = 60  # seconds
+MIN_MAP_UPTIME = 60*5  # seconds
 
 
 def next(connection):
@@ -74,6 +74,9 @@ def check_for_map_change(protocol, ignore_player_id=None):
                 valid_voters += 1
                 if p.voted_next:
                     valid_votes += 1
+        vote_percentage = VOTE_PERCENTAGE
+        if valid_voters < 5:
+            vote_percentage = 100
         if valid_voters > 0 and valid_votes >= VOTE_PERCENTAGE * valid_voters / float(100):
             protocol.vote_next_successful = True
             protocol.advance_rotation("Vote successful.")
