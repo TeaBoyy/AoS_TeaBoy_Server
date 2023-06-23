@@ -23,7 +23,8 @@
     ],
     "tips" : [
         "You are playing %(game_mode)s on %(server_name)s",
-        "Type /help for info & commands",
+        "Map sucks? Use /NEXT to start a vote to skip to the next map",
+        "Type /help for more info and commands",
 		"Your gun is now a GRENADE LAUNCHER with INFINITE ammo!",
 		"Use your grenade launcher to defeat the enemy and capture all objectives!"
     ],
