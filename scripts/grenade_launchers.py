@@ -108,7 +108,7 @@ def apply_script(protocol, connection, config):
                # Assume it's grenade launcher's projectile (and not a regular grenade).
                # Regular grenades will deal the same damage as launcher's projectiles for now
                if self.weapon == SMG_WEAPON:
-                   newAmount = 20.0
+                   newAmount = 5.0
                elif self.weapon == RIFLE_WEAPON: 
                    newAmount = 50.0
                elif self.weapon == SHOTGUN_WEAPON: 
@@ -136,7 +136,7 @@ def apply_script(protocol, connection, config):
             if self.weapon is SMG_WEAPON:
                 multipler = 1.9
             else:
-                multipler = 2.2
+                multipler = 2.3
             
             velocity.x *= multipler
             velocity.y *= multipler
