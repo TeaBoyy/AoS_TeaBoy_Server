@@ -1,5 +1,5 @@
 {
-    "name" : "Grenade Launchers | Classic Maps | Territorial Control | v0.0.1 (PoC)",
+    "name" : "Grenade Launchers | Classic Maps | Territorial Control",
     "motd" : [
         "Welcome to %(server_name)s",
         "Map: %(map_name)s by %(map_author)s",
@@ -7,7 +7,7 @@
         "Your gun is now a GRENADE LAUNCHER with INFINITE ammo!",
 		"Use your grenade launcher to defeat the enemy and capture all objectives!",
 		"You cannot damage yourself or your teammates! Leverage this to dig huge caves!",
-		"Oh, and feel free to destroy everything on the map with SMG if you wish!",
+		"Oh, and feel free to destroy everything on the map with SMG!",
 		"Performance note: this runs better on lower-end clients like Build&Shoot!",
 		"Note: this is an ealy proof of concept. Updates are planned for future!"
     ],
@@ -15,6 +15,7 @@
         "Server name: %(server_name)s",
         "Map: %(map_name)s by %(map_author)s",
         "Game mode: %(game_mode)s",
+		"/NEXT      Start a vote to advance to the next map",
         "/VOTEKICK  Start a vote to temporarily ban a disruptive player",
         "/TIME      Remaining time until forced map reset",
 		"/STREAK    Shows how many kills in a row you got without dying"
