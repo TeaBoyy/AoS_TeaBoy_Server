@@ -19,6 +19,64 @@ GUNS_INTERVALS = {
     SHOTGUN_WEAPON : 1.0
 }
 
+global G_RIFLE_LAUNCHER_DAMAGE
+G_RIFLE_LAUNCHER_DAMAGE=50.0
+
+global G_SMG_LAUNCHER_DAMAGE
+G_SMG_LAUNCHER_DAMAGE=5.0
+
+global G_SHOTGUN_LAUNCHER_DAMAGE
+G_SHOTGUN_LAUNCHER_DAMAGE=50.0
+
+def set_weapon_launcher_damage(connection, value = None, damage_ordinal = 0, launcher_type = "Unknown"):
+    global G_RIFLE_LAUNCHER_DAMAGE
+    global G_SMG_LAUNCHER_DAMAGE
+    global G_SHOTGUN_LAUNCHER_DAMAGE
+
+    try:
+        if value is not None:
+            old_damage = 0.0
+
+            # May throw
+            new_damage = float(value)
+
+            if damage_ordinal is 0:
+                old_damage = G_RIFLE_LAUNCHER_DAMAGE
+                G_RIFLE_LAUNCHER_DAMAGE = new_damage
+            elif damage_ordinal is 1:
+                old_damage = G_SMG_LAUNCHER_DAMAGE
+                G_SMG_LAUNCHER_DAMAGE = new_damage
+            elif damage_ordinal is 2:
+                old_damage = G_SHOTGUN_LAUNCHER_DAMAGE
+                G_SHOTGUN_LAUNCHER_DAMAGE = new_damage
+            else:
+                return
+
+            chat_message = "[INFO] Changed " + launcher_type  + " grenade launcher damage from " + str(old_damage) + " to " + str(new_damage)
+            connection.protocol.send_chat(chat_message)
+    except Exception:
+        print("Got some exception for set_weapon_launcher_damage")
+    return 
+
+@admin
+def setrifledamage(connection, value = None):
+    set_weapon_launcher_damage(connection, value, 0, "Rifle")
+    return
+
+@admin
+def setsmgdamage(connection, value = None):
+    set_weapon_launcher_damage(connection, value, 1, "SMG")
+    return
+
+@admin
+def setshotgundamage(connection, value = None):
+    set_weapon_launcher_damage(connection, value, 2, "Shotgun")
+    return
+
+add(setrifledamage)
+add(setsmgdamage)
+add(setshotgundamage)
+
 def shoot_grenade(connection, protocol, player, x, y, z, color):
     if x < 0 or y < 0 or z < 0 or x >= 512 or y >= 512 or z > 62:
         return False
@@ -29,7 +87,7 @@ def shoot_grenade(connection, protocol, player, x, y, z, color):
 def generate_grenade(player, connection):
     if player.tool != WEAPON_TOOL:
         return
-        
+
     location = player.world_object.position
     x, y, z = location.x, location.y, location.z
 
@@ -105,14 +163,18 @@ def apply_script(protocol, connection, config):
            if grenade:
                newAmount = hit_amount
                
+               global G_RIFLE_LAUNCHER_DAMAGE
+               global G_SMG_LAUNCHER_DAMAGE
+               global G_SHOTGUN_LAUNCHER_DAMAGE
+
                # Assume it's grenade launcher's projectile (and not a regular grenade).
                # Regular grenades will deal the same damage as launcher's projectiles for now
                if self.weapon == SMG_WEAPON:
-                   newAmount = 5.0
+                   newAmount = G_SMG_LAUNCHER_DAMAGE
                elif self.weapon == RIFLE_WEAPON: 
-                   newAmount = 50.0
+                   newAmount = G_RIFLE_LAUNCHER_DAMAGE
                elif self.weapon == SHOTGUN_WEAPON: 
-                   newAmount = 50.0
+                   newAmount = G_SHOTGUN_LAUNCHER_DAMAGE
 
                return newAmount
            elif hit_type is WEAPON_KILL or hit_type is HEADSHOT_KILL:
