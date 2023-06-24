@@ -22,11 +22,7 @@
 		"/STREAK    Shows how many kills in a row you got without dying"
     ],
     "tips" : [
-        "You are playing %(game_mode)s on %(server_name)s",
-        "Map sucks? Use /NEXT to start a vote to skip to the next map",
-        "Type /help for more info and commands",
-		"Your gun is now a GRENADE LAUNCHER with INFINITE ammo!",
-		"Use your grenade launcher to defeat the enemy and capture all objectives!"
+        "Tips: Type /NEXT to start a vote to advance to the next map. Type /HELP for more info"
     ],
     "tip_frequency" : 5,
     "rules" : [
