@@ -270,13 +270,14 @@ def apply_script(protocol, connection, config):
             self.grenade_models = None
             connection.on_reset(self)
         
-        def on_grenade_thrown(self, grenade):
-            if self.grenade_models:
-                grenade.name = 'seed'
-                grenade.callback = self.seed_exploded
-            connection.on_grenade_thrown(self, grenade)
+        #def on_grenade_thrown(self, grenade):
+            #if self.grenade_models:
+                #grenade.name = 'seed'
+                #grenade.callback = self.seed_exploded
+            #connection.on_grenade_thrown(self, grenade)
         
         def seed_exploded(self, grenade):
+            #print("Test seed_exploded inside grownade")
             if not self.grenade_models:
                 return
             x, y, z = (int(n) for n in grenade.position.get())

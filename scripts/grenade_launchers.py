@@ -203,12 +203,21 @@ def apply_script(protocol, connection, config):
             velocity.x *= multipler
             velocity.y *= multipler
             velocity.z *= multipler
-             
-            grenade = protocol.world.create_object(Grenade, 0.0,
-                position, None, velocity, self.nade_exploded)
+
+            ### TODO: spawning cover when holding V (sneak)
+            spawn_cover = False
+
+            if player.world_object.sneak:
+                spawn_cover = True
             
-            grenade.name = 'rocket'
-            
+            if spawn_cover:
+                grenade = protocol.world.create_object(Grenade, 0.0, position, None, velocity, self.cover_seed_exploded)
+                grenade.name = 'cover_seed'
+            else:
+                grenade = protocol.world.create_object(Grenade, 0.0, position, None, velocity, self.nade_exploded)
+                grenade.name = 'rocket'
+            ###
+
             # Figure out when grenade will land
             collision = grenade.get_next_collision(UPDATE_FREQUENCY)
             if collision:
@@ -238,7 +247,11 @@ def apply_script(protocol, connection, config):
             if position.z >= 1:
                 position.z -= 1
             
-            connection.grenade_exploded(self, grenade)
+            return connection.grenade_exploded(self, grenade)
+
+        def cover_seed_exploded(self, grenade):
+            return connection.seed_exploded(self, grenade)
+            #return connection.grenade_exploded(self, grenade)
             
     return protocol, GrenadeLaunchersConnection
     

@@ -126,6 +126,7 @@
         "chatprefix" : "."
     },
     "scripts" : [
+        "grownade",
 	    "grenade_launchers",
 		"spawn_protect",
         "map_extensions",
