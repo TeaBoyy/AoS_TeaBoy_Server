@@ -78,7 +78,7 @@ add(setsmgdamage)
 add(setshotgundamage)
 
 def shoot_grenade(connection, protocol, player, x, y, z, color):
-    if x < 0 or y < 0 or z < 0 or x >= 512 or y >= 512 or z > 62:
+    if x < 0 or y < 0 or x >= 512 or y >= 512 or z > 62:
         return False
 
     player.spawn_grenade(connection, protocol, player, x, y, z)
