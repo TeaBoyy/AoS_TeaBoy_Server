@@ -36,7 +36,7 @@
 
     "game_mode" : "tc",
     "cap_limit" : 10,
-    "default_time_limit" : 120,
+    "default_time_limit" : 300,
     "advance_on_win" : true,
     "maps" : ["burbs", "scandinavia", "normandie", "classicgen"],
     "random_rotation" : false,
