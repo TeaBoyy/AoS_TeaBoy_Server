@@ -138,7 +138,8 @@
         "afk",
 		"daycycle",
 		"votenext",
-        "medkit"
+        "medkit",
+        "allow_kill"
     ],
 
     "squad_respawn_time" : 32,
