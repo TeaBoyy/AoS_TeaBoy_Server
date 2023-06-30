@@ -137,7 +137,8 @@
         "blockinfo",
         "afk",
 		"daycycle",
-		"votenext"
+		"votenext",
+        "medkit"
     ],
 
     "squad_respawn_time" : 32,
@@ -146,5 +147,7 @@
     "load_saved_map" : false,
     "rollback_on_game_end" : false,
     "afk_time_limit" : 10,
-	"spawn_protect_time" : 2
+	"spawn_protect_time" : 2,
+    "medkits" : 1,
+    "medkit_heal_amount" : 40
 }
