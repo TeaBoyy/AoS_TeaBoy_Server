@@ -18,17 +18,20 @@ def apply_script(protocol, connection, config):
             return connection.on_disconnect(self)
         
         def log_player_count(self):
-            player_count = len(self.protocol.connections)
-            current_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            log_entry = "[" + current_date + "] " + "Current player count: " + str(player_count) + ".\n"
+            try:
+                player_count = len(self.protocol.connections)
+                current_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                log_entry = "[" + current_date + "] " + "Current player count: " + str(player_count) + ".\n"
 
-            if not self.logfile_opened:
-                self.logfile = open(LOG_FILE_PATH, "a")
+                if not self.logfile_opened:
+                    self.logfile = open(LOG_FILE_PATH, "a")
 
-            if self.logfile is not None:
-                self.logfile.write(log_entry)
-                self.logfile.flush()
-            else:
-                print(log_entry)
+                if self.logfile is not None:
+                    self.logfile.write(log_entry)
+                    self.logfile.flush()
+                else:
+                    print(log_entry)
+            except Exception:
+                print("Got some exception for log_player_count")
 
     return protocol, LogPlayerCountConnection
