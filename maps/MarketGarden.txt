@@ -1,0 +1,5 @@
+name = 'Market Garden'
+version = '1.0'
+author = 'Influx'
+description = ('An asymmetrical map of an assault of a large town,' 
+'complete with outlying fields and woodlands.')
