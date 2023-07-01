@@ -38,7 +38,7 @@
     "cap_limit" : 10,
     "default_time_limit" : 300,
     "advance_on_win" : true,
-    "maps" : ["MarketGarden", "burbs", "scandinavia", "normandie", "classicgen"],
+    "maps" : ["hiesville", "MarketGarden", "classicgen", "burbs", "scandinavia", "normandie"],
     "random_rotation" : false,
 
     "respawn_time" : 10,
