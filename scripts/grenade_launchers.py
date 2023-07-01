@@ -224,7 +224,8 @@ def apply_script(protocol, connection, config):
            
         def nade_exploded(self, grenade):
             position, velocity = grenade.position, grenade.velocity
-            
+            velocity.normalize()
+
             # Penetrate up to 2 blocks to get to the solid block
             extra_distance = 2
             while extra_distance:
