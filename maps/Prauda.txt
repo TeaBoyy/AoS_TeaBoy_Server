@@ -1,0 +1,5 @@
+name = "Prauda"
+version = '1.0'
+author = 'onigiri'
+fog = (100, 100,100)
+extensions = { 'water_damage' : 15 }
