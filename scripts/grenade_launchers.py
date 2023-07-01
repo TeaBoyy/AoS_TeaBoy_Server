@@ -228,6 +228,8 @@ def apply_script(protocol, connection, config):
             # Penetrate up to 2 blocks to get to the solid block
             extra_distance = 2
             while extra_distance:
+                extra_distance -= 1
+                
                 solid = self.protocol.map.get_solid(*position.get())
                 if solid or solid is None:
                     break
