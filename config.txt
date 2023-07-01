@@ -139,7 +139,8 @@
 		"daycycle",
 		"votenext",
         "medkit",
-        "allow_kill"
+        "allow_kill",
+		"log_player_count"
     ],
 
     "squad_respawn_time" : 32,
