@@ -140,7 +140,8 @@
 		"votenext",
         "medkit",
         "allow_kill",
-		"log_player_count"
+		"log_player_count",
+        "memcheck"
     ],
 
     "squad_respawn_time" : 32,
