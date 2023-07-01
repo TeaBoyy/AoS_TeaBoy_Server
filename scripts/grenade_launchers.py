@@ -228,16 +228,14 @@ def apply_script(protocol, connection, config):
 
             # Penetrate up to 2 blocks to get to the solid block
             extra_distance = 2
-            while extra_distance:
-                extra_distance -= 1
-                
+            for _ in range(extra_distance):
                 solid = self.protocol.map.get_solid(*position.get())
                 if solid or solid is None:
                     break
                     
                 position += velocity
             
-            # Expload a bit higher to not damage ground too much on indirect impact
+            # Explode a bit higher to not damage ground too much on indirect impact
             if position.z >= 1:
                 position.z -= 1
             
