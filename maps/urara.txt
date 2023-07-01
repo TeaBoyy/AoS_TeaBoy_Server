@@ -1,0 +1,5 @@
+name = "urara"
+version = '1.0'
+author = 'onigiri'
+fog = (178, 178, 178)
+
