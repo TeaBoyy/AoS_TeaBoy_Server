@@ -141,7 +141,8 @@
         "medkit",
         "allow_kill",
 		"log_player_count",
-        "memcheck"
+        "memcheck",
+        "build_height"
     ],
 
     "squad_respawn_time" : 32,

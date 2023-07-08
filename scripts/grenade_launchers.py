@@ -240,7 +240,7 @@ def apply_script(protocol, connection, config):
                 position.z -= 1
             
             connection.grenade_exploded(self, grenade)
-            
+        
     return protocol, GrenadeLaunchersConnection
     
        
