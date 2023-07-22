@@ -273,10 +273,10 @@ def apply_script(protocol, connection, config):
         
         def rollback_area(self, position):
             # Hardcoded size
-            size = 3 
+            size = 5 
             start_point = position.copy() 
-            start_point.x -= 1
-            start_point.y -= 1
+            start_point.x -= 2
+            start_point.y -= 2
 
             block_action = BlockAction()
             block_action.player_id = 31 
@@ -284,7 +284,7 @@ def apply_script(protocol, connection, config):
             set_color = SetColor()
             set_color.player_id = 31
 
-            for z in range(-1, size - 1):
+            for z in range(-2, size - 2):
                 for x in range(0, size):
                     for y in range(0, size):
                         current_restore_pos = start_point.copy()
