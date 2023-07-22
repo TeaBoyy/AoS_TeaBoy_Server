@@ -198,7 +198,7 @@ def apply_script(protocol, connection, config):
             if self.weapon is SMG_WEAPON:
                 multipler = 2.0
             else:
-                multipler = 2.3
+                multipler = 2.2
             
             velocity.x *= multipler
             velocity.y *= multipler
