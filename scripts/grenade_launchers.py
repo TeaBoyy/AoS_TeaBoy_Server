@@ -20,8 +20,6 @@ GUNS_INTERVALS = {
     SHOTGUN_WEAPON : 1.0
 }
 
-GRAYSCALE_ROLLBACK = True
-
 global G_RIFLE_LAUNCHER_DAMAGE
 G_RIFLE_LAUNCHER_DAMAGE=50.0
 
@@ -286,7 +284,7 @@ def apply_script(protocol, connection, config):
                             action = BUILD_BLOCK
                             new_color = self.protocol.original_map.get_color(current_restore_pos.x, current_restore_pos.y, current_restore_pos.z)
                             
-                            if GRAYSCALE_ROLLBACK:
+                            if config.get('nade_launcher_restore_blocks_grayscale', True):
                                 r, g, b = new_color
                                 r = g = b = ((r + g + b) / 2)
                                 new_color = (r, g, b)
