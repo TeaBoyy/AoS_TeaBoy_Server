@@ -1,22 +1,24 @@
 {
-    "name" : "Grenade Launchers | Classic Maps | Territorial Control",
+    "name" : "TeaBoy's Grenade Launchers",
     "motd" : [
         "Welcome to %(server_name)s",
         "Map: %(map_name)s by %(map_author)s",
         "Game mode: %(game_mode)s",
         "Your gun is now a GRENADE LAUNCHER with INFINITE ammo!",
-		"Use your grenade launcher to defeat the enemy and capture all objectives!",
-		"You cannot damage yourself or your teammates! Leverage this to dig huge caves!",
-		"Oh, and feel free to destroy everything on the map with SMG!",
-		"Performance note: this runs better on lower-end clients like Build&Shoot!",
-		"Note: this is an ealy proof of concept. Updates are planned for future!"
+		"Use your grenade launcher to CAPTURE ALL OBJECTIVES!",
+		"You cannot damage yourself or your teammates! Leverage this to DIG CAVES!",
+        "Performance note: this runs smoother on lower-end clients like Build&Shoot!"
     ],
     "help" : [
         "Server name: %(server_name)s",
         "Map: %(map_name)s by %(map_author)s",
         "Game mode: %(game_mode)s",
+        "Use your grenade launcher to CAPTURE ALL OBJECTIVES!",
+        "Press N (or M) to open the map! You can see the OBJECTIVES and TEAMMATES on it!",
+        "Commands (press T to start typing them):",
         "/ADMIN     Send a message to admins",
 		"/NEXT      Start a vote to advance to the next map",
+        "/M         Use medkit to heal yourself. Medkit is given once per spawn",
         "/VOTEKICK  Start a vote to temporarily ban a disruptive player",
         "/TIME      Remaining time until forced map reset",
 		"/STREAK    Shows how many kills in a row you got without dying"
