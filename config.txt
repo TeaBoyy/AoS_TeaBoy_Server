@@ -147,7 +147,8 @@
         "allow_kill",
 		"log_player_count",
         "memcheck",
-        "build_height"
+        "build_height",
+        "reloadconfig"
     ],
 
     "squad_respawn_time" : 32,
