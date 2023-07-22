@@ -248,7 +248,11 @@ def apply_script(protocol, connection, config):
             connection.grenade_exploded(self, grenade)
 
         def rollback_seed_exploded(self, grenade):
-            self.rollback_area(grenade.position)
+            try:
+                self.rollback_area(grenade.position)
+            except Exception:
+                print("Got some exception for rollback_seed_exploded")
+
             return False
         
         def rollback_area(self, position):
