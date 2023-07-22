@@ -208,7 +208,7 @@ def apply_script(protocol, connection, config):
             grenade_callback = self.nade_exploded
             if player.world_object.sneak:
                 if not config.get('nade_launcher_restore_blocks', False):
-                    connection.protocol.send_chat("Block restoration is temporarily turned off!")
+                    protocol.send_chat("Block restoration is temporarily turned off!")
                     return
                 grenade_callback = self.rollback_seed_exploded
                 
