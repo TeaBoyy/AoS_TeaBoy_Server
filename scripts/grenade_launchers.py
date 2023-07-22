@@ -284,7 +284,7 @@ def apply_script(protocol, connection, config):
             set_color = SetColor()
             set_color.player_id = 31
 
-            for z in range(-1, size + 1):
+            for z in range(-1, size - 1):
                 for x in range(0, size):
                     for y in range(0, size):
                         current_restore_pos = start_point.copy()
