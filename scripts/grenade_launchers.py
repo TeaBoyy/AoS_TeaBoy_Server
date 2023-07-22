@@ -249,11 +249,27 @@ def apply_script(protocol, connection, config):
 
         def rollback_seed_exploded(self, grenade):
             try:
+                self.penetrate_blocks(grenade)
                 self.rollback_area(grenade.position)
             except Exception:
                 print("Got some exception for rollback_seed_exploded")
 
             return False
+        
+        # TODO: use this for nade_exploded as well
+        def penetrate_blocks(self, grenade):
+            position, velocity = grenade.position, grenade.velocity
+            velocity.normalize()
+
+            # Penetrate up to 2 blocks to get to the solid block
+            extra_distance = 2
+            for _ in range(extra_distance):
+                solid = self.protocol.map.get_solid(*position.get())
+                if solid or solid is None:
+                    break
+                    
+                position += velocity
+            return 
         
         def rollback_area(self, position):
             # Hardcoded size
