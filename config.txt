@@ -8,7 +8,7 @@
 		"Use your grenade launcher to CAPTURE ALL OBJECTIVES!",
 		"You cannot damage yourself or your teammates! Leverage this to DIG CAVES!",
         "Performance note: this runs smoother on lower-end clients like Build&Shoot!",
-        "NEW: Hold V (sneak) and SHOOT to RESTORE BLOCKS BACK IN TIME!",
+        "NEW: Hold V (sneak) and SHOOT to RESTORE BLOCKS BACK IN TIME!"
     ],
     "help" : [
         "Server name: %(server_name)s",
