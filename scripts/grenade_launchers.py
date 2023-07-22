@@ -13,7 +13,6 @@ from pyspades.collision import distance_3d, distance_3d_vector
 from math import sin, floor
 from pyspades.contained import BlockAction, SetColor
 from pyspades.common import make_color
-import datetime
 
 GUNS_INTERVALS = {
     RIFLE_WEAPON : 0.5,
@@ -210,6 +209,9 @@ def apply_script(protocol, connection, config):
              
             grenade_callback = self.nade_exploded
             if player.world_object.sneak:
+                if not config.get('nade_launcher_restore_blocks', False):
+                    connection.protocol.send_chat("Block restoration is temporarily turned off!")
+                    return
                 grenade_callback = self.rollback_seed_exploded
                 
             grenade = protocol.world.create_object(Grenade, 0.0, position, None, velocity, grenade_callback)

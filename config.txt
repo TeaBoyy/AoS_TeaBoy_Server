@@ -158,5 +158,6 @@
     "afk_time_limit" : 10,
 	"spawn_protect_time" : 2,
     "medkits" : 1,
-    "medkit_heal_amount" : 40
+    "medkit_heal_amount" : 40,
+    "nade_launcher_restore_blocks" : true
 }
