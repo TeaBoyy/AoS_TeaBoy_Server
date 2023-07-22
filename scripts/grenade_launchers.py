@@ -11,7 +11,8 @@ from pyspades.server import orientation_data, grenade_packet
 from twisted.internet.task import LoopingCall
 from pyspades.collision import distance_3d, distance_3d_vector
 from math import sin, floor
-from pyspades.contained import BlockAction
+from pyspades.contained import BlockAction, SetColor
+from pyspades.common import make_color
 
 GUNS_INTERVALS = {
     RIFLE_WEAPON : 0.5,
@@ -204,9 +205,14 @@ def apply_script(protocol, connection, config):
             velocity.y *= multipler
             velocity.z *= multipler
              
-            grenade = protocol.world.create_object(Grenade, 0.0,
-                position, None, velocity, self.nade_exploded)
-            
+            grenade_callback = self.nade_exploded
+            if player.world_object.sneak:
+                if not config.get('nade_launcher_restore_blocks', False):
+                    protocol.send_chat("Block restoration is temporarily turned off!")
+                    return
+                grenade_callback = self.rollback_seed_exploded
+                
+            grenade = protocol.world.create_object(Grenade, 0.0, position, None, velocity, grenade_callback)
             grenade.name = 'rocket'
             
             # Figure out when grenade will land
@@ -240,7 +246,96 @@ def apply_script(protocol, connection, config):
                 position.z -= 1
             
             connection.grenade_exploded(self, grenade)
+
+        def rollback_seed_exploded(self, grenade):
+            try:
+                self.penetrate_blocks(grenade, 1)
+                self.rollback_area(grenade.position)
+            except Exception:
+                print("Got some exception for rollback_seed_exploded")
+
+            return False
         
-    return protocol, GrenadeLaunchersConnection
+        # TODO: use this for nade_exploded as well
+        def penetrate_blocks(self, grenade, depth = 2):
+            position, velocity = grenade.position, grenade.velocity
+            velocity.normalize()
+
+            # Penetrate up to 2 blocks to get to the solid block
+            extra_distance = depth
+            for _ in range(extra_distance):
+                solid = self.protocol.map.get_solid(*position.get())
+                if solid or solid is None:
+                    break
+                    
+                position += velocity
+            return 
+        
+        def rollback_area(self, position):
+            # Hardcoded size
+            size = 5 
+            start_point = position.copy() 
+            start_point.x -= 2
+            start_point.y -= 2
+
+            block_action = BlockAction()
+            block_action.player_id = 31 
+
+            set_color = SetColor()
+            set_color.player_id = 31
+
+            for z in range(-2, size - 2):
+                for x in range(0, size):
+                    for y in range(0, size):
+                        current_restore_pos = start_point.copy()
+                        current_restore_pos.z -= z
+                        current_restore_pos.x += x
+                        current_restore_pos.y += y
+
+                        cur_solid = self.protocol.map.get_solid(current_restore_pos.x, current_restore_pos.y, current_restore_pos.z)
+                        old_solid = self.protocol.original_map.get_solid(current_restore_pos.x, current_restore_pos.y, current_restore_pos.z)
+
+                        action = None
+
+                        if cur_solid and not old_solid:
+                            action = DESTROY_BLOCK
+                            self.protocol.map.remove_point(current_restore_pos.x, current_restore_pos.y, current_restore_pos.z)
+                        elif old_solid and not cur_solid:
+                            action = BUILD_BLOCK
+                            new_color = self.protocol.original_map.get_color(current_restore_pos.x, current_restore_pos.y, current_restore_pos.z)
+                            
+                            if config.get('nade_launcher_restore_blocks_grayscale', True):
+                                r, g, b = new_color
+                                r = g = b = ((r + g + b) / 2)
+                                new_color = (r, g, b)
+
+                            self.protocol.map.set_point(current_restore_pos.x, current_restore_pos.y, current_restore_pos.z, new_color)
+                            set_color.value = make_color(*new_color)
+                            self.protocol.send_contained(set_color, save = True)
+
+                        if action is not None:
+                            block_action.x = current_restore_pos.x
+                            block_action.y = current_restore_pos.y
+                            block_action.z = current_restore_pos.z
+                            block_action.value = action
+                            self.protocol.send_contained(block_action, save = True)
+
+            return
+        
+        def on_block_destroy(self, x, y, z, mode):
+            if mode is SPADE_DESTROY or mode is GRENADE_DESTROY:
+                return connection.on_block_destroy(self, x, y, z, mode) 
+                    
+            if self.bullet_loop.running:
+                return False
+
+            return connection.on_block_destroy(self, x, y, z, mode)
+        
+    class GrenadeSeedRollbackProtocol(protocol):
+        def on_map_change(self, map):
+            self.original_map = map.copy()
+            protocol.on_map_change(self, map)
+        
+    return GrenadeSeedRollbackProtocol, GrenadeLaunchersConnection
     
        
