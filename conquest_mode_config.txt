@@ -1,5 +1,5 @@
 {
-    "name" : "Conquest mode | Mines | Day cycle",
+    "name" : "Territory Control | Mines",
     "motd" : [
         "Welcome to %(server_name)s",
         "Map: %(map_name)s by %(map_author)s",
