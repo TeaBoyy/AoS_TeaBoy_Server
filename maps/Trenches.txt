@@ -1,0 +1,7 @@
+name = 'Trenches'
+author = 'Ki11aWi11'
+version = '1.1'
+description = 'Charge across No Mans Land to seize the enemies War Plans!'
+extensions = {
+     'babel' : True
+}
