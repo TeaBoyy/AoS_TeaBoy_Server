@@ -329,12 +329,7 @@ def apply_script(protocol, connection, config):
 						originalBlockColor = self.protocol.map.get_color(x, y, z)
 						setBlockColor(self, x, y, z, MINE_COLOR_DOCILE)
 						mineinfo = self.protocol.mine_info[(x, y, z)] = (self.name, self.team.id, self.player_id, False) # 4th arg: active
-						
-						print self.team.id
-						
-						print self.protocol.blue_team.id
-						print self.protocol.green_team.id
-						
+
 						def activateMine():
 							if (x, y, z) in self.protocol.mine_info.iterkeys():
 								if self.team is not None:
