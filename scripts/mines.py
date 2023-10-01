@@ -18,9 +18,9 @@ from pyspades.contained import BlockAction, SetColor
 
 from commands import name, add, admin, get_player, InvalidPlayer, alias
 
-MINE_COLOR_DOCILE = (0,255,0)
+MINE_COLOR_DOCILE = (255,0,0)
 MINE_COLOR_ACTIVE = [(0,0,255), #team 1 (blue)
-					 (255,0,0)] #team 2 (red)
+					 (0,255,0)] #team 2 (green)
 
 BABEL_PLATFORM_WIDTH  = 100
 BABEL_PLATFORM_HEIGHT = 32
