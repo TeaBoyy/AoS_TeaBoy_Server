@@ -82,6 +82,15 @@ def apply_script(protocol, connection, config):
                 if not config.get('snowflakes_enabled', True):
                     return protocol.on_map_change(self, map)
                 
+                # TODO: doesn't work for random maps like "classicgen #N"
+                current_map_name = self.map_info.name.lower()
+                exluded_map_names = config.get('snow_exclude_maps', [])
+                
+                for exluded_map_name in exluded_map_names:
+                    if current_map_name == exluded_map_name.lower():
+                        print("Skipping snowflakes generation for map: %s" % current_map_name)
+                        return protocol.on_map_change(self, map)
+
                 print("Generating snowflakes...")
                 start_time = time.time()
 
