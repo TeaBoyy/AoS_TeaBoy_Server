@@ -17,6 +17,7 @@
         "Use your grenade launcher to CAPTURE ALL OBJECTIVES!",
         "Press N (or M) to open the map! You can see the OBJECTIVES and TEAMMATES on it!",
         "Hint for OpenSpades: disable \"Camera Shake\" in \"Setup\" menu for better experience!",
+        "Watch out for reports of enemy attacks on objectives! They're displayed in chat!",
         "Commands (press T to start typing them):",
         "/ADMIN     Send a message to admins",
 		"/NEXT      Start a vote to advance to the next map",
@@ -27,7 +28,9 @@
     ],
     "tips" : [
         "Tip: Type /NEXT to start a vote to advance to the next map. Type /HELP for more info",
-        "Hint for OpenSpades: disable \"Camera Shake\" in \"Setup\" menu for better experience!"
+        "Hint for OpenSpades: disable \"Camera Shake\" in \"Setup\" menu for better experience!",
+        "Press N (or M) to open the MAP and locate enemy TENTS!",
+        "Watch out for reports of enemy attacks on objectives! They're displayed in chat!"
     ],
     "tip_frequency" : 5,
     "rules" : [

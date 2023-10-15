@@ -9,13 +9,15 @@
         "Server name: %(server_name)s",
         "Map: %(map_name)s by %(map_author)s",
         "Game mode: %(game_mode)s",
+        "Pick MINES from any TENT. Select GRENADE and do a RIGHT CLICK to place MINES!",
+        "Press N (or M) to open the MAP and locate enemy TENTS!",
+        "Watch out for reports of enemy attacks on objectives! They're displayed in chat!",
+        "Commands (press T to start typing them):",
         "/NEXT      Start a vote to advance to the next map",
         "/M         Use medkit to heal yourself. Medkit is given once per spawn",
         "/VOTEKICK  Start a vote to temporarily ban a disruptive player",
         "/TIME      Remaining time until forced map reset",
-        "/STREAK    Shows how many kills in a row you got without dying",
-        "Pick MINES from any TENT. Select GRENADE and do a RIGHT CLICK to place MINES!",
-        "Press N (or M) to open the MAP and locate enemy TENTS!"
+        "/STREAK    Shows how many kills in a row you got without dying"
     ],
     "tips" : [
         "You are playing %(game_mode)s on %(server_name)s",
