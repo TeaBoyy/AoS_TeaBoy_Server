@@ -147,7 +147,8 @@
         "log_player_count",
         "tc_mode_extension",
         "spawn_protect",
-        "mines"
+        "mines",
+        "snow"
     ],
 
     "squad_respawn_time" : 32,
