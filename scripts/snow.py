@@ -28,7 +28,7 @@ from pyspades.constants import *
 INITIAL_MAP_SNOW = True		#The map loads with a layer of snow already present.
 INITIAL_SNOW_AMOUNT = 1		#Number of blocks deep the initial snow is.
 FALL_DAMAGE_FACTOR = .25 	#If you land on snow, you take 1/4 normal fall damage.
-SNOW_MELT = True
+SNOW_MELT = False
 SNOW_MELT_DELAY = .75
 MAP_SIZE_X = 512
 MAP_SIZE_Y = 512
