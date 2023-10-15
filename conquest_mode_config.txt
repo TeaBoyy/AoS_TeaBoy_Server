@@ -145,6 +145,7 @@
         "medkit",
         "daycycle",
         "log_player_count",
+        "snowflakes",
         "tc_mode_extension",
         "spawn_protect",
         "mines",
@@ -161,5 +162,7 @@
     "medkits" : 1,
     "medkit_heal_amount" : 40,
     "mini_tc_scale_x" : 1.5,
-    "mini_tc_scale_y" : 1.75
+    "mini_tc_scale_y" : 1.75,
+    "snowflakes_amount" : 1500,
+    "snowflakes_height_start" : 35
 }
