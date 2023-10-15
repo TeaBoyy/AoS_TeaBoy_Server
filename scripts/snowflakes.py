@@ -1,15 +1,31 @@
 import random
 import time
 
-# TODO: resolve issue with tents/intels spawning on snowflakes. 
-# TODO: In case of custom gamemodes like tow, mini-tc can just change order
-# TODO: yet players spawning of flakes..welp, gotta check in script itself, but order matters i think
+"""
+Generares snowflakes in the sky.
+Points are generated randomly.
+
+Config parameters:
+1. snowflakes_amount (default=1500) -> total amount of snowflakes on map.
+2. snowflakes_height_start (default=35) -> height starting from which snowflakes begin to appear.
+
+Compatibility note: make sure to apply this script AFTER snow generation (with snow.py).
+Generally, do this after any other terrain modifications in on_map_change() (so that other code doesn't add stuff on top of snowflakes).
+
+Known issues:
+1. Tents (and probably intels) can spawn on top of snowflakes. The higer the density, the higher propability of this happening.
+2. Players can spawn on snowflakes as well. 
+
+Ideas:
+1. Apply snow and snowflakes randomly, not on every map change.
+2. Allow to dynamically change snowflakes color (via config change + reloadconfig.py).
+3. Consider adding some gradient for color, though white color might be the best.
+4. Optimization - takes 80ms for only 1500 snowflakes to generate, maybe use some noise algorithm instead of just random points.
+"""
 
 # TODO: add ability to turn on/off
 # TODO: add ability to exclude, or include maps
-# TODO: add option for random map picking from included maps (yet with reasonable probability)
 
-# TODO: read snow color from config
 SNOW_COLOR = (240, 240, 240)
 
 SNOWFLAKE_DIST_TO_SURFACE = 25
