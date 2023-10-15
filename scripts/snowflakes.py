@@ -80,7 +80,7 @@ def apply_script(protocol, connection, config):
         def is_valid_map_for_snow(self):
             # TODO: doesn't work for random maps like "classicgen #N"
             current_map_name = self.map_info.name.lower()
-            exluded_map_names = config.get('snow_exclude_maps', [])
+            exluded_map_names = config.get('snowflakes_exclude_maps', [])
             
             for exluded_map_name in exluded_map_names:
                 if current_map_name == exluded_map_name.lower():
