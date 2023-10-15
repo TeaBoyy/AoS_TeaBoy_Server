@@ -79,7 +79,7 @@ def apply_script(protocol, connection, config):
 
         def on_map_change(self, map):
             try:
-                if not config.get('snowflakes_enabled', True):
+                if not config.get('snow_enabled', True):
                     return protocol.on_map_change(self, map)
                 
                 # TODO: doesn't work for random maps like "classicgen #N"

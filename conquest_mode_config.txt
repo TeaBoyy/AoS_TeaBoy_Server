@@ -165,6 +165,6 @@
     "mini_tc_scale_y" : 1.75,
     "snowflakes_amount" : 1500,
     "snowflakes_height_start" : 35,
-    "snowflakes_enabled" : true,
+    "snow_enabled" : true,
     "snow_exclude_maps" : ["scandinavia", "Prauda"]
 }
