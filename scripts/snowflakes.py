@@ -23,8 +23,6 @@ Ideas:
 4. Optimization - takes 80ms for only 1500 snowflakes to generate, maybe use some noise algorithm instead of just random points.
 """
 
-# TODO: add ability to exclude, or include maps
-
 SNOW_COLOR = (240, 240, 240)
 
 SNOWFLAKE_DIST_TO_SURFACE = 25
