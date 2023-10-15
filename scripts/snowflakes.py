@@ -23,7 +23,6 @@ Ideas:
 4. Optimization - takes 80ms for only 1500 snowflakes to generate, maybe use some noise algorithm instead of just random points.
 """
 
-# TODO: add ability to turn on/off
 # TODO: add ability to exclude, or include maps
 
 SNOW_COLOR = (240, 240, 240)
@@ -80,6 +79,9 @@ def apply_script(protocol, connection, config):
 
         def on_map_change(self, map):
             try:
+                if not config.get('snowflakes_enabled', True):
+                    return protocol.on_map_change(self, map)
+                
                 print("Generating snowflakes...")
                 start_time = time.time()
 

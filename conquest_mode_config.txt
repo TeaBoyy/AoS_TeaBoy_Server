@@ -164,5 +164,6 @@
     "mini_tc_scale_x" : 1.5,
     "mini_tc_scale_y" : 1.75,
     "snowflakes_amount" : 1500,
-    "snowflakes_height_start" : 35
+    "snowflakes_height_start" : 35,
+    "snowflakes_enabled" : true
 }
