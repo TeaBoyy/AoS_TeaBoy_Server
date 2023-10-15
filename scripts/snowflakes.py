@@ -77,7 +77,7 @@ def apply_script(protocol, connection, config):
             for x, y, z in valid_points:
                 map.set_point(x, y, z, SNOW_COLOR)
 
-        def is_valid_map_for_snow(self):
+        def is_valid_map_for_snowflakes(self):
             # TODO: doesn't work for random maps like "classicgen #N"
             current_map_name = self.map_info.name.lower()
             exluded_map_names = config.get('snowflakes_exclude_maps', [])
@@ -88,18 +88,18 @@ def apply_script(protocol, connection, config):
                 
             return True
         
-        def is_snow_allowed(self):
+        def is_snowflakes_allowed(self):
             if not config.get('snow_enabled', True):
                 return False
-            
-            if not self.is_valid_map_for_snow():
+
+            if not self.is_valid_map_for_snowflakes():
                 return False
 
             return True
 
         def on_map_change(self, map):
             try:
-                if not self.is_snow_allowed():
+                if not self.is_snowflakes_allowed():
                     return protocol.on_map_change(self, map)
 
                 print("Generating snowflakes...")
