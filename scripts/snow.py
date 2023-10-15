@@ -95,6 +95,10 @@ def apply_script(protocol, connection, config):
 		position_offset = [(-.5 * BODY_WIDTH), (.5 * BODY_WIDTH)]
 		
 		def on_map_change(self, map):
+			# Custom changes to original script
+			if not self.is_snow_allowed():
+				return protocol.on_map_change(self, map)
+	
 			self.snowmeltgenerator = False
 			if INITIAL_MAP_SNOW == True:
 				self.snow_list = [False] * (MAP_SIZE_X * MAP_SIZE_Y * MAP_SIZE_Z)
@@ -147,6 +151,28 @@ def apply_script(protocol, connection, config):
 			block_action.value = DESTROY_BLOCK
 			self.send_contained(block_action, True)
 			self.map.destroy_point(x, y, z)
+
+		# Custom changes to original script
+		def is_valid_map_for_snow(self):
+			# TODO: doesn't work for random maps like "classicgen #N"
+			current_map_name = self.map_info.name.lower()
+			exluded_map_names = config.get('snow_exclude_maps', [])
+			
+			for exluded_map_name in exluded_map_names:
+				if current_map_name == exluded_map_name.lower():
+					return False
+				
+			return True
+		
+		# Custom changes to original script
+		def is_snow_allowed(self):
+			if not config.get('snow_enabled', True):
+				return False
+			
+			if not self.is_valid_map_for_snow():
+				return False
+
+			return True
 			
 	return snowProtocol, snowConnection
 
