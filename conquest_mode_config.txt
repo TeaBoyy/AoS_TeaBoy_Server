@@ -147,7 +147,9 @@
         "log_player_count",
         "tc_mode_extension",
         "spawn_protect",
-        "mines"
+        "mines",
+        "snowflakes",
+        "snow"
     ],
 
     "squad_respawn_time" : 32,
@@ -160,5 +162,10 @@
     "medkits" : 1,
     "medkit_heal_amount" : 40,
     "mini_tc_scale_x" : 1.5,
-    "mini_tc_scale_y" : 1.75
+    "mini_tc_scale_y" : 1.75,
+    "snowflakes_amount" : 1500,
+    "snowflakes_height_start" : 35,
+    "snow_enabled" : true,
+    "snow_exclude_maps" : ["scandinavia", "Prauda"],
+    "snowflakes_exclude_maps" : []
 }
