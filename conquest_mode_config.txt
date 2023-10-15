@@ -145,10 +145,10 @@
         "medkit",
         "daycycle",
         "log_player_count",
-        "snowflakes",
         "tc_mode_extension",
         "spawn_protect",
         "mines",
+        "snowflakes",
         "snow"
     ],
 
