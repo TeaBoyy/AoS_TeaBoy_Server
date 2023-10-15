@@ -24,20 +24,24 @@ Ideas:
 """
 
 SNOW_COLOR = (240, 240, 240)
-
 SNOWFLAKE_DIST_TO_SURFACE = 25
 
 def get_snowflake_points(snowflakes_amount, snowflakes_height_start):
-    # TODO: more range checks
-    # TODO: optimization?
+    x_range = (0, 511)
+    y_range = (0, 511)
 
-    xrange = (0, 511)
-    yrange = (0, 511)
-    zrange = (0, min(snowflakes_height_start, 60))
+    start_z = 0
+    end_z = max(0, min(snowflakes_height_start, 60))
+
+    if start_z >= end_z:
+        start_z = 0
+        end_z = 1
+
+    z_range = (start_z, end_z)
 
     points = []
 
-    [ points.append((random.uniform(*xrange), random.uniform(*yrange), random.uniform(*zrange))) for i in range(snowflakes_amount) ]
+    [ points.append((random.uniform(*x_range), random.uniform(*y_range), random.uniform(*z_range))) for i in range(snowflakes_amount) ]
 
     return points
 
