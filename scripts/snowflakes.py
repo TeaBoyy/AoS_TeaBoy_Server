@@ -46,25 +46,28 @@ def is_valid_snowflake_point(map, x, y, z):
 
 def apply_script(protocol, connection, config):
     class SnowflakesProtocol(protocol):
+        def generate_snowflakes_on_map(self, map):
+            snowflakes_amount = config.get('snowflakes_amount', 1500)
+            snowflakes_height_start = config.get('snowflakes_height_start', 35)
+
+            points = get_snowflake_points(snowflakes_amount, snowflakes_height_start)
+
+            # Check collisions with map before adding snowflakes
+            valid_points = []
+            for x, y, z in points:
+                if is_valid_snowflake_point(map, x, y, z):
+                    valid_points.append((x, y, z))
+                
+            # Spawn snowflakes on map
+            for x, y, z in valid_points:
+                map.set_point(x, y, z, SNOW_COLOR)
+
         def on_map_change(self, map):
             try:
-                snowflakes_amount = config.get('snowflakes_amount', 1500)
-                snowflakes_height_start = config.get('snowflakes_height_start', 35)
-
-                print("Generating %i snowflakes..." % snowflakes_amount)
+                print("Generating snowflakes...")
                 start_time = time.time()
 
-                points = get_snowflake_points(snowflakes_amount, snowflakes_height_start)
-
-                # Check collisions with map before adding snowflakes
-                valid_points = []
-                for x, y, z in points:
-                    if is_valid_snowflake_point(map, x, y, z):
-                        valid_points.append((x, y, z))
-                    
-                # Spawn snowflakes on map
-                for x, y, z in valid_points:
-                    map.set_point(x, y, z, SNOW_COLOR)
+                self.generate_snowflakes_on_map(map)
 
                 elapsed_time_ms = (time.time() - start_time) * 1000.0
                 print("Done Generating snowflakes in: %s ms" % elapsed_time_ms)
