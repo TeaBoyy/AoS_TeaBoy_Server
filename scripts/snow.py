@@ -55,22 +55,25 @@ def apply_script(protocol, connection, config):
 	class snowConnection(connection):	
 	
 		def on_block_removed(self, x, y, z):
-			self.protocol.snow_list[hash(x, y, z)] = False
+			if self.protocol.snow_list:
+				self.protocol.snow_list[hash(x, y, z)] = False
 			return connection.on_block_removed(self, x, y, z)
 			
 		def on_block_build(self, x, y, z):
-			if self.name != None:
+			if self.name != None and self.protocol.snow_list:
 				self.protocol.snow_list[hash(x, y, z)] = False
 	
 		def on_line_build(self, points):
-			if self.name != None:
+			if self.name != None and self.protocol.snow_list:
 				for point in points:
 					x, y, z = point[0], point[1], point[2]
 					self.protocol.snow_list[hash(x, y, z)] = False
 		
 		def on_fall(self, damage):
 			value = connection.on_fall(self, damage)
-			print value, damage
+			if not self.protocol.snow_list:
+				return value
+
 			if value == False:
 				return False
 			position = self.world_object.position
