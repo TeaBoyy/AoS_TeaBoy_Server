@@ -40,7 +40,7 @@
     "cap_limit" : 10,
     "default_time_limit" : 180,
     "advance_on_win" : true,
-    "maps" : ["classicgen", "hiesville", "urara", "scandinavia", "trenches", "Prauda", "burbs", "mesa", "normandie"],
+    "maps" : ["classicgen", "hiesville", "urara", "scandinavia", "trenches", "burbs", "mesa", "normandie"],
     "random_rotation" : false,
 
     "respawn_time" : 16,
