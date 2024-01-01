@@ -895,6 +895,8 @@ try:
             tamakazu=30
             reload_wait=0
 
+            # TODO: crutch to at least run
+            local = False
             def _get_turn_speed(self):
                 return self._turn_speed
             def _set_turn_speed(self, value):
@@ -3333,7 +3335,8 @@ try:
             
             def on_connect(self):
                 if self.local:
-                    return connection.on_connect(self)
+                    return
+                    #return connection.on_connect(self)
                 callLater(0.1,self.protocol.bot_num_adjust,True)
                 protocol = self.protocol
                 if len(protocol.connections) + len(protocol.bots) > 32:
