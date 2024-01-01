@@ -49,6 +49,11 @@ from pyspades.protocol import BaseConnection
 from pyspades.world import Grenade
 from twisted.internet.reactor import callLater, seconds
 
+@name('testme')
+def test_me(connection, amount=None, team=None):
+    print("testme")
+    return
+
 try:
 
     BOT_IN_BOTH     = True	   
@@ -68,7 +73,7 @@ try:
 
     DEBUG_VIRTUAL_HIT=False 
 
-    AI_mode = 0
+    AI_mode = 8
 
     # 0: TOW
     # 1: TDM
@@ -89,6 +94,10 @@ try:
 
     ### vvvv DO NOT CHANGE HERE vvvv ###
     TOWmode = False
+
+    # TODO:
+    TCmode = False
+
     TDMmode = False
     ARENAmode = False
     VSBOTmode = False
@@ -123,6 +132,8 @@ try:
         DOMINE_FULLmode = True
     elif AI_mode==7:
         KABADI_mode=True
+    elif AI_mode==8:
+        TCmode = True
 
     ARENA_JUNKAI_SECT = 7
 
@@ -142,6 +153,7 @@ try:
 
     @name('addbot')
     def add_bot(connection, amount=None, team=None):
+        print("adding bot")
         protocol = connection.protocol
         if team:
             bot_team = get_team(connection, team)
@@ -897,6 +909,58 @@ try:
 
             # TODO: crutch to at least run
             local = False
+
+            # TODO: test
+            stored_entity_target = None
+
+            # TODO: test
+            def get_random_enemy_tent(self):
+                #print("test_update"
+
+                tgt_entity = None
+
+                if (self.stored_entity_target is None) or (self.stored_entity_target.team == self.team):
+                    try:
+                        tgt_entity = random.choice(list(self.team.other.get_entities()))
+                        print("tgt_entity.team: , self.team: ", tgt_entity.team.id, self.team.id)
+                    except IndexError:
+                        pass
+                else:
+                    tgt_entity = self.stored_entity_target
+
+                dist = 99999
+                found_entity = None
+                for entity in self.protocol.entities:
+                    if entity.capturing_team == self.team.other:
+                        d = self.distance_calc(entity.get(),self.world_object.position.get())
+                        if d < dist:
+                            found_entity=entity
+                            dist=d
+
+                if found_entity is not None and tgt_entity is not None:
+                    dA = self.distance_calc(found_entity.get(),self.world_object.position.get())
+                    dB = self.distance_calc(tgt_entity.get(),self.world_object.position.get())
+
+                    if dA < dB:
+                        tgt_entity = found_entity
+                    else:
+                        tgt_entity = tgt_entity
+
+                for entity in self.protocol.entities:
+                    if entity.capturing_team == self.team.other:
+                        tgt_entity = entity
+                
+                if tgt_entity is not None:
+                    #print("Found base")
+                    #base = random.choice(list(self.team.other.get_entities()))
+                    #tgt_entity = base
+                    self.assigned_position = tgt_entity
+                    self.stored_entity_target = tgt_entity
+                    #base.get_spawn_location()
+                    self.enitity_add_remove(tgt_entity)
+                else:
+                    print("tgt_entity is none")
+
             def _get_turn_speed(self):
                 return self._turn_speed
             def _set_turn_speed(self, value):
@@ -1336,6 +1400,16 @@ try:
                         tgt_entity = self.protocol.entities[n-1]
                         self.assigned_position = self.protocol.entities[n-1]
                     self.enitity_add_remove(tgt_entity)
+
+                # TODO: test
+                elif TCmode:
+                    #print("test_update")
+                    #if (self.stored_entity_target is None) or (self.stored_entity_target.team == self.team):
+                        #print("Preparing new target")
+                        self.get_random_enemy_tent()
+                    #else:
+                        #print("No target change")
+
 
                 elif DOMINE_FULLmode:
                     dist = 9999
