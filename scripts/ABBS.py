@@ -14,8 +14,9 @@ from pyspades.world import Grenade
 from pyspades.common import coordinates, to_coordinates, Vertex3
 from pyspades.collision import vector_collision
 from pyspades.constants import *
-from piqueserver.commands import admin, add, name, get_team, alias, get_player
-from piqueserver.commands import command
+#from piqueserver.commands import admin, add, name, get_team, alias, get_player
+from commands import add, admin, get_player, name
+#from pyspades import *
 from copy import copy
 from pyspades import contained as loaders
 from pyspades.packet import load_client_packet
@@ -31,7 +32,7 @@ LOGIC_FPS = 4.0
 from math import cos, sin
 
 from enet import Address
-from piqueserver.commands import command, get_team
+#from piqueserver.commands import command, get_team
 from pyspades.collision import vector_collision
 from pyspades.common import Vertex3
 from pyspades.constants import (
@@ -139,7 +140,7 @@ try:
 
 
 
-    @command("addbot")
+    @name('addbot')
     def add_bot(connection, amount=None, team=None):
         protocol = connection.protocol
         if team:
@@ -154,35 +155,35 @@ try:
                 return "Added %s bot(s)" % i
         return "Added %s bot(s)" % amount
 
-    @command('botmute')		#BOTmute
+    @name('botmute')		#BOTmute
     def botmute(connection):
         global BOTMUTE
         BOTMUTE = not BOTMUTE
         return "BOTMUTE %s" % BOTMUTE
 
 
-    @command('addmode')		#BOT_ADD_PATTERN
+    @name('addmode')		#BOT_ADD_PATTERN
     def addmode(connection, num):
         global BOT_ADD_PATTERN
         BOT_ADD_PATTERN = int(num)
         return "BOT_ADD_PATTERN %s" % BOT_ADD_PATTERN
 
 
-    @command('botnum')		#BOT_ADD_NUM
+    @name('botnum')		#BOT_ADD_NUM
     def botnum(connection, num):
         global BOT_ADD_NUM
         BOT_ADD_NUM = int(num)
         return "BOT_ADD_NUM %s" % BOT_ADD_NUM
 
 
-    @command('stg')		#stage level
+    @name('stg')		#stage level
     def stage_select(connection,value):
         connection.protocol.stage_level = int(value)
         connection.protocol.send_chat("stage selected : STAGE %d"%connection.protocol.stage_level)
         connection.protocol.stage_level-=1
 
 
-    @command('toggleai')	#BOT
+    @name('toggleai')	#BOT
     def toggle_ai(connection):
         protocol = connection.protocol
         protocol.ai_enabled = not protocol.ai_enabled
@@ -194,7 +195,7 @@ try:
         protocol.irc_say('* %s %s AI' % (connection.name, state))
         
 
-    @command('cpulv')		#CPUlevel
+    @name('cpulv')		#CPUlevel
     def cpulv(connection,mean=-1,pm=5):
         if mean<0:
             cpulv=connection.protocol.teamcpulv
@@ -210,7 +211,7 @@ try:
         else:
             return "error (Lv should be set in 1-99)"
 
-    @command('lv')		#CPUlevel check
+    @name('lv')		#CPUlevel check
     def lv(connection,player=None):
         protocol = connection.protocol
         if player == "all":
@@ -220,7 +221,7 @@ try:
                 contained.chat_type = [CHAT_TEAM, CHAT_ALL][int(global_message)]
                 contained.value = "Lv.%d"%int(bot.cpulevel*100)
                 contained.player_id = bot.player_id
-                callLater(bot.player_id/1.5,bot.protocol.broadcast_contained,contained)
+                callLater(bot.player_id/1.5,bot.protocol.send_contained,contained)
             return
         if player is not None:
             player = get_player(protocol, player)
@@ -232,7 +233,7 @@ try:
             return "player '%s' is not BOT"%player.name
 
 
-    @command('lvset')		#CPUlevel check
+    @name('lvset')		#CPUlevel check
     def lvset(connection,player=None, value=None):
         if value == None:
             return "error"
@@ -250,7 +251,7 @@ try:
 
 
 
-    @command('allref')		#all bot dissconect and enter again
+    @name('allref')		#all bot dissconect and enter again
     def allreflesh(connection):
         for botn in connection.protocol.players.values():
             if botn.local:
@@ -258,35 +259,35 @@ try:
         callLater(0.1,connection.protocol.add_bot, botn.team)
         return "all bot refleshed"
 
-    @command('ksk')			#arena kasoku
+    @name('ksk')			#arena kasoku
     def ksk(connection):
         connection.protocol.arena_kasoku = not connection.protocol.arena_kasoku 
         return "kasoku mode %s"%connection.protocol.arena_kasoku
 
-    @command('ksk2')			#arena kasoku
+    @name('ksk2')			#arena kasoku
     def ksk2(connection):
         connection.protocol.ksk2 = not connection.protocol.arena_kasoku 
         return "kasoku2 mode %s"%connection.protocol.arena_kasoku
 
 
-    @command('debughit')		#DEBUG_VIRTUAL_HIT
+    @name('debughit')		#DEBUG_VIRTUAL_HIT
     def debughit(connection):
         global DEBUG_VIRTUAL_HIT
         DEBUG_VIRTUAL_HIT = not DEBUG_VIRTUAL_HIT
         return "DEBUG_VIRTUAL_HIT %s" % DEBUG_VIRTUAL_HIT
-    # @command("debughit")
-    # @command("ksk")
-    # @command("ksk2")
-    # @command("allreflesh")
-    # @command("add_bot")
-    # @command("toggle_ai")
-    # @command("botmute")
-    # @command("addmode")
-    # @command("stage_select")
-    # @command("botnum")
-    # @command("cpulv")
-    # @command("lv")
-    # @command(lvset)
+    # @name("debughit")
+    # @name("ksk")
+    # @name("ksk2")
+    # @name("allreflesh")
+    # @name("add_bot")
+    # @name("toggle_ai")
+    # @name("botmute")
+    # @name("addmode")
+    # @name("stage_select")
+    # @name("botnum")
+    # @name("cpulv")
+    # @name("lv")
+    # @name(lvset)
 
     LINE_COLOR_MAIN=(255,0,0)
     LINE_COLOR_SUB=(255,255,0)
@@ -1942,7 +1943,7 @@ try:
                     grenade_packet.player_id = self.player_id
                     grenade_packet.position = pos.get()
                     grenade_packet.velocity = velo.get()
-                    self.protocol.broadcast_contained(grenade_packet)
+                    self.protocol.send_contained(grenade_packet)
                     self.grenades-=1
                 self.grenade_keep=0
                 if self.tool == GRENADE_TOOL:
@@ -2759,7 +2760,7 @@ try:
                     block_action.x = x
                     block_action.y = y
                     block_action.z = z
-                    self.protocol.broadcast_contained(block_action)
+                    self.protocol.send_contained(block_action)
                     self.protocol.map.remove_point(x, y, z)
 
             def flush_input(self):
@@ -2796,7 +2797,7 @@ try:
                             input_data.crouch = world_object.crouch
                             input_data.sneak = world_object.sneak
                             input_data.sprint = world_object.sprint
-                            self.protocol.broadcast_contained(input_data)
+                            self.protocol.send_contained(input_data)
                     primary = 'primary_fire' in input
                     secondary = 'secondary_fire' in input
                     shoot_changed = not (
@@ -2815,7 +2816,7 @@ try:
                             weapon_input.player_id = self.player_id
                             weapon_input.primary = primary
                             weapon_input.secondary = secondary
-                            self.protocol.broadcast_contained(weapon_input)
+                            self.protocol.send_contained(weapon_input)
                     input.clear()
 
             def set_tool(self, tool):
@@ -2832,7 +2833,7 @@ try:
                 set_tool = SetTool()
                 set_tool.player_id = self.player_id
                 set_tool.value = self.tool
-                self.protocol.broadcast_contained(set_tool)
+                self.protocol.send_contained(set_tool)
             
             def bot_set_color(self, color):
                 if self.on_color_set_attempt(color) == False:
@@ -2842,7 +2843,7 @@ try:
                 set_color = SetColor()			
                 set_color.value = make_color(*color)
                 set_color.player_id = self.player_id
-                self.protocol.broadcast_contained(set_color, sender = self, save = True)
+                self.protocol.send_contained(set_color, sender = self, save = True)
 
             def bot_reload(self):
                 if self.tool == WEAPON_TOOL and seconds() > self.reloadfin:
@@ -2862,7 +2863,7 @@ try:
                         weapon_reload.player_id = self.player_id
                         weapon_reload.clip_ammo = self.weapon_object.current_ammo
                         weapon_reload.reserve_ammo = self.weapon_object.current_stock
-                        self.protocol.broadcast_contained(weapon_reload)
+                        self.protocol.send_contained(weapon_reload)
                         self.tamakazu=magsize
                         self.reloadfin=seconds()+rtime
             
@@ -3172,7 +3173,7 @@ try:
                     block_action.z = z
                     block_action.value = value
                     block_action.player_id = self.player_id
-                    self.protocol.broadcast_contained(block_action, save = True)
+                    self.protocol.send_contained(block_action, save = True)
                     self.protocol.update_entities()
             
             def on_hit(self, damage, hitplayer, type, grenade):
@@ -3429,7 +3430,7 @@ try:
                         contained.chat_type = [CHAT_TEAM, CHAT_ALL][int(global_message)]
                         contained.value = message
                         contained.player_id = self.player_id
-                        self.protocol.broadcast_contained(contained)
+                        self.protocol.send_contained(contained)
                         self.on_chat(message, global_message)
 
             def on_disconnect(self):
