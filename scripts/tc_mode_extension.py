@@ -62,7 +62,7 @@ def apply_script(protocol, connection, config):
             scale_y = config.get('mini_tc_scale_y', 1.5)
 
             # TODO:
-            scale_x = 2
+            scale_x = 1.25
             scale_y = 100
 
             # Shift by a half of total area outside of battlefield
@@ -81,6 +81,9 @@ def apply_script(protocol, connection, config):
             territory_count = int((land_count/(512.0 * 512.0))*(
                 MAX_TERRITORY_COUNT-MIN_TERRITORY_COUNT) + MIN_TERRITORY_COUNT)
             
+            # TODO: test
+            territory_count = 12
+
             j = 512.0 / territory_count
 
             # Scale down distance between entities on X-axis
@@ -88,6 +91,7 @@ def apply_script(protocol, connection, config):
                 j /= scale_x
 
             count = 0
+            row_count = 0
             for i in range(territory_count):
                 x1 = i * j
                 y1 = 512 / 4
@@ -119,9 +123,16 @@ def apply_script(protocol, connection, config):
                     y1 += 128
                     y2 += 128
 
+                y1 += row_count * 16
+                y2 += row_count * 16
+
                 count+=1
                 if count >= 3:
+                    row_count+=1
                     count = 0
+
+                if row_count >= 2:
+                    row_count = 0
 
                 flag = TCExtensionTerritory(i, self, *self.get_random_location(
                     zone = (x1, y1, x2, y2)))
