@@ -61,6 +61,10 @@ def apply_script(protocol, connection, config):
             scale_x = config.get('mini_tc_scale_x', 1.5)
             scale_y = config.get('mini_tc_scale_y', 1.5)
 
+            """ # TODO:
+            scale_x = 2
+            scale_y = 100 """
+
             # Shift by a half of total area outside of battlefield
             offset_x = (512.0 - (512.0 / scale_x)) / 2
             
@@ -83,6 +87,7 @@ def apply_script(protocol, connection, config):
             if scale_x > 1.0:
                 j /= scale_x
 
+            count = 0
             for i in range(territory_count):
                 x1 = i * j
                 y1 = 512 / 4
@@ -94,6 +99,29 @@ def apply_script(protocol, connection, config):
                 x2 += offset_x
                 y1 += offset_y
                 y2 -= offset_y
+
+                """ # TODO:
+                offset_gray = 32
+                if i < territory_count / 2:
+                    x1 -= offset_gray
+                    x2 -= offset_gray
+                elif i > (territory_count-1) / 2:
+                    x1 += offset_gray
+                    x2 += offset_gray
+
+                if count == 0:
+                    y1 -= 128
+                    y2 -= 128
+                elif count == 1:
+                    y1 -= 0
+                    y2 -= 0
+                else:
+                    y1 += 128
+                    y2 += 128
+
+                count+=1
+                if count >= 3:
+                    count = 0 """
 
                 flag = TCExtensionTerritory(i, self, *self.get_random_location(
                     zone = (x1, y1, x2, y2)))
