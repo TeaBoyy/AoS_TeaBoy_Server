@@ -357,6 +357,8 @@ try:
                 entities = list(self.entities)
                 print("len(entities): ", len(entities))
 
+                self.green_home_bases = []
+                self.blue_home_bases = []
                 for entity in entities:
                     if entity.team == self.green_team:
                         print("Found green home")
