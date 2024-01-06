@@ -2166,7 +2166,21 @@ try:
                         newxy = cos(radians(phi))
                         newx = cos(radians(theta))*newxy
                         newy = sin(radians(theta))*newxy
-                        self.target_orientation =Vertex3(newx,newy,newz)#���Z��p�x����
+
+                        # TODO: this is a test for nade launchers to aim higer based on distance
+                        test_up_z = 0
+                        offset = 0.002
+                        if distance_to_aim > 20:
+                            test_up_z = distance_to_aim * offset
+                        elif distance_to_aim > 5:
+                            test_up_z = distance_to_aim * -offset/2
+                        else:
+                            test_up_z = -0.35
+
+                        if (newz - test_up_z) <= -1 or (newz - test_up_z) >= 1:
+                            test_up_z = 0
+
+                        self.target_orientation =Vertex3(newx,newy,newz - test_up_z)#���Z��p�x����
                         diff = ori - self.target_orientation #����p�ƖڕW�p�̍���
                         diff.z = 0.0
                         diff = diff.length_sqr()
