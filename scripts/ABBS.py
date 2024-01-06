@@ -2604,14 +2604,15 @@ try:
                                     if not self.protocol.building:
                                         self.has_arena_tgt = False
                                         self.stucking=seconds()
-                                    else:
+                                    # TODO: try prevent from digging at all to avoid weird tunnels
+                                    """ else:
                                         spade_using = True
                                         if self.tool != SPADE_TOOL:
                                             set_tool = SetTool()
                                             self.set_tool(SPADE_TOOL)
                                             self.toolchangetime = seconds()	
                                         if seconds() - self.toolchangetime>0.5 and self.tool == SPADE_TOOL:	
-                                            digging = self.spadeing()
+                                            digging = self.spadeing() """
                                 self.jisatu+=1
                                 if self.jisatu>1000:
                                     self.kill()
