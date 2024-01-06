@@ -346,6 +346,25 @@ try:
             bot_level_adjust=[0,0]
             bot_level_average_change=0
         
+            # TODO:
+            green_home_bases = []
+            blue_home_bases = []
+
+            def reset_tc(self):
+                protocol.reset_tc(self)
+                # TODO:
+                # TODO: also if neutral, then how to prioritize?
+                entities = list(self.entities)
+                print("len(entities): ", len(entities))
+
+                for entity in entities:
+                    if entity.team == self.green_team:
+                        print("Found green home")
+                        self.green_home_bases.append(entity)
+                    elif entity.team == self.blue_team:
+                        print("Found blue home")
+                        self.blue_home_bases.append(entity)
+
             def kasoku(self):
                 if ARENAmode:
                     human_alive=False
@@ -1291,6 +1310,61 @@ try:
                         self.assigned_position = None
                         entity.add_player(self)
 
+            def select_targets(self):
+                # TODO: prioritizing taking what's capturing team not theirs doesn't seem to work too well
+                # TODO: they just loose anyway, maybe they want to go too far, or keep chacning direction
+                # TODO: looks like its sometimes better to expand from what u have, rather than try to retake what's too far
+                # TODO: but maybe keeping home bases would work better idk
+
+                # TODO: defender mode
+                dist = 9999
+                tgt_entity=None
+                
+                home_bases = None
+                if self.team == self.protocol.green_team:
+                    home_bases = self.protocol.green_home_bases
+                else:
+                    home_bases = self.protocol.blue_home_bases
+
+                #print("Home entity count: ", len(home_bases))
+
+                for entity in home_bases:
+                #for entity in self.protocol.entities:
+                    #print("entity.team: ", entity.team, "self.team: ", self.team)
+
+                    if entity.team != self.team or entity.capturing_team == self.team.other:
+                    #if entity.capturing_team == self.team.other:
+                        #print("Trying")
+                        d = self.distance_calc(entity.get(),self.world_object.position.get())
+                        if d < dist:
+                            #print("Found one")
+                            tgt_entity=entity
+                            dist=d
+                if tgt_entity != None:
+                    #print ("Defender point set: ", tgt_entity.get(),self.world_object.position.get())
+                    self.assigned_position = tgt_entity
+                    self.enitity_add_remove(tgt_entity)
+                    return
+                #else:
+                    #print("Nothing to defend")
+                #return
+                
+                # TODO: attacker mode
+                dist = 9999
+                tgt_entity=None
+                for entity in self.protocol.entities:
+                    if entity.team != self.team or entity.capturing_team == self.team.other:
+                    #if entity.team != self.team:
+                        d = self.distance_calc(entity.get(),self.world_object.position.get())
+                        if d < dist:
+                            tgt_entity=entity
+                            dist=d
+                if tgt_entity == None:
+                    tgt_entity = choice(self.protocol.entities)
+                self.assigned_position = tgt_entity
+                self.enitity_add_remove(tgt_entity)
+                #print ("Attacker point set: ", tgt_entity.get(),self.world_object.position.get())
+
             def tgt_pos_update(self):
                 px,py,pzo = self.world_object.position.get()
 
@@ -1337,19 +1411,10 @@ try:
                         self.assigned_position = self.protocol.entities[n-1]
                     self.enitity_add_remove(tgt_entity)
 
+                # TODO: first issue not prioriting rear
+                # TODO: second issue not splitting into groups (unless tents are spread out on map)
                 elif DOMINE_FULLmode:
-                    dist = 9999
-                    tgt_entity=None
-                    for entity in self.protocol.entities:
-                        if entity.team != self.team or entity.capturing_team == self.team.other:
-                            d = self.distance_calc(entity.get(),self.world_object.position.get())
-                            if d < dist:
-                                tgt_entity=entity
-                                dist=d
-                    if tgt_entity == None:
-                        tgt_entity = choice(self.protocol.entities)
-                    self.assigned_position = tgt_entity
-                    self.enitity_add_remove(tgt_entity)
+                    self.select_targets()
 
                 elif TDMmode:
                     if self.team == self.protocol.blue_team:
