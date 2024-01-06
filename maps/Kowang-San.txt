@@ -1,0 +1,15 @@
+name = 'Kowang-San (Hill 355)'
+version = '1.0'
+author = 'Influx'
+description = ('Defense of Hill 355 (called Kowang-San) in the Korean War'
+               'where the 1st Royal Canadian Regiment held off 2 battalions of Chinese soldiers')
+
+extensions = {
+     
+'attspawn': (12, 12, 15),
+'defspawn': (208, 391, 26),
+'east': (450, 277, 61),
+'west': (36, 217, 43),
+'north': (263, 147, 54),
+'flag':(164, 390, 14)
+}

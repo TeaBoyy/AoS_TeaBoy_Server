@@ -1,0 +1,4 @@
+name = 'No Man`s Land'
+version = '2.0'
+author = 'Buffet of Lies'
+description = ('All is NOT quiet on the Western Front!')
