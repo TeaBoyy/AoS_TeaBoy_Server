@@ -134,8 +134,13 @@ def apply_script(protocol, connection, config):
                 if row_count >= 2:
                     row_count = 0
 
-                flag = TCExtensionTerritory(i, self, *self.get_random_location(
-                    zone = (x1, y1, x2, y2)))
+                location = self.get_random_location(zone = (x1, y1, x2, y2))
+                _, _, check_z = location
+                if check_z >= 63:
+                    print("skipping z: ", check_z)
+                    continue
+
+                flag = TCExtensionTerritory(i, self, *location)
                 if i < territory_count / 2:
                     team = self.blue_team
                 elif i > (territory_count-1) / 2:
