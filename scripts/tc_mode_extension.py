@@ -43,9 +43,6 @@ def apply_script(protocol, connection, config):
             self.protocol.send_chat(chat_message)
 
         def update_rate(self):
-            # TODO: disable temporarity
-            return Territory.update_rate(self)
-
             had_finish_call = self.finish_call != None
             Territory.update_rate(self)
             has_finish_call = self.finish_call != None
