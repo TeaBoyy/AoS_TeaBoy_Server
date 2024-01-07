@@ -359,7 +359,6 @@ try:
                 # TODO:
                 # TODO: also if neutral, then how to prioritize?
                 entities = list(self.entities)
-                print("len(entities): ", len(entities))
 
                 self.green_home_bases = []
                 self.blue_home_bases = []
@@ -3268,6 +3267,7 @@ try:
                 if not self.protocol.bot_adjusting:
                     self.protocol.bot_num_adjust(True)
                 if not self.local:
+                    print("no local")
                     return connection.on_spawn(self, pos)	#�l�Ԃ̏����I���
                 #���x���𒲐�����	
                 teamcpulv = self.protocol.teamcpulv[self.team.id]
