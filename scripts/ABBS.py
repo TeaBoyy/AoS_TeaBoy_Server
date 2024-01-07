@@ -52,12 +52,12 @@ from twisted.internet.reactor import callLater, seconds
 try:
 
     BOT_IN_BOTH     = True	   
-    BOT_ADD_NUM		= 20
 
     # TODO: 2nd mode removes a bot when human joins, and add a bot whem human leaves
     # TODO: but stil can't join team with bots and 1 human, need to join team with 0 humans first
     BOT_ADD_PATTERN = 2
 
+    BOT_ADD_NUM		= 18
     LITE_MODE       = False    
     LV_AUTO_ADJUST  = 0       # 0:off 1:human vs bot   2:blue vs green 3:both human/bot and blue/green
     BOT_NUM_NAME    = True    
