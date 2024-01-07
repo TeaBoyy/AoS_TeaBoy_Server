@@ -299,7 +299,8 @@ try:
 
     TENTNUM = 3
 
-
+    # TODO: improve
+    LAST_STAND_TENT_COUNT = 6
 
     class LocalPeer:
         #address = Address(None, 0)
@@ -370,6 +371,24 @@ try:
                     elif entity.team == self.blue_team:
                         print("Found blue home")
                         self.blue_home_bases.append(entity)
+
+            # TODO: improve
+            def on_cp_capture(self, cp):
+                # TODO: do it once, not after took 1/2 remaining ones!
+                result = protocol.on_cp_capture(self, cp)
+                if len(list(self.green_team.get_entities())) == LAST_STAND_TENT_COUNT:
+                    self.protocol.send_chat("Green team last stand mode! Lower HP to 25!")
+                    for connection in self.connections.values():
+                        if connection.team == self.green_team:
+                            if connection.hp > 25:
+                                connection.set_hp(25)
+                elif len(list(self.blue_team.get_entities())) == LAST_STAND_TENT_COUNT:
+                    self.protocol.send_chat("Blue team last stand mode! Lower HP to 25!")
+                    for connection in self.connections.values():
+                        if connection.team == self.blue_team:
+                            if connection.hp > 25:
+                                connection.set_hp(25)
+                return result
 
             def kasoku(self):
                 if ARENAmode:
@@ -1315,6 +1334,18 @@ try:
                     if collides:
                         self.assigned_position = None
                         entity.add_player(self)
+
+            # TODO: improve
+            def get_respawn_time(self):
+                new_get_respawn_time = connection.get_respawn_time(self)
+
+                if len(list(self.team.get_entities())) <= LAST_STAND_TENT_COUNT:
+                    self.send_chat("Last stand mode! Spawned with 25 HP and respawn time increased!")
+                    self.set_hp(25)
+                    if new_get_respawn_time < 15:
+                        new_get_respawn_time = 15
+
+                return new_get_respawn_time
 
             def select_targets(self):
                 # TODO: prioritizing taking what's capturing team not theirs doesn't seem to work too well
