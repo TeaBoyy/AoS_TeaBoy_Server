@@ -1331,28 +1331,16 @@ try:
                 else:
                     home_bases = self.protocol.blue_home_bases
 
-                #print("Home entity count: ", len(home_bases))
-
                 for entity in home_bases:
-                #for entity in self.protocol.entities:
-                    #print("entity.team: ", entity.team, "self.team: ", self.team)
-
                     if entity.team != self.team or entity.capturing_team == self.team.other:
-                    #if entity.capturing_team == self.team.other:
-                        #print("Trying")
                         d = self.distance_calc(entity.get(),self.world_object.position.get())
                         if d < dist:
-                            #print("Found one")
                             tgt_entity=entity
                             dist=d
                 if tgt_entity != None:
-                    #print ("Defender point set: ", tgt_entity.get(),self.world_object.position.get())
                     self.assigned_position = tgt_entity
                     self.enitity_add_remove(tgt_entity)
                     return
-                #else:
-                    #print("Nothing to defend")
-                #return
                 
                 # TODO: attacker mode
                 dist = 9999
