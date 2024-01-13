@@ -3252,17 +3252,18 @@ try:
                 try:
                     entities = list(self.team.get_entities())
                     other_entities = list(self.team.other.get_entities())
-                    pick_other_entity = random.choice(other_entities)
+                    if len(other_entities) <= 2:
+                        pick_other_entity = random.choice(other_entities)
 
-                    dist = 9999
-                    for entity in entities:
-                        d = self.distance_calc(pick_other_entity.get(), entity.get())
-                        if d < dist:
-                            closest_other_entity=entity
-                            dist=d
-                            
-                    if closest_other_entity != None:
-                        return closest_other_entity.get_spawn_location()
+                        dist = 9999
+                        for entity in entities:
+                            d = self.distance_calc(pick_other_entity.get(), entity.get())
+                            if d < dist:
+                                closest_other_entity=entity
+                                dist=d
+                                
+                        if closest_other_entity != None:
+                            return closest_other_entity.get_spawn_location()
                 except IndexError:
                     pass
 
