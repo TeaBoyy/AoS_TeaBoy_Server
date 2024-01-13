@@ -1331,21 +1331,8 @@ try:
                 else:
                     home_bases = self.protocol.blue_home_bases
 
-                # TODO: prioritize stopping home bases from being taken
                 for entity in home_bases:
-                    if entity.team == self.team and entity.capturing_team == self.team.other and entity.finish_call != None:
-                        d = self.distance_calc(entity.get(),self.world_object.position.get())
-                        if d < dist:
-                            tgt_entity=entity
-                            dist=d
-                if tgt_entity != None:
-                    self.assigned_position = tgt_entity
-                    self.enitity_add_remove(tgt_entity)
-                    return
-
-                # TODO: re-take home bases
-                for entity in home_bases:
-                    if entity.team != self.team:
+                    if entity.team != self.team or entity.capturing_team == self.team.other:
                         d = self.distance_calc(entity.get(),self.world_object.position.get())
                         if d < dist:
                             tgt_entity=entity
