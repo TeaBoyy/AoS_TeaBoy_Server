@@ -3244,6 +3244,30 @@ try:
                             hitplayer.aim_at = self		#�U�����󂯂��ꍇ�U���Ώۂɋ����ύX�ݒ�
                 return connection.on_hit(self, damage, hitplayer, type, grenade)
 
+            # TODO:
+            def get_spawn_location(self):
+                if self.protocol.game_mode != TC_MODE:
+                    return connection.get_spawn_location(self)
+                
+                try:
+                    entities = list(self.team.get_entities())
+                    other_entities = list(self.team.other.get_entities())
+                    pick_other_entity = random.choice(other_entities)
+
+                    dist = 9999
+                    for entity in entities:
+                        d = self.distance_calc(pick_other_entity.get(), entity.get())
+                        if d < dist:
+                            closest_other_entity=entity
+                            dist=d
+                            
+                    if closest_other_entity != None:
+                        return closest_other_entity.get_spawn_location()
+                except IndexError:
+                    pass
+
+                return connection.get_spawn_location(self)
+
             def on_spawn(self, pos):
                 if self.protocol.bot_adjusting and self.local:
                     if self.protocol.disconnect_suru[self.team.id]:
@@ -3323,7 +3347,7 @@ try:
                     self.color = (0xDF, 0x00, 0xDF)
                     self.bot_set_color(self.color) 
 
-            def get_spawn_location(self):
+            """ def get_spawn_location(self):
                 if VSBOTmode:
                     living_player = []
                     for player in self.protocol.blue_team.get_players():
@@ -3367,7 +3391,7 @@ try:
                             return sx,sy,sz
                         else:
                             return 170, uniform(255-150,255+150), 0
-                return connection.get_spawn_location(self)
+                return connection.get_spawn_location(self) """
 
             def gamewin(self):
                 self.protocol.gamewon = True
