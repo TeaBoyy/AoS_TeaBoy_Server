@@ -1325,6 +1325,10 @@ try:
                 dist = 9999
                 tgt_entity=None
                 
+                if self.assigned_position != None:
+                    # TEST: remove bot from entity before entity is overwritten
+                    self.enitity_add_remove(self.assigned_position)
+
                 home_bases = None
                 if self.team == self.protocol.green_team:
                     home_bases = self.protocol.green_home_bases
