@@ -1304,16 +1304,20 @@ try:
                 return pattern, AP,(dist+distf)
 
             def enitity_add_remove(self,entity):
-                collides = vector_collision(entity, 
-                    self.world_object.position, TC_CAPTURE_DISTANCE)
-                if self in entity.players:
-                    self.assigned_position = None
-                    if not collides:
-                        entity.remove_player(self)
-                else:
-                    if collides:
-                        self.assigned_position = None
-                        entity.add_player(self)
+                # TEST: hopefully fixes (inefficiently) leak of added players
+                for item in self.protocol.entities:
+                    collides = vector_collision(item, 
+                        self.world_object.position, TC_CAPTURE_DISTANCE)
+                    if self in item.players:
+                        if item == entity:
+                            self.assigned_position = None
+                        if not collides:
+                            item.remove_player(self)
+                    else:
+                        if collides:
+                            if item == entity:
+                                self.assigned_position = None
+                            item.add_player(self)
 
             def select_targets(self):
                 # TODO: prioritizing taking what's capturing team not theirs doesn't seem to work too well
