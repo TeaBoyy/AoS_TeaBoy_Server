@@ -354,6 +354,9 @@ try:
             green_home_bases = []
             blue_home_bases = []
 
+            # TODO:
+            grid_entities = []
+
             def reset_tc(self):
                 protocol.reset_tc(self)
                 # TODO:
@@ -369,6 +372,37 @@ try:
                     elif entity.team == self.blue_team:
                         print("Found blue home")
                         self.blue_home_bases.append(entity)
+
+                # TEST: generate entities grid
+                self.grid_entities = []
+                entities_rows = 3
+                entities_columns = 4
+                
+                for i in range(entities_rows):
+                    self.grid_entities.append([None for i in range(entities_columns)])
+
+                counter = 0
+                column = 0
+                row = 0
+                for entity in entities:
+                    if counter == 0:
+                        row = 0
+                        self.grid_entities[row][column] = entity
+                        counter += 1
+                        print("grid[", row, "][", column, "] -> team ID ->" , self.grid_entities[row][column].team.id)
+                    elif counter == 1:
+                        row+=1
+                        self.grid_entities[row][column] = entity
+                        counter += 1
+                        print("grid[", row, "][", column, "] -> team ID ->" , self.grid_entities[row][column].team.id)
+                    else:
+                        row+=1
+                        self.grid_entities[row][column] = entity
+                        print("grid[", row, "][", column, "] -> team ID ->" , self.grid_entities[row][column].team.id)
+                        counter = 0
+                        column+=1
+
+                print("Done gen grid")
 
             def kasoku(self):
                 if ARENAmode:
@@ -3248,26 +3282,60 @@ try:
                             hitplayer.aim_at = self		#�U�����󂯂��ꍇ�U���Ώۂɋ����ύX�ݒ�
                 return connection.on_hit(self, damage, hitplayer, type, grenade)
 
+            # TODO: try and spanwn on frontline, then 1 tent back from frontline
+            def get_frontline_entities(self):
+                my_team = self.team
+
+                # TODO: check other directions
+
+                frontline_entities = []
+                grid_rows_count = len(self.protocol.grid_entities)
+
+                if grid_rows_count == 0:
+                    print("Grid not initialised yet")
+                    return []
+
+                grid_columns_count = len(self.protocol.grid_entities[0])
+
+                for i in range(grid_rows_count):
+                    for j in range(grid_columns_count):
+                        print("i: ", i, ", j: ", j)
+
+                        current_entity = self.protocol.grid_entities[i][j]
+                        if current_entity.team != my_team:
+                            print("Skip green entity")
+                            continue
+
+                        is_frontline_entity = False
+
+                        if i > 0 and self.protocol.grid_entities[i - 1][j].team != my_team:
+                            is_frontline_entity = True
+
+                        if i < (grid_rows_count - 1) and self.protocol.grid_entities[i + 1][j].team != my_team:
+                            is_frontline_entity = True
+
+                        if j < (grid_columns_count - 1) and self.protocol.grid_entities[i][j + 1].team != my_team:
+                            is_frontline_entity = True
+
+                        if j > 0 and self.protocol.grid_entities[i][j - 1].team != my_team:
+                            is_frontline_entity = True
+
+                        if is_frontline_entity:
+                            print("is_frontline_entity")
+                            frontline_entities.append(current_entity)
+
+                return frontline_entities
+
             # TODO:
             def get_spawn_location(self):
                 if self.protocol.game_mode != TC_MODE:
                     return connection.get_spawn_location(self)
-                
-                try:
-                    entities = list(self.team.get_entities())
-                    other_entities = list(self.team.other.get_entities())
-                    if len(other_entities) <= 2:
-                        pick_other_entity = random.choice(other_entities)
 
-                        dist = 9999
-                        for entity in entities:
-                            d = self.distance_calc(pick_other_entity.get(), entity.get())
-                            if d < dist:
-                                closest_other_entity=entity
-                                dist=d
-                                
-                        if closest_other_entity != None:
-                            return closest_other_entity.get_spawn_location()
+                try:
+                    frontline_entities = self.get_frontline_entities()
+                    print("len(frontline_entities): ", len(frontline_entities))
+                    base = random.choice(frontline_entities)
+                    return base.get_spawn_location()
                 except IndexError:
                     pass
 
