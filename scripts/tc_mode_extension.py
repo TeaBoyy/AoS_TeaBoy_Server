@@ -2,6 +2,86 @@ from pyspades.constants import MAX_TERRITORY_COUNT, MIN_TERRITORY_COUNT, TC_MODE
 from pyspades.server import Territory
 
 def apply_script(protocol, connection, config):
+    class RespawnConnection(connection):
+        def get_spawn_location(self):
+            #self.protocol.blue_spawn_ordinal = 1
+            #self.protocol.green_spawn_ordinal = 1
+            if self.team.id == 0:
+                player_count = 5
+                print("self.protocol.blue_spawn_ordinal: ", self.protocol.blue_spawn_ordinal)
+                if self.protocol.blue_spawn_ordinal <= int(player_count / 2):
+                    move = 1
+                    self.protocol.blue_spawn_ordinal += 1
+                    #print("Blue spawn: first")
+                elif self.protocol.blue_spawn_ordinal > int(player_count / 2) and self.protocol.blue_spawn_ordinal < int(player_count):
+                    move = 2
+                    self.protocol.blue_spawn_ordinal += 1
+                    #print("Blue spawn: second")
+                else:
+                    move = 1
+                    #print("Blue spawn: next - always first")
+
+                """
+                if self.protocol.blue_spawn_ordinal == 0:
+                    move = 1
+                    self.protocol.blue_spawn_ordinal += 1
+                elif self.protocol.blue_spawn_ordinal == 1:
+                    move = 2
+                    self.protocol.blue_spawn_ordinal += 1
+                    #self.protocol.blue_spawn_ordinal = 0
+                else:
+                    move = 1
+                    #self.protocol.blue_spawn_ordinal = 1 
+                    """
+                move = move * -1
+            else:
+                player_count = 5
+                if self.protocol.green_spawn_ordinal <= int(player_count / 2):
+                    move = 1
+                    self.protocol.green_spawn_ordinal += 1
+                    #print("Green spawn: first")
+                elif self.protocol.green_spawn_ordinal > int(player_count / 2) and self.protocol.green_spawn_ordinal < int(player_count):
+                    move = 2
+                    self.protocol.green_spawn_ordinal += 1
+                    #print("Green spawn: second")
+                else:
+                    move = 1
+                    #print("Green spawn: next - always first")
+
+                """
+                if self.protocol.green_spawn_ordinal == 0:
+                    move = 1
+                    self.protocol.green_spawn_ordinal += 1
+                elif self.protocol.green_spawn_ordinal == 1:
+                    move = 2
+                    self.protocol.green_spawn_ordinal += 1
+                    #self.protocol.green_spawn_ordinal = 0
+                else:
+                    move = 1
+                    #self.protocol.green_spawn_ordinal = 1
+                """
+            
+                move = move * 1
+
+                print("move: ", move)
+
+            spawn_id = 0
+            territory_count = 6
+            if self.team.id == 0:
+                spawn_id = (territory_count / 2 - 1) + move
+            else:
+                spawn_id = (territory_count / 2) + move
+
+            if spawn_id < 0 or spawn_id >= territory_count:
+                print("ERROR: out of tents")
+            else:
+                base = self.protocol.entities[spawn_id]
+            print("base.id: ", base.id)
+
+            #return base.get_spawn_location()
+            #return (base.x, base.y, base.z)
+            return self.protocol.get_random_location(zone = (base.x - 10, base.y - 10, base.x + 10, base.y + 10))
+
     def convert_entity_pos_to_map_label(pos = (0.0, 0.0)):
         x, y = pos
 
@@ -25,6 +105,8 @@ def apply_script(protocol, connection, config):
     
     class TCExtensionTerritory(Territory):
         def send_tent_map_label_to_chat(self, team, isTaking = True, pos = (0.0, 0.0)):
+            # TODO: test
+            return
             if team is None:
                 team_str = "Unknown"
             elif team.id == 0:
@@ -55,7 +137,37 @@ def apply_script(protocol, connection, config):
     class TCExtensionProtocol(protocol):
         game_mode = TC_MODE
         
+        # TODO: test
+        blue_spawn_ordinal = 0
+        green_spawn_ordinal = 0
+
         def get_cp_entities(self): 
+            entities = []
+
+            territory_count = 6
+            offset = int(512 / territory_count)
+
+            for i in range(0, territory_count):
+                x1 = offset * i + 32
+                x2 = x1 + 5
+
+                y1 = 256
+                y2 = 264
+
+                location = self.get_random_location(zone = (x1, y1, x2, y2))
+                flag = TCExtensionTerritory(i, self, *location)
+                if i < territory_count / 2:
+                    team = self.blue_team
+                elif i > (territory_count-1) / 2:
+                    team = self.green_team
+                else:
+                    # odd number - neutral
+                    team = None
+                flag.team = team
+                entities.append(flag)
+
+            return entities
+
             # Edited algorithm to be able to scale the battlefield
             # Scale 1.0 is default value, scale below 1.0 isn't supported
             scale_x = config.get('mini_tc_scale_x', 1.5)
@@ -152,4 +264,4 @@ def apply_script(protocol, connection, config):
                 entities.append(flag)
             return entities
 
-    return TCExtensionProtocol, connection
+    return TCExtensionProtocol, RespawnConnection

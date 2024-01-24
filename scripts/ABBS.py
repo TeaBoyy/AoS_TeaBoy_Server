@@ -57,11 +57,11 @@ try:
     # TODO: but stil can't join team with bots and 1 human, need to join team with 0 humans first
     BOT_ADD_PATTERN = 2
 
-    BOT_ADD_NUM		= 20
+    BOT_ADD_NUM		= 10
     LITE_MODE       = False    
-    LV_AUTO_ADJUST  = 3       # 0:off 1:human vs bot   2:blue vs green 3:both human/bot and blue/green
+    LV_AUTO_ADJUST  = 0       # 0:off 1:human vs bot   2:blue vs green 3:both human/bot and blue/green
     BOT_NUM_NAME    = True    
-    CPU_LV          = [16,12]  
+    CPU_LV          = [30,0]  
     BOTMUTE         = True    # bot chat off
     DANSA_CALC_NUM  = 5        
     KEIRO_TANSAKU_NUM = 5      
@@ -72,7 +72,7 @@ try:
 
     DEBUG_VIRTUAL_HIT=False 
 
-    AI_mode = 6
+    AI_mode = 0
 
     # 0: TOW
     # 1: TDM
@@ -358,7 +358,7 @@ try:
             grid_entities = []
 
             def reset_tc(self):
-                protocol.reset_tc(self)
+                return protocol.reset_tc(self)
                 # TODO:
                 # TODO: also if neutral, then how to prioritize?
                 entities = list(self.entities)
@@ -1041,11 +1041,17 @@ try:
                 weapon_rdm = random.random()
                 self.z_add= gauss(0.3,0.5/3) #���̒��S����Ȃ��Ď኱���Ƃ����_���Ƃ�
                 self.battlecrouching=False
+                
+                # TODO: test
+                weapon_rdm = 0.5
+
                 if weapon_rdm>0.4:
                     self.set_weapon(RIFLE_WEAPON, True)
                     self.battle_distance = uniform(30,110)
                     if random.random()<0.2:
-                        self.battlecrouching=True
+                        # TODO:
+                        #self.battlecrouching=True
+                        self.battlecrouching=False
                     if weapon_rdm>0.7 or random.random()<self.cpulevel:
                         self.z_add= gauss(0.1,0.2*(1-self.cpulevel)/3)			
                 elif weapon_rdm>0.15:
