@@ -12,6 +12,7 @@ def apply_script(protocol, connection, config):
                 if self.protocol.blue_spawn_ordinal <= int(player_count / 2):
                     move = 1
                     self.protocol.blue_spawn_ordinal += 1
+                    self.protocol.blue_spawn_ordinal = 100
                     #print("Blue spawn: first")
                 elif self.protocol.blue_spawn_ordinal > int(player_count / 2) and self.protocol.blue_spawn_ordinal < int(player_count):
                     move = 2
@@ -39,6 +40,7 @@ def apply_script(protocol, connection, config):
                 if self.protocol.green_spawn_ordinal <= int(player_count / 2):
                     move = 1
                     self.protocol.green_spawn_ordinal += 1
+                    self.protocol.green_spawn_ordinal = 100
                     #print("Green spawn: first")
                 elif self.protocol.green_spawn_ordinal > int(player_count / 2) and self.protocol.green_spawn_ordinal < int(player_count):
                     move = 2
