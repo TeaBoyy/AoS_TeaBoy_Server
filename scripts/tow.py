@@ -11,9 +11,9 @@ import random
 import math
 from math import pi
 
-CP_COUNT = 6
+CP_COUNT = 4
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
-ANGLE = 65
+ANGLE = 0
 START_ANGLE = math.radians(-ANGLE)
 END_ANGLE = math.radians(ANGLE)
 DELTA_ANGLE = math.radians(30)
@@ -66,6 +66,8 @@ def apply_script(protocol, connection, config):
                 base = self.team.last_spawn
             else:
                 base = self.team.spawn_cp
+
+            return self.protocol.get_random_location(zone = (base.x - 10, base.y - 10, base.x + 10, base.y + 10))
             return base.get_spawn_location()
             
         def on_spawn(self, pos):
@@ -89,18 +91,24 @@ def apply_script(protocol, connection, config):
             
             points = []
             
-            square_1 = xrange(128)
-            square_2 = xrange(512 - 128, 512)
+            square_1 = xrange(128, 129)
+            square_2 = xrange(130, 131)
             
             while 1:
                 top = int(y) in square_1
                 bottom = int(y) in square_2
+
+                top = int(256)
+                bottom = int(264)
                 if top:
                     angle = limit_angle(angle + FIX_ANGLE)
                 elif bottom:
                     angle = limit_angle(angle - FIX_ANGLE)
                 else:
                     angle = limit_angle(angle + random_up_down(DELTA_ANGLE))
+
+                angle = 0
+                magnitude = 0
                 magnitude += random_up_down(2)
                 magnitude = min(15, max(5, magnitude))
                 x2, y2 = get_point(x, y, magnitude, angle)
@@ -113,17 +121,20 @@ def apply_script(protocol, connection, config):
             offset = move / 2
             
             for i in xrange(CP_EXTRA_COUNT):
-                index = 0
-                while 1:
-                    p_x, p_y = points[index]
-                    index += 1
-                    if p_x >= offset:
-                        break
+                #index = 0
+                #while 1:
+                    #p_x, p_y = points[index]
+                p_x = i * move + 32
+                p_y = 256
+
+                #index += 1
+                    #if p_x >= offset:
+                        #break
                 if i < CP_EXTRA_COUNT / 2:
                     blue_cp.append((p_x, p_y))
                 else:
                     green_cp.append((p_x, p_y))
-                offset += move
+                #offset += move
             
             # make entities
             
@@ -181,5 +192,7 @@ def apply_script(protocol, connection, config):
             for entity in self.entities:
                 if not entity.disabled and entity not in cp:
                     entity.disable()
+            
+            return protocol.on_cp_capture(self, territory)
 
     return TugProtocol, TugConnection

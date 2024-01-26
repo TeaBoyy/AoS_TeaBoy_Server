@@ -357,6 +357,26 @@ try:
             # TODO:
             grid_entities = []
 
+            # TODO:
+            test_bool = False
+
+            # TODO:
+            def on_cp_capture(self, territory):
+                result = protocol.on_cp_capture(self, territory)
+
+                # Try to balance bots
+                # If tent is taken, remove 1 bot from team, add it to another team
+                # Once taken back, it should balance back
+                # If got even deeper, then will get even less bots left
+                callLater(0.01, self.add_bot,territory.team.other)
+
+                for bot in territory.team.get_players():
+                    if bot.local and bot.world_object:
+                        bot.disconnect() 
+                        break
+
+                return result
+
             def reset_tc(self):
                 return protocol.reset_tc(self)
                 # TODO:
@@ -621,6 +641,9 @@ try:
                     self.BOT_junkai_route = extensions['BOT_junkai_route']
             
             def on_map_change(self, map):
+                # TODO:
+                self.test_bool = False
+
                 if VSBOTmode:
                     if VSBOT_INTEL:
                         self.flag_reset()
@@ -3354,9 +3377,19 @@ try:
                         self.disconnect()
                         self.protocol.disconnect_suru[id]=False
                         return False
-                    self.protocol.bot_num_adjust()
-                if not self.protocol.bot_adjusting:
-                    self.protocol.bot_num_adjust(True)
+                    
+                    # TODO: test
+                    # TODO: manually adding
+                    if self.local and not self.protocol.test_bool:
+                        self.protocol.test_bool = True
+                        for _ in range(0,2):
+                            callLater(0.01, self.protocol.add_bot,self.protocol.green_team)
+                            callLater(0.01, self.protocol.add_bot,self.protocol.blue_team)
+
+                    #self.protocol.bot_num_adjust()
+                    # TODO: test
+                #if not self.protocol.bot_adjusting:
+                    #self.protocol.bot_num_adjust(True)
                 if not self.local:
                     print("no local")
                     return connection.on_spawn(self, pos)	#�l�Ԃ̏����I���
