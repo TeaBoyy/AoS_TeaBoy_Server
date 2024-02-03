@@ -4,9 +4,32 @@ from pyspades.server import Territory
 def apply_script(protocol, connection, config):
     class RespawnConnection(connection):
         def get_spawn_location(self):
+            alive_enemy_count = 0
+            alive_friendly_count = 0
+            for bot in self.protocol.players.values():
+                if bot.world_object is None:
+                    continue
+
+                if bot.world_object.dead == False:
+                    if bot.team != self.team: 
+                        alive_enemy_count += 1
+                    else:
+                        alive_friendly_count += 1
+
+            move = 0    
+
+            # TODO: doesn't take into account respawn time
+            print("alive_enemy_count: ", alive_enemy_count, "; alive_friendly_count: ", alive_friendly_count)
+            if False and alive_enemy_count < alive_friendly_count:
+                # TODO: respawn further to let enemy team survive longer
+                move = 2
+                if self.team.id == 0:
+                    move = move * -1
+                print("Spawning bot further. team.id: ", self.team.id)
+
             #self.protocol.blue_spawn_ordinal = 1
             #self.protocol.green_spawn_ordinal = 1
-            if self.team.id == 0:
+            if move == 0 and self.team.id == 0:
                 player_count = 5
                 print("self.protocol.blue_spawn_ordinal: ", self.protocol.blue_spawn_ordinal)
                 if self.protocol.blue_spawn_ordinal <= int(player_count / 2):
@@ -35,7 +58,7 @@ def apply_script(protocol, connection, config):
                     #self.protocol.blue_spawn_ordinal = 1 
                     """
                 move = move * -1
-            else:
+            elif move == 0:
                 player_count = 5
                 if self.protocol.green_spawn_ordinal <= int(player_count / 2):
                     move = 1
@@ -50,6 +73,8 @@ def apply_script(protocol, connection, config):
                     move = 1
                     #print("Green spawn: next - always first")
 
+                move = move * 1
+
                 """
                 if self.protocol.green_spawn_ordinal == 0:
                     move = 1
@@ -62,9 +87,6 @@ def apply_script(protocol, connection, config):
                     move = 1
                     #self.protocol.green_spawn_ordinal = 1
                 """
-            
-                move = move * 1
-
                 print("move: ", move)
 
             spawn_id = 0
@@ -80,7 +102,7 @@ def apply_script(protocol, connection, config):
                 base = self.protocol.entities[spawn_id]
             print("base.id: ", base.id)
 
-            #return base.get_spawn_location()
+            return base.get_spawn_location()
             #return (base.x, base.y, base.z)
             return self.protocol.get_random_location(zone = (base.x - 10, base.y - 10, base.x + 10, base.y + 10))
 
