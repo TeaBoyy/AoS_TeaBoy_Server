@@ -361,8 +361,25 @@ try:
             test_bool = False
 
             # TODO:
+            last_human_impact_time = 0
+
+            # TODO:
             def on_cp_capture(self, territory):
                 result = protocol.on_cp_capture(self, territory)
+
+                # TODO: would be nice maybe to auto-restore backm rather then allow stalemate on next tent?
+                # TOOD: or is it better to keep where last human input was?
+                if self.last_human_impact_time != 0:
+                    diff = reactor.seconds() - self.last_human_impact_time
+                    cooldown_seconds = 120
+                    if diff < cooldown_seconds:
+                        print("[on_cp_capture] Human impact detected recently. Skipping bots auto-balancing")
+                        return result
+                    else:
+                        print("[on_cp_capture] Last human impact on battlefield expired, resetting. Cooldown was: ", cooldown_seconds, " seconds.")
+                        self.last_human_impact_time = 0
+                else:
+                    print("[on_cp_capture] No human impact yet.")
 
                 # Try to balance bots
                 # If tent is taken, remove 1 bot from team, add it to another team
@@ -370,15 +387,21 @@ try:
                 # If got even deeper, then will get even less bots left
                 callLater(0.01, self.add_bot,territory.team.other)
 
-                for bot in territory.team.get_players():
-                    if bot.local and bot.world_object:
-                        bot.disconnect() 
-                        break
+                # TODO: test
+                #callLater(0.01, self.add_bot,territory.team.other)
+
+                count = 1
+                for _ in range(0, count):
+                    for bot in territory.team.get_players():
+                        if bot.local and bot.world_object:
+                            bot.disconnect()
+                            break
 
                 return result
 
             def reset_tc(self):
-                return protocol.reset_tc(self)
+                result = protocol.reset_tc(self)
+                return result
                 # TODO:
                 # TODO: also if neutral, then how to prioritize?
                 entities = list(self.entities)
@@ -2173,6 +2196,12 @@ try:
                 self.movezure_y+=ydiff*0.2*(self.cpulevel)
                 self.movezure_z+=zdiff*0.2*(self.cpulevel)
 
+
+            # TODO: test
+            def too_much_kills(self):
+                return False
+                return self.streak >= 1
+
             def update(self):
                 if not self.world_object_alive_onpos():
                     return
@@ -2313,7 +2342,9 @@ try:
                                     if phai: self.grenade_toolchange()
                         if seconds() - self.toolchangetime > 0.5 and self.tool == WEAPON_TOOL and seconds() - self.sprinttime>0.5: # �ˌ��\����
                                 if distance_to_aim < 135:#�ڕW���F�\���� 
-                                    self.fire_weapon()	#�ˌ��w��
+                                    # TODO: test
+                                    if not self.too_much_kills():
+                                        self.fire_weapon()	#�ˌ��w��
                         if self.battlecrouching and self.tool == WEAPON_TOOL:
                             cpos = Vertex3(pos.x,pos.y,pos.z+1.1)
                             if self.world_object.crouch:
@@ -3309,6 +3340,12 @@ try:
                     if self.team != hitplayer.team:
                         if hitplayer.canseeY(hitplayer.world_object.position, self.world_object.position)>=0:
                             hitplayer.aim_at = self		#�U�����󂯂��ꍇ�U���Ώۂɋ����ύX�ݒ�
+
+                if not self.local:
+                    # TODO: don't balance bots on capture if human impacted battlefield
+                    self.protocol.last_human_impact_time = reactor.seconds()
+                    print("Set human impact time")
+
                 return connection.on_hit(self, damage, hitplayer, type, grenade)
 
             # TODO: try and spanwn on frontline, then 1 tent back from frontline
