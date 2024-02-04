@@ -14,6 +14,7 @@ In general files that are taken from other sources are added to this repository 
 # Scripts
 1. grenade_launchers.py. Guns shoot grenades.
 2. tc_mode_extension.py. Allows to scale down tent placement on a regular TC (Territorial Control) gamemode. Gamemode field in config can be set to any string, it doesn't matter. Also, script reports location of a tent in global chat every time someone is capturing it.
+3. And more stuff.
 
 # Known issues
 1. Scripts are not ported to piqueserver. Runs/tested on PySnip only.
