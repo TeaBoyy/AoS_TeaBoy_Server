@@ -12,7 +12,7 @@ List of reposities and web-sites (not full list yet) from which work (scripts) w
 In general files that are taken from other sources are added to this repository with the first commit message (in file's history) pointing to the source.
 
 # Scripts
-1. grenade_launchers.py. Guns shoot grenades.
+1. grenade_launchers.py. Guns shoot grenades. Grenades penetrate blocks and explode. Can also hold V and shoot to restore destroyed blocks (can be disabled by setting config field "nade_launcher_restore_blocks" to "false").
 2. tc_mode_extension.py. Allows to scale down tent placement on a regular TC (Territorial Control) gamemode. Gamemode field in config can be set to any string, it doesn't matter. Also, script reports location of a tent in global chat every time someone is capturing it.
 3. And more stuff.
 
