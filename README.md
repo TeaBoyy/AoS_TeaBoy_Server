@@ -1,15 +1,18 @@
 # AoS_TeaBoy_Server
-Crutchy, simple grenade launchers (and more) PySnip scripts for OpenSpades game server
+Grenade launchers (and more) PySnip scripts for OpenSpades game server
 
 Contents of this repository is free to use and modify by anyone.
 
-However, this repository also contains work (in this case scripts) downloaded from other repositories and web-sites.
+This repository also contains work (in this case scripts) downloaded from other repositories and web-sites.
 List of reposities and web-sites (not full list yet) from which work (scripts) were taken from:
 * https://github.com/aloha-pk/spades-public
 * https://github.com/1AmYF/aos-server-mods
 * https://github.com/matpow2/pyspades-userscripts
 
 In general files that are taken from other sources are added to this repository with the first commit message (in file's history) pointing to the source.
+
+# Gameplay footage
+https://youtu.be/Es9Al90DPzw?si=ZdJWAcANHO6rBPzD
 
 # Environment
 1. Scripts are not ported to piqueserver. Runs/tested on PySnip only.
