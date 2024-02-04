@@ -11,18 +11,23 @@ List of reposities and web-sites (not full list yet) from which work (scripts) w
 
 In general files that are taken from other sources are added to this repository with the first commit message (in file's history) pointing to the source.
 
+# Environment
+1. Scripts are not ported to piqueserver. Runs/tested on PySnip only.
+2. Everything should work fine with the run.exe in this repository (can find link to source from which I downloaded executable in file history's commit message).
+3. For grenade launchers, rename grenade_launchers_config.txt to config.txt. Should work out of the box.
+4. Tested for a while now on Optik Link free hosting. The only issue is often dropping connection to the master server, yet it's PySnip error. Haven't had any grenade launchers related issues for a while (I think fixing infinite loop helped to prevent server getting stuck).
+
 # Scripts
 1. grenade_launchers.py. Guns shoot grenades. Grenades penetrate blocks and explode. Can also hold V and shoot to restore destroyed blocks (can be disabled by setting config field "nade_launcher_restore_blocks" to "false").
 2. tc_mode_extension.py. Allows to scale down tent placement on a regular TC (Territorial Control) gamemode. Gamemode field in config can be set to any string, it doesn't matter. Also, script reports location of a tent in global chat every time someone is capturing it.
 3. And more stuff.
 
 # Known issues
-1. Scripts are not ported to piqueserver. Runs/tested on PySnip only.
-2. grenade_launchers.py:
+1. grenade_launchers.py:
     1. Shooting grenades doesn't stop after running out of bullets on BetterSpades client. Probably can fix by checking if ammo != 0 and stop loop.
     2. Camping on a mountain/hill/tower gives too much advantage. Can't shoot high enough from the ground, but can easily hit anyone down below. Use build_height.py as a crutch to limit how high players can build.
     3. Increasing projectile speed beyond ~2.0 makes grenades clip through blocks. So, can't really shoot more straight trajectory at the moment.
-3. snowflakes.py and/or snow.py:
+2. snowflakes.py and/or snow.py:
     1. Might cause errors if added as is with other scripts, like ABBS.py (Advanced Battle Bots) I think.
-5. snowflakes.py:
+3. snowflakes.py:
     1. Players, tents (intels?) can spawn on snowflakes sometimes. Especially concerning with grenade_launchers.py - gives way too much advantage.
