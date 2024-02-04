@@ -21,7 +21,7 @@ https://youtu.be/Es9Al90DPzw?si=ZdJWAcANHO6rBPzD
 4. Tested for a while now on Optik Link free hosting. The only issue is often dropping connection to the master server, yet it's PySnip error. Haven't had any grenade launchers related issues for a while (I think fixing infinite loop helped to prevent server getting stuck).
 
 # Scripts
-1. grenade_launchers.py. Guns shoot grenades. Grenades penetrate blocks and explode. Can also hold V and shoot to restore destroyed blocks (can be disabled by setting config field "nade_launcher_restore_blocks" to "false").
+1. grenade_launchers.py. Guns shoot grenades. Grenades penetrate blocks and explode. Can also hold V and shoot to restore destroyed blocks (can be enabled by setting config field "nade_launcher_restore_blocks" to "true").
 2. tc_mode_extension.py. Allows to scale down tent placement on a regular TC (Territorial Control) gamemode. Gamemode field in config can be set to any string, it doesn't matter. Also, script reports location of a tent in global chat every time someone is capturing it.
 3. And more stuff.
 
