@@ -11,8 +11,10 @@ List of reposities and web-sites (not full list yet) from which work (scripts) w
 
 In general files that are taken from other sources are added to this repository with the first commit message (in file's history) pointing to the source.
 
-# Gameplay footage
-https://youtu.be/Es9Al90DPzw?si=ZdJWAcANHO6rBPzD
+# Video demo
+Gameplay footage: https://youtu.be/Es9Al90DPzw?si=ZdJWAcANHO6rBPzD
+
+Experiment - trying out ABBS bots with grenade launchers: https://youtu.be/ckY1NPCrrkA?si=yaKykJCBCAD_T2qD
 
 # Environment
 1. Scripts are not ported to piqueserver. Runs/tested on PySnip only.
