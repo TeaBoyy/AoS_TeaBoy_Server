@@ -152,9 +152,7 @@
         "memcheck",
         "build_height",
         "reloadconfig",
-        "tc_mode_extension",
-        "snowflakes",
-        "snow"
+        "tc_mode_extension"
     ],
 
     "squad_respawn_time" : 32,
@@ -169,10 +167,5 @@
     "nade_launcher_restore_blocks" : false,
     "nade_launcher_restore_blocks_grayscale" : false,
     "mini_tc_scale_x" : 1.5,
-    "mini_tc_scale_y" : 1.5,
-    "snowflakes_amount" : 1500,
-    "snowflakes_height_start" : 35,
-    "snow_enabled" : true,
-    "snow_exclude_maps" : ["scandinavia", "Prauda"],
-    "snowflakes_exclude_maps" : []
+    "mini_tc_scale_y" : 1.5
 }
