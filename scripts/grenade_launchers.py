@@ -212,40 +212,44 @@ def apply_script(protocol, connection, config):
                     return
                 grenade_callback = self.rollback_seed_exploded
                 
-            grenade = protocol.world.create_object(Grenade, 0.0, position, None, velocity, grenade_callback)
-            grenade.name = 'rocket'
-            
+            grenade = self.create_grenade(position, velocity, grenade_callback, "rocket")
+
             # Figure out when grenade will land
             collision = grenade.get_next_collision(UPDATE_FREQUENCY)
             if collision:
                 eta, tmpA, tmpA, tmpA = collision
                 grenade.fuse = eta
                 
-            grenade_packet.value = grenade.fuse
-            grenade_packet.player_id = player.player_id
-            grenade_packet.position = position.get()
-            grenade_packet.velocity = velocity.get()
-            
-            protocol.send_contained(grenade_packet)
+            self.send_grenade_packet(grenade.fuse, player.player_id, position, velocity)
            
         def nade_exploded(self, grenade):
             position, velocity = grenade.position, grenade.velocity
             velocity.normalize()
 
             # Penetrate up to 2 blocks to get to the solid block
-            extra_distance = 2
-            for _ in range(extra_distance):
-                solid = self.protocol.map.get_solid(*position.get())
-                if solid or solid is None:
-                    break
-                    
-                position += velocity
+            self.penetrate_blocks(grenade, 2)
             
             # Explode a bit higher to not damage ground too much on indirect impact
             if position.z >= 1:
                 position.z -= 1
             
             connection.grenade_exploded(self, grenade)
+
+        def create_grenade(self, position, velocity, grenade_callback, name, fuse = None):
+            grenade = self.protocol.world.create_object(Grenade, 0.0, position, None, velocity, grenade_callback)
+            grenade.name = name
+
+            if fuse is not None:
+                grenade.fuse = fuse
+            
+            return grenade
+
+        def send_grenade_packet(self, fuse, player_id, position, velocity):
+            grenade_packet.value = fuse
+            grenade_packet.player_id = player_id
+            grenade_packet.position = position.get()
+            grenade_packet.velocity = velocity.get()
+            self.protocol.send_contained(grenade_packet)
 
         def rollback_seed_exploded(self, grenade):
             try:
