@@ -154,24 +154,14 @@ def apply_script(protocol, connection, config):
             return connection.on_kill(self, killer, type, grenade)
             
         def on_hit(self, hit_amount, hit_player, hit_type, grenade):  
-            
-            #print("[on_hit] debug. grenade.name: ", grenade.name)
-
-            #if grenade and grenade.name == "extra_rifle_underslung":
-            #    print("[on_hit] Got extra grenade hit")
-            #    return False
-
             if self.player_id == hit_player.player_id:
                 # Player can't hit themselves
                 return False
                
             if hit_player.god:
                 return connection.on_hit(self, hit_amount, hit_player, hit_type, grenade)
-        
-            #print("[on_hit] debug")
 
-            #if grenade and grenade.name == "extra_rifle_underslung":
-                #print("[on_hit] Got extra grenade")
+            if grenade and grenade.name == "no_damage_grenade":
                 return False
 
             if grenade:
@@ -253,8 +243,13 @@ def apply_script(protocol, connection, config):
             if position.z >= 1:
                 position.z -= 1
             
+            # TODO: read big explosion bool from config
+            # TODO: allow other weapons to be togglable with own explosion size
+            # TODO: what about shotgun rn?
+
             # Increase destruction area for Rifle
             if grenade.name == "rifle_underslung":
+                # TODO: read size from config
                 grid_size = 2 # 2x2x2
                 self.create_grenade_grid(position, grid_size, False, 1)
 
@@ -262,30 +257,31 @@ def apply_script(protocol, connection, config):
 
         def create_grenade_grid(self, position, grid_size, send_to_client = False, extra_height = 0):
             zero_vector = Vertex3(0, 0, 0)
-            grenade_impact_size = 3
+            grenade_impact_size = 3.0
 
             if grid_size < 0 or grid_size - 1 < 0:
                 return
 
+            offset = (grenade_impact_size / 2) * (grid_size - 1)
             top_left_center_positon = position.copy()
-            top_left_center_positon.x -= (grenade_impact_size / 2) * grid_size - 1
-            top_left_center_positon.y -= (grenade_impact_size / 2) * grid_size - 1
-            top_left_center_positon.z -= (grenade_impact_size / 2) * grid_size - 1
-
-            for x in range(0, grid_size):
-                for y in range(0, grid_size):
-                    for z in range(0, grid_size):
+            top_left_center_positon.x -= offset
+            top_left_center_positon.y -= offset
+            top_left_center_positon.z -= offset
+            
+            for dx in range(0, grid_size):
+                for dy in range(0, grid_size):
+                    for dz in range(0, grid_size):
                         origin_position = top_left_center_positon.copy()
-                        origin_position.x += x * grenade_impact_size
-                        origin_position.y += y * grenade_impact_size
-                        origin_position.z += z * grenade_impact_size
+                        origin_position.x += dx * grenade_impact_size
+                        origin_position.y += dy * grenade_impact_size
+                        origin_position.z += dz * grenade_impact_size
 
                         origin_position.z -= extra_height
 
-                        extra_grenade = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "extra_rifle_underslung")
+                        extra_grenade = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "no_damage_grenade")
                         
                         # TODO: send every 2nd grenade explosion
-                        if (x + y + z) % 2 == 0:
+                        if (dx + dy + dz) % 2 == 0:
                             self.send_grenade_packet(extra_grenade.fuse, 31, extra_grenade.position, extra_grenade.velocity)
 
         def create_grenade(self, position, velocity, grenade_callback, name, fuse = 0.0):
