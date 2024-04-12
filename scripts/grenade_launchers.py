@@ -281,6 +281,8 @@ def apply_script(protocol, connection, config):
                         extra_grenade = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "no_damage_grenade")
                         
                         # TODO: send every 2nd grenade explosion
+                        # TODO: just spawn 2-4 grenades in origin point, creates big boom yet no weird nades in air
+                        # TODO: also, maybe don't spawn extra nades if exploded too close, to avoid water and other effects (though keep performance in mind)
                         if (dx + dy + dz) % 2 == 0:
                             self.send_grenade_packet(extra_grenade.fuse, 31, extra_grenade.position, extra_grenade.velocity)
 
