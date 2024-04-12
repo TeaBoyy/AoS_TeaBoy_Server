@@ -1007,6 +1007,9 @@ try:
                 weapon_rdm = random.random()
                 self.z_add= gauss(0.3,0.5/3) #���̒��S����Ȃ��Ď኱���Ƃ����_���Ƃ�
                 self.battlecrouching=False
+
+                # TODO: force Rifle only
+                weapon_rdm = 0.5
                 if weapon_rdm>0.4:
                     self.set_weapon(RIFLE_WEAPON, True)
                     self.battle_distance = uniform(30,110)
