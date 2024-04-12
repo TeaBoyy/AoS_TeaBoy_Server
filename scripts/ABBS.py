@@ -2229,7 +2229,13 @@ try:
                         newy = sin(radians(theta))*newxy
 
                         # TODO: test for nade launchers aim higer based on distance
-                        test_up_z = (distance_to_aim / 2) * 0.0025
+                        if distance_to_aim > 20:
+                            #offset = 0.0025
+                            offset = 0.0025
+                            #test_up_z = (distance_to_aim / 2) * offset
+                            test_up_z = distance_to_aim * offset
+                        else:
+                            test_up_z = 2
                         #print("test_up_z: ", test_up_z, "newz: ", newz)
                         if (newz - test_up_z) <= -1 or (newz - test_up_z) >= 1:
                             test_up_z = 0
