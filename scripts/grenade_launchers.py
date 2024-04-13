@@ -284,9 +284,14 @@ def apply_script(protocol, connection, config):
                         # Spawn extra grenades on server side only
                         _ = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "no_damage_grenade")
 
+            # TODO: ensure performance is not getting worse because of this
+            explosion_distance = distance_3d_vector(self.world_object.position, position)
+            if explosion_distance < 10:
+                # Don't spawn extra grenades for shooter on client side if detonated too close (to avoid extra water slash effects, etc)
+                return
+
             # Create extra explosions at origin point on client side for better visual/audio feedback
             for _ in range(0,3):
-                # TODO: maybe don't spawn extra nades if exploded too close, to avoid water splash and other effects (though keep performance in mind)
                 self.send_grenade_packet(0, 31, position, zero_vector)
 
         def create_grenade(self, position, velocity, grenade_callback, name, fuse = 0.0):
