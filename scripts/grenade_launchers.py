@@ -340,8 +340,8 @@ def apply_script(protocol, connection, config):
             return 
         
         def rollback_area(self, position):
-            # Hardcoded size
-            size = 5 
+            size = config.get('nade_launcher_restore_blocks_size', 5)
+
             start_point = position.copy() 
             start_point.x -= 2
             start_point.y -= 2

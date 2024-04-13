@@ -166,6 +166,7 @@
     "medkit_heal_amount" : 40,
     "nade_launcher_restore_blocks" : false,
     "nade_launcher_restore_blocks_grayscale" : false,
+    "nade_launcher_restore_blocks_size": 5,
     "nade_launcher_extra_destruction" : true,
     "nade_launcher_extra_destruction_size" : 2,
     "nade_launcher_extra_destruction_sound" : 2,
