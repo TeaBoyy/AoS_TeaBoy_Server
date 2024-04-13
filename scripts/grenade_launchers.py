@@ -289,12 +289,12 @@ def apply_script(protocol, connection, config):
                         # Spawn extra grenades on server side only
                         _ = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "no_damage_grenade")
 
-            extra_destruction_sound = config.get('nade_launcher_extra_destruction_sound', 3)
+            extra_destruction_sound = config.get('nade_launcher_extra_destruction_sound', 2)
             if extra_destruction_sound <= 0:
                 return
 
             explosion_distance = distance_3d_vector(self.world_object.position, position)
-            if explosion_distance < 10:
+            if explosion_distance < 20:
                 # Don't spawn extra grenades for shooter on client side if detonated too close (to avoid extra water slash effects, etc)
                 return
 
