@@ -29,6 +29,9 @@ G_SMG_LAUNCHER_DAMAGE=15.0
 global G_SHOTGUN_LAUNCHER_DAMAGE
 G_SHOTGUN_LAUNCHER_DAMAGE=50.0
 
+global G_RIFLE_GRENADE_NAME
+G_RIFLE_GRENADE_NAME="rifle_underslung"
+
 def set_weapon_launcher_damage(connection, value = None, damage_ordinal = 0, launcher_type = "Unknown"):
     global G_RIFLE_LAUNCHER_DAMAGE
     global G_SMG_LAUNCHER_DAMAGE
@@ -205,7 +208,7 @@ def apply_script(protocol, connection, config):
                 grenade_name = "smg_underslung"
             elif self.weapon is RIFLE_WEAPON:
                 multipler = 2.2
-                grenade_name = "rifle_underslung"
+                grenade_name = G_RIFLE_GRENADE_NAME
             elif self.weapon is SHOTGUN_WEAPON:
                 multipler = 2.2
                 grenade_name = "shotgun_underslung"
@@ -222,7 +225,6 @@ def apply_script(protocol, connection, config):
                 grenade_callback = self.rollback_seed_exploded
                 
             grenade = self.create_grenade(position, velocity, grenade_callback, grenade_name)
-            #print("grenade.name --> ", grenade.name)
 
             # Figure out when grenade will land
             collision = grenade.get_next_collision(UPDATE_FREQUENCY)
@@ -248,7 +250,7 @@ def apply_script(protocol, connection, config):
             # TODO: what about shotgun rn?
 
             # Increase destruction area for Rifle
-            if grenade.name == "rifle_underslung":
+            if grenade.name == G_RIFLE_GRENADE_NAME:
                 # TODO: read size from config
                 grid_size = 2 # 2x2x2
                 self.create_grenade_grid(position, grid_size, False, 1)
@@ -278,13 +280,13 @@ def apply_script(protocol, connection, config):
 
                         origin_position.z -= extra_height
 
-                        extra_grenade = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "no_damage_grenade")
-                        
-                        # TODO: send every 2nd grenade explosion
-                        # TODO: just spawn 2-4 grenades in origin point, creates big boom yet no weird nades in air
-                        # TODO: also, maybe don't spawn extra nades if exploded too close, to avoid water and other effects (though keep performance in mind)
-                        if (dx + dy + dz) % 2 == 0:
-                            self.send_grenade_packet(extra_grenade.fuse, 31, extra_grenade.position, extra_grenade.velocity)
+                        # Spawn extra grenades on server side only
+                        _ = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "no_damage_grenade")
+
+            # Create extra explosions at origin point on client side for better visual/audio feedback
+            for _ in range(0,3):
+                # TODO: maybe don't spawn extra nades if exploded too close, to avoid water splash and other effects (though keep performance in mind)
+                self.send_grenade_packet(0, 31, position, zero_vector)
 
         def create_grenade(self, position, velocity, grenade_callback, name, fuse = 0.0):
             grenade = self.protocol.world.create_object(Grenade, 0.0, position, None, velocity, grenade_callback)
