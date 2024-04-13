@@ -2234,8 +2234,10 @@ try:
                             offset = 0.0025
                             #test_up_z = (distance_to_aim / 2) * offset
                             test_up_z = distance_to_aim * offset
-                        else:
+                        elif distance_to_aim > 5:
                             test_up_z = 2
+                        else:
+                            test_up_z = 0.5
                         #print("test_up_z: ", test_up_z, "newz: ", newz)
                         if (newz - test_up_z) <= -1 or (newz - test_up_z) >= 1:
                             test_up_z = 0
