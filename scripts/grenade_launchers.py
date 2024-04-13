@@ -250,7 +250,7 @@ def apply_script(protocol, connection, config):
                 position.z -= extra_height
             
             # Increase destruction area for Rifle
-            if config.get('nade_launcher_extra_destruction', False) 
+            if config.get('nade_launcher_extra_destruction', False):
                 if grenade.name == G_RIFLE_GRENADE_NAME or grenade.name == G_SHOTGUN_GRENADE_NAME:
                     # Default is 2x2x2
                     grid_size = config.get('nade_launcher_extra_destruction_size', 2)
