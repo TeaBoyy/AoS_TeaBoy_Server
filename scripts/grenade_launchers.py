@@ -29,13 +29,8 @@ G_SMG_LAUNCHER_DAMAGE=15.0
 global G_SHOTGUN_LAUNCHER_DAMAGE
 G_SHOTGUN_LAUNCHER_DAMAGE=50.0
 
-global G_RIFLE_GRENADE_NAME
 G_RIFLE_GRENADE_NAME="rifle_underslung"
-
-global G_SHOTGUN_GRENADE_NAME
 G_SHOTGUN_GRENADE_NAME="shotgun_underslung"
-
-global G_SMG_GRENADE_NAME
 G_SMG_GRENADE_NAME="smg_underslung"
 
 def set_weapon_launcher_damage(connection, value = None, damage_ordinal = 0, launcher_type = "Unknown"):
@@ -254,16 +249,14 @@ def apply_script(protocol, connection, config):
 
             # Increase destruction area for Rifle
             if config.get('nade_launcher_extra_destruction', False):
-                enabled_weapons = config.get('nade_launcher_extra_destruction_weapons', ["rifle", "shotgun"])
-
-                if self.is_enabled_extra_destrution_for_grenade(grenade.name, enabled_weapons):
+                if self.is_enabled_extra_destrution_for_grenade(grenade.name):
                     # Default is 2x2x2
                     grid_size = config.get('nade_launcher_extra_destruction_size', 2)
-                    self.create_grenade_grid(position, grid_size, False, extra_height)
+                    self.create_grenade_grid(position, grid_size, grenade, extra_height)
 
             connection.grenade_exploded(self, grenade)
 
-        def create_grenade_grid(self, position, grid_size, send_to_client = False, extra_height = 0):
+        def create_grenade_grid(self, position, grid_size, original_grenade, extra_height = 0):
             zero_vector = Vertex3(0, 0, 0)
             grenade_impact_size = 3.0
 
@@ -291,6 +284,9 @@ def apply_script(protocol, connection, config):
 
             extra_destruction_sound = config.get('nade_launcher_extra_destruction_sound', 2)
             if extra_destruction_sound <= 0:
+                return
+
+            if not self.is_enabled_extra_destrution_sound_for_grenade(original_grenade.name):
                 return
 
             explosion_distance = distance_3d_vector(self.world_object.position, position)
@@ -399,7 +395,15 @@ def apply_script(protocol, connection, config):
 
             return connection.on_block_destroy(self, x, y, z, mode)
 
-        def is_enabled_extra_destrution_for_grenade(self, grenade_name, enabled_weapons):
+        def is_enabled_extra_destrution_for_grenade(self, grenade_name):
+            enabled_weapons = config.get('nade_launcher_extra_destruction_weapons', ["rifle", "shotgun"])
+            return self.is_enabled_extra_destrution_setting_for_grenade(grenade_name, enabled_weapons)
+
+        def is_enabled_extra_destrution_sound_for_grenade(self, grenade_name):
+            enabled_weapons = config.get('nade_launcher_extra_destruction_sound_weapons', ["rifle", "shotgun"])
+            return self.is_enabled_extra_destrution_setting_for_grenade(grenade_name, enabled_weapons)
+ 
+        def is_enabled_extra_destrution_setting_for_grenade(self, grenade_name, enabled_weapons):
             # Refactoring would be nice
             if "rifle" in enabled_weapons and grenade_name == G_RIFLE_GRENADE_NAME:
                 return True
