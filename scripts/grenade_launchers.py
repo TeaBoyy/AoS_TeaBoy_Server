@@ -247,13 +247,16 @@ def apply_script(protocol, connection, config):
             if position.z >= 1:
                 position.z -= extra_height
 
-            # Increase destruction area for Rifle
-            if config.get('nade_launcher_extra_destruction', False):
-                if self.is_enabled_extra_destrution_for_grenade(grenade.name):
-                    # Default is 2x2x2
-                    # TODO: allow to set destruction size per weapon type
-                    grid_size = config.get('nade_launcher_extra_destruction_size', 2)
-                    self.create_grenade_grid(position, grid_size, grenade, extra_height)
+            try:
+                # TODO: allow to set destruction size per weapon type
+                # Increase destruction area
+                if config.get('nade_launcher_extra_destruction', False):
+                    if self.is_enabled_extra_destrution_for_grenade(grenade.name):
+                        # Default is 2x2x2
+                        grid_size = config.get('nade_launcher_extra_destruction_size', 2)
+                        self.create_grenade_grid(position, grid_size, grenade, extra_height)
+            except Exception as ex:
+                print("Got some exception when increasing destruction area", ex)
 
             connection.grenade_exploded(self, grenade)
 
@@ -282,6 +285,9 @@ def apply_script(protocol, connection, config):
 
                         # Spawn extra grenades on server side only
                         _ = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "no_damage_grenade")
+
+            if self.world_object is None:
+                return
 
             extra_destruction_sound = config.get('nade_launcher_extra_destruction_sound', 2)
             if extra_destruction_sound <= 0:
