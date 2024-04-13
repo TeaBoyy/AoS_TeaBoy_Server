@@ -1,0 +1,4 @@
+name = 'icebridge'
+version = '1.0'
+author = 'RandomJack and SuperCool Builders'
+description = 'SuperCool Ice Bridge'
