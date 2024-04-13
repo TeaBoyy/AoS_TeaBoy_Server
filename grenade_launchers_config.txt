@@ -8,7 +8,8 @@
 		"Use your grenade launcher to CAPTURE ALL OBJECTIVES!",
 		"You cannot damage yourself or your teammates! Leverage this to DIG CAVES!",
         "Hint for OpenSpades: disable \"Camera Shake\" in \"Setup\" menu for better experience!",
-        "Performance note: this runs smoother on lower-end clients like Build&Shoot!"
+        "Performance note: this runs smoother on lower-end clients like Build&Shoot!",
+        "NEW: Hold V (sneak) and SHOOT to RESTORE BLOCKS BACK IN TIME!"
     ],
     "help" : [
         "Server name: %(server_name)s",
@@ -16,6 +17,7 @@
         "Game mode: %(game_mode)s",
         "Use your grenade launcher to CAPTURE ALL OBJECTIVES!",
         "Press N (or M) to open the map! You can see the OBJECTIVES and TEAMMATES on it!",
+        "NEW: Hold V (sneak) and SHOOT to RESTORE BLOCKS BACK IN TIME!",
         "Hint for OpenSpades: disable \"Camera Shake\" in \"Setup\" menu for better experience!",
         "Watch out for reports of enemy attacks on objectives! They're displayed in chat!",
         "Commands (press T to start typing them):",
@@ -27,6 +29,7 @@
 		"/STREAK    Shows how many kills in a row you got without dying"
     ],
     "tips" : [
+        "Tip: (NEW!) Hold V (sneak) and SHOOT to RESTORE BLOCKS BACK IN TIME!",
         "Tip: Type /NEXT to start a vote to advance to the next map. Type /HELP for more info",
         "Hint for OpenSpades: disable \"Camera Shake\" in \"Setup\" menu for better experience!",
         "Press N (or M) to open the MAP and locate enemy TENTS!",
@@ -164,7 +167,7 @@
 	"spawn_protect_time" : 2,
     "medkits" : 1,
     "medkit_heal_amount" : 40,
-    "nade_launcher_restore_blocks" : false,
+    "nade_launcher_restore_blocks" : true,
     "nade_launcher_restore_blocks_grayscale" : false,
     "mini_tc_scale_x" : 1.5,
     "mini_tc_scale_y" : 1.5
