@@ -35,6 +35,9 @@ G_RIFLE_GRENADE_NAME="rifle_underslung"
 global G_SHOTGUN_GRENADE_NAME
 G_SHOTGUN_GRENADE_NAME="shotgun_underslung"
 
+global G_SMG_GRENADE_NAME
+G_SMG_GRENADE_NAME="smg_underslung"
+
 def set_weapon_launcher_damage(connection, value = None, damage_ordinal = 0, launcher_type = "Unknown"):
     global G_RIFLE_LAUNCHER_DAMAGE
     global G_SMG_LAUNCHER_DAMAGE
@@ -208,7 +211,7 @@ def apply_script(protocol, connection, config):
             grenade_name = "underslung"
             if self.weapon is SMG_WEAPON:
                 multipler = 2.0
-                grenade_name = "smg_underslung"
+                grenade_name = G_SMG_GRENADE_NAME
             elif self.weapon is RIFLE_WEAPON:
                 multipler = 2.2
                 grenade_name = G_RIFLE_GRENADE_NAME
@@ -248,10 +251,12 @@ def apply_script(protocol, connection, config):
             extra_height = 1
             if position.z >= 1:
                 position.z -= extra_height
-            
+
             # Increase destruction area for Rifle
             if config.get('nade_launcher_extra_destruction', False):
-                if grenade.name == G_RIFLE_GRENADE_NAME or grenade.name == G_SHOTGUN_GRENADE_NAME:
+                enabled_weapons = config.get('nade_launcher_extra_destruction_weapons', ["rifle", "shotgun"])
+
+                if self.is_enabled_extra_destrution_for_grenade(grenade.name, enabled_weapons):
                     # Default is 2x2x2
                     grid_size = config.get('nade_launcher_extra_destruction_size', 2)
                     self.create_grenade_grid(position, grid_size, False, extra_height)
@@ -284,13 +289,17 @@ def apply_script(protocol, connection, config):
                         # Spawn extra grenades on server side only
                         _ = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "no_damage_grenade")
 
+            extra_destruction_sound = config.get('nade_launcher_extra_destruction_sound', 3)
+            if extra_destruction_sound <= 0:
+                return
+
             explosion_distance = distance_3d_vector(self.world_object.position, position)
             if explosion_distance < 10:
                 # Don't spawn extra grenades for shooter on client side if detonated too close (to avoid extra water slash effects, etc)
                 return
 
             # Create extra explosions at origin point on client side for better visual/audio feedback
-            for _ in range(0,3):
+            for _ in range(0, extra_destruction_sound):
                 self.send_grenade_packet(0, 31, position, zero_vector)
 
         def create_grenade(self, position, velocity, grenade_callback, name, fuse = 0.0):
@@ -389,6 +398,19 @@ def apply_script(protocol, connection, config):
                 return False
 
             return connection.on_block_destroy(self, x, y, z, mode)
+
+        def is_enabled_extra_destrution_for_grenade(self, grenade_name, enabled_weapons):
+            # Refactoring would be nice
+            if "rifle" in enabled_weapons and grenade_name == G_RIFLE_GRENADE_NAME:
+                return True
+
+            if "shotgun" in enabled_weapons and grenade_name == G_SHOTGUN_GRENADE_NAME:
+                return True
+
+            if "smg" in enabled_weapons and grenade_name == G_SMG_GRENADE_NAME:
+                return True  
+
+            return False
         
     class GrenadeSeedRollbackProtocol(protocol):
         def on_map_change(self, map):
