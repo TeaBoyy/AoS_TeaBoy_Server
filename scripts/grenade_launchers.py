@@ -251,6 +251,7 @@ def apply_script(protocol, connection, config):
             if config.get('nade_launcher_extra_destruction', False):
                 if self.is_enabled_extra_destrution_for_grenade(grenade.name):
                     # Default is 2x2x2
+                    # TODO: allow to set destruction size per weapon type
                     grid_size = config.get('nade_launcher_extra_destruction_size', 2)
                     self.create_grenade_grid(position, grid_size, grenade, extra_height)
 
