@@ -32,6 +32,9 @@ G_SHOTGUN_LAUNCHER_DAMAGE=50.0
 global G_RIFLE_GRENADE_NAME
 G_RIFLE_GRENADE_NAME="rifle_underslung"
 
+global G_SHOTGUN_GRENADE_NAME
+G_SHOTGUN_GRENADE_NAME="shotgun_underslung"
+
 def set_weapon_launcher_damage(connection, value = None, damage_ordinal = 0, launcher_type = "Unknown"):
     global G_RIFLE_LAUNCHER_DAMAGE
     global G_SMG_LAUNCHER_DAMAGE
@@ -211,7 +214,7 @@ def apply_script(protocol, connection, config):
                 grenade_name = G_RIFLE_GRENADE_NAME
             elif self.weapon is SHOTGUN_WEAPON:
                 multipler = 2.2
-                grenade_name = "shotgun_underslung"
+                grenade_name = G_SHOTGUN_GRENADE_NAME
 
             velocity.x *= multipler
             velocity.y *= multipler
@@ -242,18 +245,16 @@ def apply_script(protocol, connection, config):
             self.penetrate_blocks(grenade, 2)
             
             # Explode a bit higher to not damage ground too much on indirect impact
+            extra_height = 1
             if position.z >= 1:
-                position.z -= 1
+                position.z -= extra_height
             
-            # TODO: read big explosion bool from config
-            # TODO: allow other weapons to be togglable with own explosion size
-            # TODO: what about shotgun rn?
-
             # Increase destruction area for Rifle
-            if grenade.name == G_RIFLE_GRENADE_NAME:
-                # TODO: read size from config
-                grid_size = 2 # 2x2x2
-                self.create_grenade_grid(position, grid_size, False, 1)
+            if config.get('nade_launcher_extra_destruction', False) 
+                if grenade.name == G_RIFLE_GRENADE_NAME or grenade.name == G_SHOTGUN_GRENADE_NAME:
+                    # Default is 2x2x2
+                    grid_size = config.get('nade_launcher_extra_destruction_size', 2)
+                    self.create_grenade_grid(position, grid_size, False, extra_height)
 
             connection.grenade_exploded(self, grenade)
 
@@ -311,7 +312,6 @@ def apply_script(protocol, connection, config):
 
             return False
         
-        # TODO: use this for nade_exploded as well
         def penetrate_blocks(self, grenade, depth = 2):
             position, velocity = grenade.position, grenade.velocity
             velocity.normalize()
