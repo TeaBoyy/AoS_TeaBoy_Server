@@ -170,5 +170,5 @@
     "nade_launcher_restore_blocks" : true,
     "nade_launcher_restore_blocks_grayscale" : false,
     "mini_tc_scale_x" : 1.5,
-    "mini_tc_scale_y" : 1.5
+    "mini_tc_scale_y" : 1.2
 }
