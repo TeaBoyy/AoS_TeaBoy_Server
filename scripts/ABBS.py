@@ -144,7 +144,7 @@ try:
 
 
 
-    @name('addbot')
+    @admin
     def add_bot(connection, amount=None, team=None):
         protocol = connection.protocol
         if team:
@@ -159,7 +159,7 @@ try:
                 return "Added %s bot(s)" % i
         return "Added %s bot(s)" % amount
 
-    @name('botmute')		#BOTmute
+    @admin		#BOTmute
     def botmute(connection):
         global BOTMUTE
         BOTMUTE = not BOTMUTE
@@ -173,7 +173,7 @@ try:
         return "BOT_ADD_PATTERN %s" % BOT_ADD_PATTERN
 
 
-    @name('botnum')		#BOT_ADD_NUM
+    @admin		#BOT_ADD_NUM
     def botnum(connection, num):
         global BOT_ADD_NUM
         BOT_ADD_NUM = int(num)
@@ -187,7 +187,7 @@ try:
         connection.protocol.stage_level-=1
 
 
-    @name('toggleai')	#BOT
+    @admin	#BOT
     def toggle_ai(connection):
         protocol = connection.protocol
         protocol.ai_enabled = not protocol.ai_enabled
@@ -254,7 +254,7 @@ try:
             return "player '%s' is not BOT"%player.name
 
 
-
+    # TODO: seems to be slightly broken
     @name('allref')		#all bot dissconect and enter again
     def allreflesh(connection):
         for botn in connection.protocol.players.values():
@@ -292,6 +292,12 @@ try:
     # @name("cpulv")
     # @name("lv")
     # @name(lvset)
+
+    # Pyspades fix
+    add(botnum)
+    add(toggle_ai)
+    add(botmute)
+    add(add_bot)
 
     LINE_COLOR_MAIN=(255,0,0)
     LINE_COLOR_SUB=(255,255,0)
