@@ -29,6 +29,10 @@ G_SMG_LAUNCHER_DAMAGE=15.0
 global G_SHOTGUN_LAUNCHER_DAMAGE
 G_SHOTGUN_LAUNCHER_DAMAGE=50.0
 
+G_RIFLE_GRENADE_NAME="rifle_underslung"
+G_SHOTGUN_GRENADE_NAME="shotgun_underslung"
+G_SMG_GRENADE_NAME="smg_underslung"
+
 def set_weapon_launcher_damage(connection, value = None, damage_ordinal = 0, launcher_type = "Unknown"):
     global G_RIFLE_LAUNCHER_DAMAGE
     global G_SMG_LAUNCHER_DAMAGE
@@ -154,36 +158,39 @@ def apply_script(protocol, connection, config):
             return connection.on_kill(self, killer, type, grenade)
             
         def on_hit(self, hit_amount, hit_player, hit_type, grenade):  
-           if self.player_id == hit_player.player_id:
-               # Player can't hit themselves
-               return False
+            if self.player_id == hit_player.player_id:
+                # Player can't hit themselves
+                return False
                
-           if hit_player.god:
-               return connection.on_hit(self, hit_amount, hit_player, hit_type, grenade)
-        
-           if grenade:
-               newAmount = hit_amount
-               
-               global G_RIFLE_LAUNCHER_DAMAGE
-               global G_SMG_LAUNCHER_DAMAGE
-               global G_SHOTGUN_LAUNCHER_DAMAGE
+            if hit_player.god:
+                return connection.on_hit(self, hit_amount, hit_player, hit_type, grenade)
 
-               # Assume it's grenade launcher's projectile (and not a regular grenade).
-               # Regular grenades will deal the same damage as launcher's projectiles for now
-               if self.weapon == SMG_WEAPON:
-                   newAmount = G_SMG_LAUNCHER_DAMAGE
-               elif self.weapon == RIFLE_WEAPON: 
-                   newAmount = G_RIFLE_LAUNCHER_DAMAGE
-               elif self.weapon == SHOTGUN_WEAPON: 
-                   newAmount = G_SHOTGUN_LAUNCHER_DAMAGE
-
-               return newAmount
-           elif hit_type is WEAPON_KILL or hit_type is HEADSHOT_KILL:
-                # This is regular bullet, it deals no damage
+            if grenade and grenade.name == "no_damage_grenade":
                 return False
 
-           # Handle melee, fall
-           return connection.on_hit(self, hit_amount, hit_player, hit_type, grenade)
+            if grenade:
+                newAmount = hit_amount
+                
+                global G_RIFLE_LAUNCHER_DAMAGE
+                global G_SMG_LAUNCHER_DAMAGE
+                global G_SHOTGUN_LAUNCHER_DAMAGE
+
+                # Assume it's grenade launcher's projectile (and not a regular grenade).
+                # Regular grenades will deal the same damage as launcher's projectiles for now
+                if self.weapon == SMG_WEAPON:
+                    newAmount = G_SMG_LAUNCHER_DAMAGE
+                elif self.weapon == RIFLE_WEAPON: 
+                    newAmount = G_RIFLE_LAUNCHER_DAMAGE
+                elif self.weapon == SHOTGUN_WEAPON: 
+                    newAmount = G_SHOTGUN_LAUNCHER_DAMAGE
+
+                return newAmount
+            elif hit_type is WEAPON_KILL or hit_type is HEADSHOT_KILL:
+                    # This is regular bullet, it deals no damage
+                    return False
+
+            # Handle melee, fall
+            return connection.on_hit(self, hit_amount, hit_player, hit_type, grenade)
 
         def _on_reload(self):
             # Refill ammo only
@@ -196,11 +203,17 @@ def apply_script(protocol, connection, config):
             velocity = direction
             
             multipler = 2
+            grenade_name = "underslung"
             if self.weapon is SMG_WEAPON:
                 multipler = 2.0
-            else:
+                grenade_name = G_SMG_GRENADE_NAME
+            elif self.weapon is RIFLE_WEAPON:
                 multipler = 2.2
-            
+                grenade_name = G_RIFLE_GRENADE_NAME
+            elif self.weapon is SHOTGUN_WEAPON:
+                multipler = 2.2
+                grenade_name = G_SHOTGUN_GRENADE_NAME
+
             velocity.x *= multipler
             velocity.y *= multipler
             velocity.z *= multipler
@@ -212,40 +225,99 @@ def apply_script(protocol, connection, config):
                     return
                 grenade_callback = self.rollback_seed_exploded
                 
-            grenade = protocol.world.create_object(Grenade, 0.0, position, None, velocity, grenade_callback)
-            grenade.name = 'rocket'
-            
+            grenade = self.create_grenade(position, velocity, grenade_callback, grenade_name)
+
             # Figure out when grenade will land
             collision = grenade.get_next_collision(UPDATE_FREQUENCY)
             if collision:
                 eta, tmpA, tmpA, tmpA = collision
                 grenade.fuse = eta
                 
-            grenade_packet.value = grenade.fuse
-            grenade_packet.player_id = player.player_id
-            grenade_packet.position = position.get()
-            grenade_packet.velocity = velocity.get()
-            
-            protocol.send_contained(grenade_packet)
+            self.send_grenade_packet(grenade.fuse, player.player_id, position, velocity)
            
         def nade_exploded(self, grenade):
             position, velocity = grenade.position, grenade.velocity
             velocity.normalize()
 
             # Penetrate up to 2 blocks to get to the solid block
-            extra_distance = 2
-            for _ in range(extra_distance):
-                solid = self.protocol.map.get_solid(*position.get())
-                if solid or solid is None:
-                    break
-                    
-                position += velocity
+            self.penetrate_blocks(grenade, 2)
             
             # Explode a bit higher to not damage ground too much on indirect impact
+            extra_height = 1
             if position.z >= 1:
-                position.z -= 1
-            
+                position.z -= extra_height
+
+            try:
+                # TODO: allow to set destruction size per weapon type
+                # Increase destruction area
+                if config.get('nade_launcher_extra_destruction', False):
+                    if self.is_enabled_extra_destrution_for_grenade(grenade.name):
+                        # Default is 2x2x2
+                        grid_size = config.get('nade_launcher_extra_destruction_size', 2)
+                        self.create_grenade_grid(position, grid_size, grenade, extra_height)
+            except Exception as ex:
+                print("Got some exception when increasing destruction area", ex)
+
             connection.grenade_exploded(self, grenade)
+
+        def create_grenade_grid(self, position, grid_size, original_grenade, extra_height = 0):
+            zero_vector = Vertex3(0, 0, 0)
+            grenade_impact_size = 3.0
+
+            if grid_size < 0 or grid_size - 1 < 0:
+                return
+
+            offset = (grenade_impact_size / 2) * (grid_size - 1)
+            top_left_center_positon = position.copy()
+            top_left_center_positon.x -= offset
+            top_left_center_positon.y -= offset
+            top_left_center_positon.z -= offset
+            
+            for dx in range(0, grid_size):
+                for dy in range(0, grid_size):
+                    for dz in range(0, grid_size):
+                        origin_position = top_left_center_positon.copy()
+                        origin_position.x += dx * grenade_impact_size
+                        origin_position.y += dy * grenade_impact_size
+                        origin_position.z += dz * grenade_impact_size
+
+                        origin_position.z -= extra_height
+
+                        # Spawn extra grenades on server side only
+                        _ = self.create_grenade(origin_position, zero_vector, self.grenade_exploded, "no_damage_grenade")
+
+            if self.world_object is None:
+                return
+
+            extra_destruction_sound = config.get('nade_launcher_extra_destruction_sound', 2)
+            if extra_destruction_sound <= 0:
+                return
+
+            if not self.is_enabled_extra_destrution_sound_for_grenade(original_grenade.name):
+                return
+
+            explosion_distance = distance_3d_vector(self.world_object.position, position)
+            if explosion_distance < 20:
+                # Don't spawn extra grenades for shooter on client side if detonated too close (to avoid extra water slash effects, etc)
+                return
+
+            # Create extra explosions at origin point on client side for better visual/audio feedback
+            for _ in range(0, extra_destruction_sound):
+                self.send_grenade_packet(0, 31, position, zero_vector)
+
+        def create_grenade(self, position, velocity, grenade_callback, name, fuse = 0.0):
+            grenade = self.protocol.world.create_object(Grenade, 0.0, position, None, velocity, grenade_callback)
+            grenade.name = name
+            grenade.fuse = fuse
+            
+            return grenade
+
+        def send_grenade_packet(self, fuse, player_id, position, velocity):
+            grenade_packet.value = fuse
+            grenade_packet.player_id = player_id
+            grenade_packet.position = position.get()
+            grenade_packet.velocity = velocity.get()
+            self.protocol.send_contained(grenade_packet)
 
         def rollback_seed_exploded(self, grenade):
             try:
@@ -256,7 +328,6 @@ def apply_script(protocol, connection, config):
 
             return False
         
-        # TODO: use this for nade_exploded as well
         def penetrate_blocks(self, grenade, depth = 2):
             position, velocity = grenade.position, grenade.velocity
             velocity.normalize()
@@ -272,8 +343,8 @@ def apply_script(protocol, connection, config):
             return 
         
         def rollback_area(self, position):
-            # Hardcoded size
-            size = 5 
+            size = config.get('nade_launcher_restore_blocks_size', 5)
+
             start_point = position.copy() 
             start_point.x -= 2
             start_point.y -= 2
@@ -330,6 +401,27 @@ def apply_script(protocol, connection, config):
                 return False
 
             return connection.on_block_destroy(self, x, y, z, mode)
+
+        def is_enabled_extra_destrution_for_grenade(self, grenade_name):
+            enabled_weapons = config.get('nade_launcher_extra_destruction_weapons', ["rifle", "shotgun"])
+            return self.is_enabled_extra_destrution_setting_for_grenade(grenade_name, enabled_weapons)
+
+        def is_enabled_extra_destrution_sound_for_grenade(self, grenade_name):
+            enabled_weapons = config.get('nade_launcher_extra_destruction_sound_weapons', ["rifle", "shotgun"])
+            return self.is_enabled_extra_destrution_setting_for_grenade(grenade_name, enabled_weapons)
+ 
+        def is_enabled_extra_destrution_setting_for_grenade(self, grenade_name, enabled_weapons):
+            # Refactoring would be nice
+            if "rifle" in enabled_weapons and grenade_name == G_RIFLE_GRENADE_NAME:
+                return True
+
+            if "shotgun" in enabled_weapons and grenade_name == G_SHOTGUN_GRENADE_NAME:
+                return True
+
+            if "smg" in enabled_weapons and grenade_name == G_SMG_GRENADE_NAME:
+                return True  
+
+            return False
         
     class GrenadeSeedRollbackProtocol(protocol):
         def on_map_change(self, map):

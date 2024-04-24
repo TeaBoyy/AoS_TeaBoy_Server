@@ -1,0 +1,5 @@
+name = 'Kowang-San (Hill 355)'
+version = '1.0'
+author = 'Influx'
+description = ('Defense of Hill 355 (called Kowang-San) in the Korean War'
+               'where the 1st Royal Canadian Regiment held off 2 battalions of Chinese soldiers')
