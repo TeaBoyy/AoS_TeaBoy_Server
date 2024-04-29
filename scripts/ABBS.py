@@ -3322,6 +3322,9 @@ try:
                         # TODO: disgusting performance
                         if other_frontline is not None:
                             if current_entity in other_frontline:
+                                # TODO: check if borders with out-of-bounds tents. Add to the second frontline if so
+                                # TODO: store pairs of entity/position (None/position) or use wrapper
+                                # TODO: but don't add out-of-bounds tent to the second frontline if got enough spawn points already
                                 continue
 
                             if i > 0 and self.protocol.grid_entities[i - 1][j] in other_frontline:
