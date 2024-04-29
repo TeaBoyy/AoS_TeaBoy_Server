@@ -3294,7 +3294,7 @@ try:
                 return connection.on_hit(self, damage, hitplayer, type, grenade)
 
             # TODO: try and spanwn on frontline, then 1 tent back from frontline
-            def get_frontline_entities(self):
+            def get_frontline_entities(self, other_frontline = None):
                 my_team = self.team
 
                 # TODO: check other directions
@@ -3310,14 +3310,38 @@ try:
 
                 for i in range(grid_rows_count):
                     for j in range(grid_columns_count):
-                        print("i: ", i, ", j: ", j)
+                        #print("i: ", i, ", j: ", j)
 
                         current_entity = self.protocol.grid_entities[i][j]
                         if current_entity.team != my_team:
-                            print("Skip green entity")
                             continue
 
                         is_frontline_entity = False
+
+                        # TODO: refactoring
+                        # TODO: disgusting performance
+                        if other_frontline is not None:
+                            if current_entity in other_frontline:
+                                continue
+
+                            if i > 0 and self.protocol.grid_entities[i - 1][j] in other_frontline:
+                                is_frontline_entity = True
+
+                            if i < (grid_rows_count - 1) and self.protocol.grid_entities[i + 1][j] in other_frontline:
+                                is_frontline_entity = True
+
+                            if j < (grid_columns_count - 1) and self.protocol.grid_entities[i][j + 1] in other_frontline:
+                                is_frontline_entity = True
+
+                            if j > 0 and self.protocol.grid_entities[i][j - 1] in other_frontline:
+                                is_frontline_entity = True
+                            
+                            if is_frontline_entity:
+                                print("is_second_frontline_entity: ", "i: ", i, ", j: ", j)
+                                frontline_entities.append(current_entity)
+
+                            # TODO: refactoring
+                            continue
 
                         if i > 0 and self.protocol.grid_entities[i - 1][j].team != my_team:
                             is_frontline_entity = True
@@ -3332,7 +3356,7 @@ try:
                             is_frontline_entity = True
 
                         if is_frontline_entity:
-                            print("is_frontline_entity")
+                            print("is_primary_frontline_entity: ", "i: ", i, ", j: ", j)
                             frontline_entities.append(current_entity)
 
                 return frontline_entities
@@ -3352,6 +3376,23 @@ try:
 
                 return connection.get_spawn_location(self)
             '''
+
+            def get_spawn_location(self):
+                if self.protocol.game_mode != TC_MODE:
+                    return connection.get_spawn_location(self)
+
+                # TODO: spawn on one tent behind the frontline
+                try:
+                    frontline_entities = self.get_frontline_entities()
+                    rear_frontline_entities = self.get_frontline_entities(frontline_entities)
+
+                    print("len(rear_frontline_entities): ", len(rear_frontline_entities))
+                    base = random.choice(rear_frontline_entities)
+                    return base.get_spawn_location()
+                except IndexError:
+                    pass
+                
+                return connection.get_spawn_location(self)
 
             def on_spawn(self, pos):
                 if self.protocol.bot_adjusting and self.local:
