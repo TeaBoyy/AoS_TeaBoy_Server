@@ -3260,7 +3260,7 @@ try:
                 return connection.on_hit(self, damage, hitplayer, type, grenade)
 
             # TODO:
-            def get_spawn_location(self):
+            ''' def get_spawn_location(self):
                 if self.protocol.game_mode != TC_MODE:
                     return connection.get_spawn_location(self)
                 
@@ -3283,6 +3283,7 @@ try:
                     pass
 
                 return connection.get_spawn_location(self)
+            '''
 
             def on_spawn(self, pos):
                 if self.protocol.bot_adjusting and self.local:
