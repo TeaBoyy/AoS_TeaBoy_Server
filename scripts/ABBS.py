@@ -1055,15 +1055,15 @@ try:
                 if weapon_rdm>0.4:
                     self.set_weapon(RIFLE_WEAPON, True)
                     self.battle_distance = uniform(30,110)
-                    if random.random()<0.2:
-                        self.battlecrouching=True
+                    #if random.random()<0.2:
+                        #self.battlecrouching=True
                     if weapon_rdm>0.7 or random.random()<self.cpulevel:
                         self.z_add= gauss(0.1,0.2*(1-self.cpulevel)/3)			
                 elif weapon_rdm>0.15:
                     self.set_weapon(SMG_WEAPON, True)
                     self.battle_distance = uniform(10,80)
-                    if random.random()<self.cpulevel or random.random()<0.2:
-                        self.battlecrouching=True
+                    #if random.random()<self.cpulevel or random.random()<0.2:
+                        #self.battlecrouching=True
                     if weapon_rdm>0.3:
                         self.z_add= gauss(0.5,0.2*(1-self.cpulevel)/3)	#SMG�Ȃ瓷�_����������
                     elif random.random()<self.cpulevel:		
@@ -1071,8 +1071,8 @@ try:
                 else:
                     self.set_weapon(SHOTGUN_WEAPON, True)
                     self.battle_distance = uniform(10,60)
-                    if random.random()<0.1:
-                        self.battlecrouching=True
+                    #if random.random()<0.1:
+                        #self.battlecrouching=True
                     if weapon_rdm>0.05:
                         self.z_add= gauss(0.7,0.3*(1-self.cpulevel)/3)	
                 if ARENAmode:self.battle_distance/=2		
@@ -2236,8 +2236,9 @@ try:
                                             if seconds()-self.jumptime>0.5 and obj.velocity.z**2<0.0001:
                                                 self.jumptime=seconds()
                                                 self.input.add('jump')
-                                    if random.random() < self.cpulevel**2/4-0.04: #���L���
-                                        crouchadd = True
+                                    #if random.random() < self.cpulevel**2/4-0.04: #���L���
+                                        # TODO: maybe responsible for battlecrouch, maybe all crouching, idk
+                                        #crouchadd = True
                                 if 0.1 > p_dot > 0.0:
                                     self.input.add('right')
                                 elif 0.0 > p_dot > -0.1:
