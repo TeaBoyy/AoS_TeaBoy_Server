@@ -3386,6 +3386,8 @@ try:
                     return connection.get_spawn_location(self)
 
                 # TODO: spawn on one tent behind the frontline
+                # TODO: handle no safe bases, at lesat pick random one
+                # TODO: spawn on edges of map, behind tents, if no safe tent available
                 try:
                     frontline_entities = self.get_frontline_entities()
                     rear_frontline_entities = self.get_frontline_entities(frontline_entities)
