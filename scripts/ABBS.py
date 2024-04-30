@@ -3326,6 +3326,39 @@ try:
                                 # TODO: check if borders with out-of-bounds tents. Add to the second frontline if so
                                 # TODO: store pairs of entity/position (None/position) or use wrapper
                                 # TODO: but don't add out-of-bounds tent to the second frontline if got enough spawn points already
+                                
+                                # TODO: for now offset is diagonal, not 2 spawn points, in case is corner tent
+                                out_of_tents_spawn_point_max_offset = 64
+                                x1 = y1 = 0
+
+                                if i <= 0:
+                                    y1 -= out_of_tents_spawn_point_max_offset
+                                    is_frontline_entity = True
+
+                                if i >= (grid_rows_count - 1):
+                                    y1 += out_of_tents_spawn_point_max_offset
+                                    is_frontline_entity = True
+
+                                if j >= (grid_columns_count - 1):
+                                    x1 += out_of_tents_spawn_point_max_offset
+                                    is_frontline_entity = True
+
+                                if j <= 0:
+                                    x1 -= out_of_tents_spawn_point_max_offset
+                                    is_frontline_entity = True
+
+                                if is_frontline_entity:
+                                    print("fallback_frontline_entity: ", "i: ", i, ", j: ", j)
+                                    x2, y2 = current_entity.x, current_entity.y
+                                    
+                                    x2 += x1
+                                    y2 += y1
+                                    z2 = self.protocol.map.get_z(x2, y2)
+
+                                    new_point = (x2, y2, z2)
+
+                                    frontline_entities.append((current_entity, new_point))
+
                                 continue
 
                             if i > 0 and self.protocol.grid_entities[i - 1][j] in other_frontline:
