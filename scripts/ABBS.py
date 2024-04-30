@@ -3319,6 +3319,8 @@ try:
 
                         is_frontline_entity = False
 
+                        # TODO: exception when accessing grid_entities[][].team (accessing team throws, cause entity itself is None)
+
                         # TODO: refactoring
                         # TODO: disgusting performance
                         if other_frontline is not None:
