@@ -3342,7 +3342,7 @@ try:
                             
                             if is_frontline_entity:
                                 print("is_second_frontline_entity: ", "i: ", i, ", j: ", j)
-                                frontline_entities.append(current_entity)
+                                frontline_entities.append((current_entity, current_entity.get_spawn_location()))
 
                             # TODO: refactoring
                             continue
@@ -3361,7 +3361,7 @@ try:
 
                         if is_frontline_entity:
                             print("is_primary_frontline_entity: ", "i: ", i, ", j: ", j)
-                            frontline_entities.append(current_entity)
+                            frontline_entities.append((current_entity, current_entity.get_spawn_location()))
 
                 return frontline_entities
 
@@ -3390,11 +3390,18 @@ try:
                 # TODO: spawn on edges of map, behind tents, if no safe tent available
                 try:
                     frontline_entities = self.get_frontline_entities()
-                    rear_frontline_entities = self.get_frontline_entities(frontline_entities)
+
+                    frontline_entities_arg = []
+                    for entity, _ in frontline_entities:
+                        frontline_entities_arg.append(entity)
+
+                    rear_frontline_entities = self.get_frontline_entities(frontline_entities_arg)
 
                     print("len(rear_frontline_entities): ", len(rear_frontline_entities))
                     base = random.choice(rear_frontline_entities)
-                    return base.get_spawn_location()
+                    _, location = base
+                    return location
+                    #return base.get_spawn_location()
                 except IndexError:
                     pass
                 
