@@ -90,6 +90,8 @@ def apply_script(protocol, connection, config):
             if scale_x > 1.0:
                 j /= scale_x
 
+            test_y_offset = 8
+
             count = 0
             row_count = 0
             for i in range(territory_count):
@@ -114,14 +116,14 @@ def apply_script(protocol, connection, config):
                     x2 += offset_gray
 
                 if count == 0:
-                    y1 -= 128
-                    y2 -= 128
+                    y1 -= 128 + test_y_offset
+                    y2 -= 128 + test_y_offset
                 elif count == 1:
                     y1 -= 0
                     y2 -= 0
                 else:
-                    y1 += 128
-                    y2 += 128
+                    y1 += 128 + test_y_offset
+                    y2 += 128 + test_y_offset
 
                 y1 += row_count * 16
                 y2 += row_count * 16
