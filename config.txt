@@ -173,6 +173,6 @@
     "nade_launcher_extra_destruction_sound" : 2,
     "nade_launcher_extra_destruction_weapons" : ["rifle", "shotgun"],
     "nade_launcher_extra_destruction_sound_weapons" : ["rifle", "shotgun"],
-    "mini_tc_scale_x" : 1.5,
-    "mini_tc_scale_y" : 1.2
+    "mini_tc_scale_x" : 1.75,
+    "mini_tc_scale_y" : 1.25
 }
