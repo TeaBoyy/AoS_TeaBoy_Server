@@ -3295,7 +3295,7 @@ try:
                 return connection.on_hit(self, damage, hitplayer, type, grenade)
 
             # TODO: try and spanwn on frontline, then 1 tent back from frontline
-            def get_frontline_entities(self, other_frontline = None):
+            def get_frontline_entities(self):
                 my_team = self.team
 
                 # TODO: check other directions
@@ -3321,67 +3321,6 @@ try:
 
                         # TODO: exception when accessing grid_entities[][].team (accessing team throws, cause entity itself is None)
 
-                        # TODO: refactoring
-                        # TODO: disgusting performance
-                        if other_frontline is not None:
-                            if current_entity in other_frontline:
-                                # TODO: check if borders with out-of-bounds tents. Add to the second frontline if so
-                                # TODO: store pairs of entity/position (None/position) or use wrapper
-                                # TODO: but don't add out-of-bounds tent to the second frontline if got enough spawn points already
-                                
-                                # TODO: for now offset is diagonal, not 2 spawn points, in case is corner tent
-                                out_of_tents_spawn_point_max_offset = 64
-                                x1 = y1 = 0
-
-                                if i <= 0:
-                                    y1 -= out_of_tents_spawn_point_max_offset
-                                    is_frontline_entity = True
-
-                                if i >= (grid_rows_count - 1):
-                                    y1 += out_of_tents_spawn_point_max_offset
-                                    is_frontline_entity = True
-
-                                if j >= (grid_columns_count - 1):
-                                    x1 += out_of_tents_spawn_point_max_offset
-                                    is_frontline_entity = True
-
-                                if j <= 0:
-                                    x1 -= out_of_tents_spawn_point_max_offset
-                                    is_frontline_entity = True
-
-                                if is_frontline_entity:
-                                    print("fallback_frontline_entity: ", "i: ", i, ", j: ", j)
-                                    x2, y2 = current_entity.x, current_entity.y
-                                    
-                                    x2 += x1
-                                    y2 += y1
-                                    z2 = self.protocol.map.get_z(x2, y2)
-
-                                    new_point = (x2, y2, z2)
-
-                                    frontline_entities.append((current_entity, new_point))
-
-                                continue
-
-                            if i > 0 and self.protocol.grid_entities[i - 1][j] in other_frontline:
-                                is_frontline_entity = True
-
-                            if i < (grid_rows_count - 1) and self.protocol.grid_entities[i + 1][j] in other_frontline:
-                                is_frontline_entity = True
-
-                            if j < (grid_columns_count - 1) and self.protocol.grid_entities[i][j + 1] in other_frontline:
-                                is_frontline_entity = True
-
-                            if j > 0 and self.protocol.grid_entities[i][j - 1] in other_frontline:
-                                is_frontline_entity = True
-                            
-                            if is_frontline_entity:
-                                print("is_second_frontline_entity: ", "i: ", i, ", j: ", j)
-                                frontline_entities.append((current_entity, current_entity.get_spawn_location()))
-
-                            # TODO: refactoring
-                            continue
-
                         if i > 0 and self.protocol.grid_entities[i - 1][j].team != my_team:
                             is_frontline_entity = True
 
@@ -3396,6 +3335,89 @@ try:
 
                         if is_frontline_entity:
                             print("is_primary_frontline_entity: ", "i: ", i, ", j: ", j)
+                            frontline_entities.append((current_entity, current_entity.get_spawn_location()))
+
+                return frontline_entities
+
+            # TODO:
+            def get_safe_behind_frontline(self, other_frontline):
+                # TODO: refactoring
+                # TODO: disgusting performance
+
+                # TODO: exception when accessing grid_entities[][].team (accessing team throws, cause entity itself is None)
+
+                my_team = self.team
+
+                frontline_entities = []
+                grid_rows_count = len(self.protocol.grid_entities)
+
+                if grid_rows_count == 0:
+                    print("Grid not initialised yet")
+                    return []
+
+                grid_columns_count = len(self.protocol.grid_entities[0])
+
+                for i in range(grid_rows_count):
+                    for j in range(grid_columns_count):
+                        is_frontline_entity = False
+
+                        current_entity = self.protocol.grid_entities[i][j]
+                        if current_entity.team != my_team:
+                            continue
+
+                        if current_entity in other_frontline:
+                            # TODO: check if borders with out-of-bounds tents. Add to the second frontline if so
+                            # TODO: store pairs of entity/position (None/position) or use wrapper
+                            # TODO: but don't add out-of-bounds tent to the second frontline if got enough spawn points already
+                            
+                            # TODO: for now offset is diagonal, not 2 spawn points, in case is corner tent
+                            out_of_tents_spawn_point_max_offset = 64
+                            x1 = y1 = 0
+
+                            if i <= 0:
+                                y1 -= out_of_tents_spawn_point_max_offset
+                                is_frontline_entity = True
+
+                            if i >= (grid_rows_count - 1):
+                                y1 += out_of_tents_spawn_point_max_offset
+                                is_frontline_entity = True
+
+                            if j >= (grid_columns_count - 1):
+                                x1 += out_of_tents_spawn_point_max_offset
+                                is_frontline_entity = True
+
+                            if j <= 0:
+                                x1 -= out_of_tents_spawn_point_max_offset
+                                is_frontline_entity = True
+
+                            if is_frontline_entity:
+                                print("fallback_frontline_entity: ", "i: ", i, ", j: ", j)
+                                x2, y2 = current_entity.x, current_entity.y
+                                
+                                x2 += x1
+                                y2 += y1
+                                z2 = self.protocol.map.get_z(x2, y2)
+
+                                new_point = (x2, y2, z2)
+
+                                frontline_entities.append((current_entity, new_point))
+
+                            continue
+
+                        if i > 0 and self.protocol.grid_entities[i - 1][j] in other_frontline:
+                            is_frontline_entity = True
+
+                        if i < (grid_rows_count - 1) and self.protocol.grid_entities[i + 1][j] in other_frontline:
+                            is_frontline_entity = True
+
+                        if j < (grid_columns_count - 1) and self.protocol.grid_entities[i][j + 1] in other_frontline:
+                            is_frontline_entity = True
+
+                        if j > 0 and self.protocol.grid_entities[i][j - 1] in other_frontline:
+                            is_frontline_entity = True
+                        
+                        if is_frontline_entity:
+                            print("is_safe_behind_frontline_entity: ", "i: ", i, ", j: ", j)
                             frontline_entities.append((current_entity, current_entity.get_spawn_location()))
 
                 return frontline_entities
@@ -3430,7 +3452,7 @@ try:
                     for entity, _ in frontline_entities:
                         frontline_entities_arg.append(entity)
 
-                    rear_frontline_entities = self.get_frontline_entities(frontline_entities_arg)
+                    rear_frontline_entities = self.get_safe_behind_frontline(frontline_entities_arg)
 
                     print("len(rear_frontline_entities): ", len(rear_frontline_entities))
                     base = random.choice(rear_frontline_entities)
