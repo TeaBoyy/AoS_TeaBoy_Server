@@ -3414,7 +3414,7 @@ try:
                             if search_for_fallback_spawn and initial_zize == len(used_safe_tents):
                                 print("Searching for fallback spawn")
                                 # TODO: for now offset is diagonal, not 2 spawn points, in case is corner tent
-                                out_of_tents_spawn_point_max_offset = 64
+                                out_of_tents_spawn_point_max_offset = 80
                                 x1 = y1 = 0
 
                                 if i <= 0:
