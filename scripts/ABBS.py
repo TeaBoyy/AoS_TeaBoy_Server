@@ -3413,7 +3413,7 @@ try:
 
                             if search_for_fallback_spawn and initial_zize == len(used_safe_tents):
                                 print("Searching for fallback spawn")
-                                # TODO: for now offset is diagonal, not 2 spawn points, in case is corner tent
+                                # TODO: consider increasing distance penalty proportionally to remaining home tents
                                 out_of_tents_spawn_point_max_offset = 80
                                 x1 = y1 = 0
 
@@ -3437,8 +3437,12 @@ try:
                                     print("fallback_frontline_entity: ", "i: ", i, ", j: ", j)
                                     x2, y2 = current_entity.x, current_entity.y
                                     
-                                    x2 += x1
-                                    y2 += y1
+                                    # Case for corner
+                                    possibilities = ((x2 + 0, y2 + y1), (x2 + x1, y2 + 0))
+
+                                    chosen = random.choice(possibilities)
+
+                                    x2, y2 = chosen
                                     z2 = self.protocol.map.get_z(x2, y2)
 
                                     new_point = (x2, y2, z2)
