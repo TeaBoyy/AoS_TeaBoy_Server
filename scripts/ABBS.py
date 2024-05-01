@@ -3357,6 +3357,7 @@ try:
 
                 grid_columns_count = len(self.protocol.grid_entities[0])
 
+                used_safe_tents = []
                 for i in range(grid_rows_count):
                     for j in range(grid_columns_count):
                         is_frontline_entity = False
@@ -3366,41 +3367,85 @@ try:
                             continue
 
                         if current_entity in other_frontline:
+                            #continue
                             # TODO: check if borders with out-of-bounds tents. Add to the second frontline if so
                             # TODO: store pairs of entity/position (None/position) or use wrapper
                             # TODO: but don't add out-of-bounds tent to the second frontline if got enough spawn points already
+
+                            # TODO: if 2 tents have same safe point, then it needs to be handled
                             
-                            # TODO: for now offset is diagonal, not 2 spawn points, in case is corner tent
-                            out_of_tents_spawn_point_max_offset = 64
-                            x1 = y1 = 0
+                            search_for_fallback_spawn = False
+                            initial_zize = len(used_safe_tents)
 
-                            if i <= 0:
-                                y1 -= out_of_tents_spawn_point_max_offset
-                                is_frontline_entity = True
+                            if (i > 0 and (self.protocol.grid_entities[i - 1][j] in used_safe_tents or self.protocol.grid_entities[i - 1][j] in other_frontline or self.protocol.grid_entities[i - 1][j].team != my_team)):
+                                search_for_fallback_spawn = True
+                            elif i > 0:
+                                used_safe_tents.append(self.protocol.grid_entities[i - 1][j])
 
-                            if i >= (grid_rows_count - 1):
-                                y1 += out_of_tents_spawn_point_max_offset
-                                is_frontline_entity = True
+                            if (i < (grid_rows_count - 1) and (self.protocol.grid_entities[i + 1][j] in used_safe_tents or self.protocol.grid_entities[i + 1][j] in other_frontline or self.protocol.grid_entities[i + 1][j].team != my_team)):
+                                search_for_fallback_spawn = True
+                            elif i < (grid_rows_count - 1):
+                                used_safe_tents.append(self.protocol.grid_entities[i + 1][j])
 
-                            if j >= (grid_columns_count - 1):
-                                x1 += out_of_tents_spawn_point_max_offset
-                                is_frontline_entity = True
+                            if (j < (grid_columns_count - 1) and (self.protocol.grid_entities[i][j + 1] in used_safe_tents or self.protocol.grid_entities[i][j + 1] in other_frontline or self.protocol.grid_entities[i][j + 1].team != my_team)):
+                                search_for_fallback_spawn = True
+                            elif j < (grid_columns_count - 1):
+                                used_safe_tents.append(self.protocol.grid_entities[i][j + 1])
 
-                            if j <= 0:
-                                x1 -= out_of_tents_spawn_point_max_offset
-                                is_frontline_entity = True
+                            if (j > 0 and (self.protocol.grid_entities[i][j - 1] in used_safe_tents or self.protocol.grid_entities[i][j - 1] in other_frontline or self.protocol.grid_entities[i][j - 1].team != my_team)):
+                                search_for_fallback_spawn = True
+                            elif j > 0:
+                                used_safe_tents.append(self.protocol.grid_entities[i][j - 1])
 
-                            if is_frontline_entity:
-                                print("fallback_frontline_entity: ", "i: ", i, ", j: ", j)
-                                x2, y2 = current_entity.x, current_entity.y
-                                
-                                x2 += x1
-                                y2 += y1
-                                z2 = self.protocol.map.get_z(x2, y2)
+                            print("len(used_safe_tents): ", len(used_safe_tents))
 
-                                new_point = (x2, y2, z2)
+                            #if not search_for_fallback_spawn and (i <= 0 or i >= (grid_rows_count - 1) or j >= (grid_columns_count - 1) or j <= 0):
 
-                                frontline_entities.append((current_entity, new_point))
+                            if initial_zize == len(used_safe_tents):
+                                print("Haven't got a safe spawn point")
+                            else:
+                                print("Got a safe spawn point")
+
+                            if search_for_fallback_spawn:
+                                print("Found candidate for search for fallback spawn")
+                            else:
+                                print("Haven't found candidate for search for fallback spawn")
+
+                            if search_for_fallback_spawn and initial_zize == len(used_safe_tents):
+                                print("Searching for fallback spawn")
+                                # TODO: for now offset is diagonal, not 2 spawn points, in case is corner tent
+                                out_of_tents_spawn_point_max_offset = 64
+                                x1 = y1 = 0
+
+                                if i <= 0:
+                                    y1 -= out_of_tents_spawn_point_max_offset
+                                    is_frontline_entity = True
+
+                                if i >= (grid_rows_count - 1):
+                                    y1 += out_of_tents_spawn_point_max_offset
+                                    is_frontline_entity = True
+
+                                if j >= (grid_columns_count - 1):
+                                    x1 += out_of_tents_spawn_point_max_offset
+                                    is_frontline_entity = True
+
+                                if j <= 0:
+                                    x1 -= out_of_tents_spawn_point_max_offset
+                                    is_frontline_entity = True
+
+                                if is_frontline_entity:
+                                    print("fallback_frontline_entity: ", "i: ", i, ", j: ", j)
+                                    x2, y2 = current_entity.x, current_entity.y
+                                    
+                                    x2 += x1
+                                    y2 += y1
+                                    z2 = self.protocol.map.get_z(x2, y2)
+
+                                    new_point = (x2, y2, z2)
+
+                                    frontline_entities.append((current_entity, new_point))
+                            else:
+                                print("Skip searching for fallback spawn")
 
                             continue
 
