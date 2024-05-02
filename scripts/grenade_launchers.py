@@ -102,6 +102,9 @@ def apply_script(protocol, connection, config):
     class GrenadeLaunchersConnection(connection):
         should_stop_loop = False
         smg_shot_ordinal = 0
+
+        # TODO:
+        underslungs_left = 0
         
         def on_connect(self):
             self.bullet_loop = LoopingCall(self.bullet_shoot)
@@ -113,7 +116,11 @@ def apply_script(protocol, connection, config):
                 self.should_stop_loop = False
                 self.smg_shot_ordinal = 0
                 return
-                
+
+            if self.underslungs_left <= 0:
+                print("No more underslungs!")
+                return
+
             if self.weapon == SMG_WEAPON:
                 if self.smg_shot_ordinal != 0 and self.smg_shot_ordinal % 2 == 0:
                     # Skip every third bullet
@@ -202,6 +209,18 @@ def apply_script(protocol, connection, config):
             self.weapon_object.restock()
             return connection._on_reload(self)
 
+        def on_spawn(self, position):
+            self.restock_underslungs()
+            return connection.on_spawn(self, position)
+
+        # TODO: restock on tent (and display message for underslung mode)
+        def restock_underslungs(self):
+            # Ammo is constant size of weapon clip
+            ammo = self.weapon_object.ammo
+            if config.get('nade_launcher_underslung_mode', False):
+                ammo /= 2
+            self.underslungs_left = ammo
+
         def spawn_grenade(self, connection, protocol, player, x, y, z):
             position = Vertex3(x, y, z)
             direction = player.world_object.orientation.copy().normal()
@@ -247,6 +266,9 @@ def apply_script(protocol, connection, config):
                 grenade.fuse = eta
                 
             self.send_grenade_packet(grenade.fuse, player.player_id, position, velocity)
+
+            self.underslungs_left -= 1
+            print("underslungs_left: ", self.underslungs_left)
            
         def nade_exploded(self, grenade):
             position, velocity = grenade.position, grenade.velocity
