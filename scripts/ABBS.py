@@ -363,6 +363,10 @@ try:
             # TODO:
             grid_entities = []
 
+            # TODO:
+            green_frontline_targets_to_assignees = {}
+            blue_frontline_targets_to_assignees = {}
+
             def reset_tc(self):
                 protocol.reset_tc(self)
                 # TODO:
@@ -937,6 +941,9 @@ try:
 
             @assigned_position.setter
             def assigned_position(self, new_value):
+                #if self._assigned_position != new_value:
+                #    print("Old target: ", self._assigned_position)
+                #    print("New target: ", new_value)
                 self._assigned_position = new_value
 
             _assigned_position=None
@@ -3308,8 +3315,7 @@ try:
                 return connection.on_hit(self, damage, hitplayer, type, grenade)
 
             # TODO: try and spanwn on frontline, then 1 tent back from frontline
-            def get_frontline_entities(self):
-                my_team = self.team
+            def get_frontline_entities(self, my_team):
 
                 # TODO: check other directions
 
@@ -3508,7 +3514,7 @@ try:
                 # TODO: handle no safe bases, at lesat pick random one
                 # TODO: spawn on edges of map, behind tents, if no safe tent available
                 try:
-                    frontline_entities = self.get_frontline_entities()
+                    frontline_entities = self.get_frontline_entities(self.team)
 
                     frontline_entities_arg = []
                     for entity, _ in frontline_entities:
@@ -3516,11 +3522,53 @@ try:
 
                     rear_frontline_entities = self.get_safe_behind_frontline(frontline_entities_arg)
 
-                    print("len(rear_frontline_entities): ", len(rear_frontline_entities))
-                    base = random.choice(rear_frontline_entities)
-                    _, location = base
-                    return location
+                    #print("len(rear_frontline_entities): ", len(rear_frontline_entities))
+                    #base = random.choice(rear_frontline_entities)
+                    #_, location = base
+                    #return location
                     #return base.get_spawn_location()
+
+
+                    # TODO: spread forces evenly across enemy frontline tents
+                    current_team_count = 0
+                    for player in self.team.get_players():
+                        current_team_count += 1
+
+                    enemy_frontline_entities = self.get_frontline_entities(self.team.other)
+                    players_per_spawn = int(current_team_count / len(enemy_frontline_entities))
+
+                    if self.team == self.protocol.green_team:
+                        frontline_targets_to_assignees = self.protocol.green_frontline_targets_to_assignees
+                    else:
+                        frontline_targets_to_assignees = self.protocol.blue_frontline_targets_to_assignees
+
+                    for enemy_frontline_entity, _ in enemy_frontline_entities:
+                        if frontline_targets_to_assignees.has_key(enemy_frontline_entity) and frontline_targets_to_assignees[enemy_frontline_entity] >= players_per_spawn:
+                            print("Already taken")
+                            continue
+
+                        # Triggers setter that updates dictionary
+                        # TODO: handle assigning target after spawn in update as well
+                        self.assigned_position = enemy_frontline_entity
+
+                        previous_distance = None
+                        closest_rear_spawn_entity = None
+                        closest_rear_spawn_position = None
+                        for rear_frontline_entity, spawn_position in rear_frontline_entities:
+                            d = self.distance_calc(enemy_frontline_entity.get(), rear_frontline_entity.get())
+                            if previous_distance is None or d < previous_distance:
+                                previous_distance = d
+                                closest_rear_spawn_entity = rear_frontline_entity
+                                closest_rear_spawn_position = spawn_position
+
+                        if closest_rear_spawn_entity is None or closest_rear_spawn_position is None:
+                            base = random.choice(rear_frontline_entities)
+                            _, location = base
+                            print("random location: ", location)
+                            return location
+                        
+                        print("closest_rear_spawn_position: ", closest_rear_spawn_position)
+                        return closest_rear_spawn_position
                 except IndexError:
                     pass
                 
