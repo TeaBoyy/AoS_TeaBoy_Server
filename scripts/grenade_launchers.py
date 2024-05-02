@@ -169,6 +169,10 @@ def apply_script(protocol, connection, config):
                 return False
 
             if grenade:
+                if grenade.name != G_RIFLE_GRENADE_NAME and grenade.name != G_SMG_GRENADE_NAME and grenade.name != G_SHOTGUN_GRENADE_NAME:
+                    # Is a regular grenade, not underslung
+                    return connection.on_hit(self, hit_amount, hit_player, hit_type, grenade)
+
                 newAmount = hit_amount
                 
                 global G_RIFLE_LAUNCHER_DAMAGE
@@ -186,6 +190,7 @@ def apply_script(protocol, connection, config):
 
                 return newAmount
             elif hit_type is WEAPON_KILL or hit_type is HEADSHOT_KILL:
+                if not config.get('nade_launcher_underslung_mode', False):
                     # This is regular bullet, it deals no damage
                     return False
 
@@ -405,7 +410,7 @@ def apply_script(protocol, connection, config):
             if mode is SPADE_DESTROY or mode is GRENADE_DESTROY:
                 return connection.on_block_destroy(self, x, y, z, mode) 
                     
-            if self.bullet_loop.running:
+            if not config.get('nade_launcher_underslung_mode', False) and self.bullet_loop.running:
                 return False
 
             return connection.on_block_destroy(self, x, y, z, mode)
