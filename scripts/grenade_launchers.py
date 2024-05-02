@@ -219,12 +219,20 @@ def apply_script(protocol, connection, config):
             velocity.z *= multipler
              
             grenade_callback = self.nade_exploded
+
+            underslung_mode = config.get('nade_launcher_underslung_mode', False)
+            block_restoration_enabled = config.get('nade_launcher_restore_blocks', False)
+
             if player.world_object.sneak:
-                if not config.get('nade_launcher_restore_blocks', False):
-                    protocol.send_chat("Block restoration is temporarily turned off!")
-                    return
-                grenade_callback = self.rollback_seed_exploded
-                
+                if not underslung_mode:
+                    if block_restoration_enabled:
+                        grenade_callback = self.rollback_seed_exploded
+                    else:
+                        protocol.send_chat("Block restoration is temporarily turned off!")
+                        return
+            elif underslung_mode:
+                return
+
             grenade = self.create_grenade(position, velocity, grenade_callback, grenade_name)
 
             # Figure out when grenade will land
