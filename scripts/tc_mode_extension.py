@@ -107,7 +107,7 @@ def apply_script(protocol, connection, config):
                 y2 -= offset_y
 
                 # TODO:
-                offset_gray = -16
+                offset_gray = -4
                 if i < territory_count / 2:
                     x1 -= offset_gray
                     x2 -= offset_gray
