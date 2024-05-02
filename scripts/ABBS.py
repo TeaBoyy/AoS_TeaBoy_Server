@@ -927,7 +927,20 @@ try:
             arena_route_destination=0
 
             next_fire_time=1
-            assigned_position=None
+
+            # TODO: add observer and spread forces based on taken positions
+            #assigned_position=None
+
+            @property
+            def assigned_position(self):
+                return self._assigned_position
+
+            @assigned_position.setter
+            def assigned_position(self, new_value):
+                self._assigned_position = new_value
+
+            _assigned_position=None
+
             ois = False
             positive_attacker=True
 
