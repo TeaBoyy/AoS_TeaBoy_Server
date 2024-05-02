@@ -137,7 +137,8 @@
         "chatprefix" : "."
     },
     "scripts" : [
-		"ABBS",
+        "ABBS",
+        "grenade_launchers",
         "map_extensions",
         "disco",
         "votekick",
@@ -171,8 +172,9 @@
     "nade_launcher_extra_destruction" : true,
     "nade_launcher_extra_destruction_size" : 2,
     "nade_launcher_extra_destruction_sound" : 2,
-    "nade_launcher_extra_destruction_weapons" : ["rifle", "shotgun"],
-    "nade_launcher_extra_destruction_sound_weapons" : ["rifle", "shotgun"],
+    "nade_launcher_extra_destruction_weapons" : [],
+    "nade_launcher_extra_destruction_sound_weapons" : [],
+    "nade_launcher_underslung_mode" : true,
     "mini_tc_scale_x" : 1.5,
     "mini_tc_scale_y" : 1.2
 }
