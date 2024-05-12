@@ -941,86 +941,12 @@ try:
 
             @assigned_position.setter
             def assigned_position(self, new_value):
-                if self._assigned_position == new_value:
-                    return
-
-                # TODO:
-                self._assigned_position = new_value
-
-                if new_value is not None:
-                    self._test_assigned_position = new_value
-
-                return
-
-                print("Old target: ", self._assigned_position)
-                print("New target: ", new_value)
-
-                
-
-                old_value = self._assigned_position
-
-                frontline_targets_to_assignees = self.protocol.green_frontline_targets_to_assignees
-                if self.team == self.protocol.blue_team:
-                    frontline_targets_to_assignees = self.protocol.blue_frontline_targets_to_assignees
-                
-                if old_value is not None:
-                    if frontline_targets_to_assignees.has_key(old_value) and frontline_targets_to_assignees[old_value] > 0:
-                        print("Removing 1 for old_value: ", old_value)
-                        frontline_targets_to_assignees[old_value] -= 1
-                        if frontline_targets_to_assignees[old_value] <= 0:
-                            del frontline_targets_to_assignees[old_value]
-
-                if new_value is not None:
-                    if not frontline_targets_to_assignees.has_key(new_value):
-                        print("Setting to 1 for new_value: ", new_value)
-                        frontline_targets_to_assignees[new_value] = 1
-                    else:
-                        print("Adding 1 for new_value: ", new_value)
-                        frontline_targets_to_assignees[new_value] += 1
-                        print("After adding 1: frontline_targets_to_assignees[new_value]: ", frontline_targets_to_assignees[new_value], "new_value: ", new_value)
-
+                #if self._assigned_position != new_value:
+                #    print("Old target: ", self._assigned_position)
+                #    print("New target: ", new_value)
                 self._assigned_position = new_value
 
             _assigned_position=None
-
-            # TODO:
-            _test_assigned_position = None
-
-            @property
-            def test_assigned_position(self):
-                return self._test_assigned_position
-
-            @test_assigned_position.setter
-            def test_assigned_position(self, new_value):
-                if self._test_assigned_position == new_value:
-                    return
-
-                print("Old target: ", self._test_assigned_position)
-                print("New target: ", new_value)
-
-                old_value = self._test_assigned_position
-
-                frontline_targets_to_assignees = self.protocol.green_frontline_targets_to_assignees
-                if self.team == self.protocol.blue_team:
-                    frontline_targets_to_assignees = self.protocol.blue_frontline_targets_to_assignees
-                
-                if old_value is not None:
-                    if frontline_targets_to_assignees.has_key(old_value) and frontline_targets_to_assignees[old_value] > 0:
-                        print("Removing 1 for old_value: ", old_value)
-                        frontline_targets_to_assignees[old_value] -= 1
-                        if frontline_targets_to_assignees[old_value] <= 0:
-                            del frontline_targets_to_assignees[old_value]
-
-                if new_value is not None:
-                    if not frontline_targets_to_assignees.has_key(new_value):
-                        print("Setting to 1 for new_value: ", new_value)
-                        frontline_targets_to_assignees[new_value] = 1
-                    else:
-                        print("Adding 1 for new_value: ", new_value)
-                        frontline_targets_to_assignees[new_value] += 1
-                        print("After adding 1: frontline_targets_to_assignees[new_value]: ", frontline_targets_to_assignees[new_value], "new_value: ", new_value)
-
-                self._test_assigned_position = new_value
 
             ois = False
             positive_attacker=True
@@ -3608,12 +3534,8 @@ try:
                     for player in self.team.get_players():
                         current_team_count += 1
 
-                    # TODO: initial player count is not known until all bots spawned!
-                    current_team_count = 10
-
                     enemy_frontline_entities = self.get_frontline_entities(self.team.other)
                     players_per_spawn = int(current_team_count / len(enemy_frontline_entities))
-                    print("players_per_spawn: ", players_per_spawn)
 
                     if self.team == self.protocol.green_team:
                         frontline_targets_to_assignees = self.protocol.green_frontline_targets_to_assignees
@@ -3625,15 +3547,9 @@ try:
                             print("Already taken")
                             continue
 
-                        if frontline_targets_to_assignees.has_key(enemy_frontline_entity):
-                            print("frontline_targets_to_assignees[enemy_frontline_entity]: ", frontline_targets_to_assignees[enemy_frontline_entity])
-
                         # Triggers setter that updates dictionary
                         # TODO: handle assigning target after spawn in update as well
-                        #if self.assigned_position != enemy_frontline_entity:
-                        #    self.assigned_position = enemy_frontline_entity
-
-                        self.test_assigned_position = enemy_frontline_entity
+                        self.assigned_position = enemy_frontline_entity
 
                         previous_distance = None
                         closest_rear_spawn_entity = None
@@ -3940,9 +3856,6 @@ try:
                 self.aim_at = None
             
             def on_kill(self, killer, type, grenade):
-                # TODO:
-                self.test_assigned_position = None
-
                 if LV_AUTO_ADJUST>=1:
                     if self and killer:
                         if self!=killer:
