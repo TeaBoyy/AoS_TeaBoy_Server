@@ -944,8 +944,18 @@ try:
                 if self._assigned_position == new_value:
                     return
 
+                # TODO:
+                self._assigned_position = new_value
+
+                if new_value is not None:
+                    self._test_assigned_position = new_value
+
+                return
+
                 print("Old target: ", self._assigned_position)
                 print("New target: ", new_value)
+
+                
 
                 old_value = self._assigned_position
 
@@ -972,6 +982,45 @@ try:
                 self._assigned_position = new_value
 
             _assigned_position=None
+
+            # TODO:
+            _test_assigned_position = None
+
+            @property
+            def test_assigned_position(self):
+                return self._test_assigned_position
+
+            @test_assigned_position.setter
+            def test_assigned_position(self, new_value):
+                if self._test_assigned_position == new_value:
+                    return
+
+                print("Old target: ", self._test_assigned_position)
+                print("New target: ", new_value)
+
+                old_value = self._test_assigned_position
+
+                frontline_targets_to_assignees = self.protocol.green_frontline_targets_to_assignees
+                if self.team == self.protocol.blue_team:
+                    frontline_targets_to_assignees = self.protocol.blue_frontline_targets_to_assignees
+                
+                if old_value is not None:
+                    if frontline_targets_to_assignees.has_key(old_value) and frontline_targets_to_assignees[old_value] > 0:
+                        print("Removing 1 for old_value: ", old_value)
+                        frontline_targets_to_assignees[old_value] -= 1
+                        if frontline_targets_to_assignees[old_value] <= 0:
+                            del frontline_targets_to_assignees[old_value]
+
+                if new_value is not None:
+                    if not frontline_targets_to_assignees.has_key(new_value):
+                        print("Setting to 1 for new_value: ", new_value)
+                        frontline_targets_to_assignees[new_value] = 1
+                    else:
+                        print("Adding 1 for new_value: ", new_value)
+                        frontline_targets_to_assignees[new_value] += 1
+                        print("After adding 1: frontline_targets_to_assignees[new_value]: ", frontline_targets_to_assignees[new_value], "new_value: ", new_value)
+
+                self._test_assigned_position = new_value
 
             ois = False
             positive_attacker=True
@@ -3539,14 +3588,6 @@ try:
                 # TODO: handle no safe bases, at lesat pick random one
                 # TODO: spawn on edges of map, behind tents, if no safe tent available
                 try:
-                    # TODO:
-                    self.assigned_position = None
-
-                    # TODO: take into account that might spread forces after respawn across like tents that have no one
-                    # TODO: instead of spawning like 3/9 bots in 1 place, yet 1/3 places is empty cause rest dead or fighting someplace else
-
-                    # TODO: Also, not so even. It's closest safe spot to the enemy one, sometimes it's same safe point for multiple enemy frontlines.
-
                     frontline_entities = self.get_frontline_entities(self.team)
 
                     frontline_entities_arg = []
@@ -3592,7 +3633,7 @@ try:
                         #if self.assigned_position != enemy_frontline_entity:
                         #    self.assigned_position = enemy_frontline_entity
 
-                        self.assigned_position = enemy_frontline_entity
+                        self.test_assigned_position = enemy_frontline_entity
 
                         previous_distance = None
                         closest_rear_spawn_entity = None
@@ -3661,11 +3702,7 @@ try:
                     self.target_orientation.set_vector(self.aim)
                     set_tool = SetTool()
                     self.set_tool(WEAPON_TOOL)
-
-                    # TODO: test try and not reset assigned_position here, do it in spawn location
-                    self.aim_at = None
-                    #self.assigned_position=None
-
+                    self.aim_at = self.assigned_position= None
                     self.jisatu=0
                     self.ikeru=[0,0,0,0]
                     self.has_arena_tgt =self.stopmotion= False
@@ -3904,7 +3941,7 @@ try:
             
             def on_kill(self, killer, type, grenade):
                 # TODO:
-                self.assigned_position = None
+                self.test_assigned_position = None
 
                 if LV_AUTO_ADJUST>=1:
                     if self and killer:
