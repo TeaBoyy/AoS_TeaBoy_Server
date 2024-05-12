@@ -3308,9 +3308,7 @@ try:
                 return connection.on_hit(self, damage, hitplayer, type, grenade)
 
             # TODO: try and spanwn on frontline, then 1 tent back from frontline
-            def get_frontline_entities(self):
-                my_team = self.team
-
+            def get_frontline_entities(self, my_team):
                 # TODO: check other directions
 
                 frontline_entities = []
@@ -3484,22 +3482,6 @@ try:
 
                 return frontline_entities
 
-            # TODO:
-            ''' def get_spawn_location(self):
-                if self.protocol.game_mode != TC_MODE:
-                    return connection.get_spawn_location(self)
-
-                try:
-                    frontline_entities = self.get_frontline_entities()
-                    print("len(frontline_entities): ", len(frontline_entities))
-                    base = random.choice(frontline_entities)
-                    return base.get_spawn_location()
-                except IndexError:
-                    pass
-
-                return connection.get_spawn_location(self)
-            '''
-
             def get_spawn_location(self):
                 if self.protocol.game_mode != TC_MODE:
                     return connection.get_spawn_location(self)
@@ -3508,7 +3490,7 @@ try:
                 # TODO: handle no safe bases, at lesat pick random one
                 # TODO: spawn on edges of map, behind tents, if no safe tent available
                 try:
-                    frontline_entities = self.get_frontline_entities()
+                    frontline_entities = self.get_frontline_entities(self.team)
 
                     frontline_entities_arg = []
                     for entity, _ in frontline_entities:
