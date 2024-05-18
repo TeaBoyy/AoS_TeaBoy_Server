@@ -3596,10 +3596,10 @@ try:
                             continue
 
                         # TODO: only search closest for now
-                        target = player.assigned_position
-                        #if target is None:
-                        print ("Searching for target")
-                        target = self.get_closest_point(enemy_frontline_entities_points, player_obj.position.get())
+                        target = copy(player.assigned_position)
+                        if target is None:
+                            print ("Searching for target")
+                            target = self.get_closest_point(enemy_frontline_entities_points, player_obj.position.get())
                         if target is None:
                             print("CRITICAL: couldn't find target")
                             return (0, 0, 0)
