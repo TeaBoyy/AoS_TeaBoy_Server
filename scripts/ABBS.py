@@ -3504,11 +3504,11 @@ try:
                     if last_distance is not None and d < last_distance:
                         last_distance = d
                         closest_point = point
-                        print("d < last_distance. d == ", d, ". last_distance == ", last_distance)
+                        #print("d < last_distance. d == ", d, ". last_distance == ", last_distance)
                     elif last_distance is None:
                         last_distance = d
                         closest_point = point
-                        print("last_distance is None. Set last_distance to: ", last_distance)
+                        #print("last_distance is None. Set last_distance to: ", last_distance)
                 
                 return closest_point
 
@@ -3610,16 +3610,16 @@ try:
                         #    print("CRITICAL: couldn't find target")
                         #    return (0, 0, 0)
 
-                        print("Player position: ", player_obj.position.get())
+                        #print("Player position: ", player_obj.position.get())
 
-                        print ("Searching for origin")
+                        #print ("Searching for origin")
                         origin = self.get_closest_point(rear_frontline_entities_positions, player_obj.position.get())
                         if origin is None:
                             print("CRITICAL: Player attack vector origin is not found")
                             return (0, 0, 0)
 
                         if target is None:
-                            print ("Searching for target based on origin")
+                            #print ("Searching for target based on origin")
                             target = self.get_closest_point(enemy_frontline_entities_points, origin)
                         if target is None:
                             print("CRITICAL: couldn't find target")
@@ -3631,7 +3631,7 @@ try:
                             attack_vectors_dict[player_attack_vector] += 1
                             
                             origin, target = player_attack_vector
-                            print("Found 1 more player at attack vector: (", origin, ") -> (", target, ")", " -> player count: ", attack_vectors_dict[player_attack_vector])
+                            #print("Found 1 more player at attack vector: (", origin, ") -> (", target, ")", " -> player count: ", attack_vectors_dict[player_attack_vector])
                         else:
                             no_match_vector_count += 1
                             #print("Found 1 player with no matching attack vector")
