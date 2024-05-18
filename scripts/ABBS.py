@@ -3451,7 +3451,9 @@ try:
                                     # Case for corner
                                     possibilities = ((x2 + 0, y2 + y1), (x2 + x1, y2 + 0))
 
-                                    chosen = random.choice(possibilities)
+                                    # TODO: don't randomize for now to help spawning evenly
+                                    #chosen = random.choice(possibilities)
+                                    chosen = possibilities[0]
 
                                     x2, y2 = chosen
                                     z2 = self.protocol.map.get_z(x2, y2)
@@ -3478,9 +3480,37 @@ try:
                         
                         if is_frontline_entity:
                             print("is_safe_behind_frontline_entity: ", "i: ", i, ", j: ", j)
-                            frontline_entities.append((current_entity, current_entity.get_spawn_location()))
-
+                            # TODO: don't select randomly for now, only in singular point, jsut to debug even spawning across frontline
+                            #frontline_entities.append((current_entity, current_entity.get_spawn_location()))
+                            frontline_entities.append((current_entity, current_entity.get()))
+    
                 return frontline_entities
+
+            # TODO:
+            def my_distance_calc(self, a, b):
+                dx = a[0] - b[0]
+                dy = a[1] - b[1]
+                dz = a[2] - b[2]
+                return (dx**2+dy**2+dz**2)**0.5
+
+            # TODO: 
+            def get_closest_point(self, points_array, closest_to_point):
+                last_distance = None
+                closest_point = None
+                for point in points_array:
+                    # TODO: not negavite, but in case of exception returns 0 without explanation
+                    d = self.my_distance_calc(point, closest_to_point)
+                    #print("point: ", point, ". closest_to_point: ", closest_to_point , ". d == ", d)
+                    if last_distance is not None and d < last_distance:
+                        last_distance = d
+                        closest_point = point
+                        print("d < last_distance. d == ", d, ". last_distance == ", last_distance)
+                    elif last_distance is None:
+                        last_distance = d
+                        closest_point = point
+                        print("last_distance is None. Set last_distance to: ", last_distance)
+                
+                return closest_point
 
             def get_spawn_location(self):
                 if self.protocol.game_mode != TC_MODE:
@@ -3499,6 +3529,133 @@ try:
                     rear_frontline_entities = self.get_safe_behind_frontline(frontline_entities_arg)
 
                     print("len(rear_frontline_entities): ", len(rear_frontline_entities))
+
+                    # TODO: spawn bots/players evenly across frontline
+                    enemy_frontline_entities = self.get_frontline_entities(self.team.other)
+
+                    # TODO: get array/map of actual attack vectors. Origin is rear frontline position. Target is nearest enemy frontline
+                    attack_vectors = []
+
+                    enemy_frontline_entities_points = []
+                    for _, enemy_frontline_entity_position in enemy_frontline_entities:
+                        enemy_frontline_entities_points.append(enemy_frontline_entity_position)
+
+                    for _, rear_frontline_entity_position in rear_frontline_entities:
+                        #last_distance = None
+                        #closest_target = None
+                        #for _, enemy_frontline_entity_position in enemy_frontline_entities:
+                        #    d = self.distance_calc(rear_frontline_entity_position, enemy_frontline_entity_position)
+                        #    if last_distance is not None and d < last_distance:
+                        #        last_distance = d
+                        #        closest_target = enemy_frontline_entity_position
+                        #    elif last_distance is None:
+                        #        last_distance = d
+                        #        closest_target = enemy_frontline_entity_position
+                        
+                        closest_target = self.get_closest_point(enemy_frontline_entities_points, rear_frontline_entity_position)
+
+                        if closest_target is None:
+                            continue
+
+                        attack_vectors.append((rear_frontline_entity_position, closest_target))
+                        #print("Attack vector: (", rear_frontline_entity_position, ") -> (", closest_target, ")")
+
+                    # TODO: get array/map of current players/bots attack vectors.
+                    # TODO: 
+
+                    attack_vectors_dict = {}
+                    for attack_vector in attack_vectors:
+                        attack_vectors_dict[attack_vector] = 0
+
+                    # TODO: map each player/bot to their attack vector
+                    # TODO: vector may not match expected one, if retaking home base
+                    
+                    rear_frontline_entities_positions = []
+                    for _, rear_frontline_entity_position in rear_frontline_entities:
+                        print("rear_frontline_entity_position: ", rear_frontline_entity_position)
+                        rear_frontline_entities_positions.append(rear_frontline_entity_position)
+
+                    if len(enemy_frontline_entities_points) <= 0 or len(rear_frontline_entities_positions) <=0 :
+                        print("CRITICAL: empty enemy_frontline_entities_points or rear_frontline_entities_positions")
+                        return (0, 0, 0)
+
+                    for player in self.protocol.players.values():
+                        if player.team is not self.team:
+                            continue
+
+                        player_obj = player.world_object
+                        if player_obj is None:
+                            continue
+
+                        # TODO: only search closest for now
+                        target = player.assigned_position
+                        #if target is None:
+                        print ("Searching for target")
+                        target = self.get_closest_point(enemy_frontline_entities_points, player_obj.position.get())
+                        if target is None:
+                            print("CRITICAL: couldn't find target")
+                            return (0, 0, 0)
+
+                        print ("Searching for origin")
+                        origin = self.get_closest_point(rear_frontline_entities_positions, player_obj.position.get())
+                        if origin is None:
+                            print("CRITICAL: Player attack vector origin is not found")
+                            return (0, 0, 0)
+
+                        print("Player position: ", player_obj.position.get())
+
+                        player_attack_vector = (origin, target)
+                        if player_attack_vector in attack_vectors_dict:
+                            attack_vectors_dict[player_attack_vector] += 1
+                            
+                            origin, target = player_attack_vector
+                            print("Found 1 more player at attack vector: (", origin, ") -> (", target, ")", " -> player count: ", attack_vectors_dict[player_attack_vector])
+                        #else:
+                            #attack_vectors_dict[player_attack_vector] = 1
+                            #
+                            #origin, target = player_attack_vector
+                            #print("Set 1 player count at attack vector: (", origin, ") -> (", target, ")", " -> player count: ", attack_vectors_dict[player_attack_vector])
+
+                    for attack_vector in attack_vectors_dict:
+                        origin, target = attack_vector
+                        print("Attack vector: (", origin, ") -> (", target, ")", " -> player count: ", attack_vectors_dict[attack_vector])
+
+                    # TODO: bug? Looks like race condition, not always collecting valid map since previous not yet spawned, and didn't update count
+                    # TODO: bug. Somehow attack vectors size grows from 3 to 4 after entering game (at least as spectator)
+
+                    # TODO: now find least manned attack vector and spawn there
+                    least_manned_attack_vector = None
+                    for attack_vector in attack_vectors_dict:
+                        assigned_player_count = attack_vectors_dict[attack_vector]
+                        if least_manned_attack_vector is None:
+                            least_manned_attack_vector = attack_vector
+                        else:
+                            if assigned_player_count < attack_vectors_dict[least_manned_attack_vector]:
+                                least_manned_attack_vector = attack_vector
+                        
+                    if least_manned_attack_vector is None:
+                        print("[CRITICAL] Couldn't find least manned attack vector to spawn on")
+                        return (0, 0, 0)
+
+                    spawn_pos, _ = least_manned_attack_vector 
+                    print ("Spawning at spawn_pos: ", spawn_pos)
+                    return spawn_pos
+                        
+
+                    # TODO: see which attack vectors match actual attack vectors, how many players per each vector assigned.
+                    
+                    # TODO: pick least populated attack vector, spawn there
+
+                    # TODO: handle cases when multiple attack vectors, but no need to spread even. Like, 1 backcapping tent isn't worth spreading it in 3-4 directions.
+                    # TODO: can't treat low activity areas same as frontline
+
+                    # TODO: handle case when bot/player attack vector doesn't match any actual vectors.
+                    # TODO: like, when going across map to home base to defend from backcapping.
+                    # TODO: can at least ignore for now player attack vector and let him go. But once another one wants to spawn, it'll get closer to actual vector.
+                    
+                    # TODO: dynamically balance load. Don't let half team take back home base with 1-2 enemies in it. 
+                    # TODO: keep track of attack vectors, always peak least populated one. Unless too far away.
+
                     base = random.choice(rear_frontline_entities)
                     _, location = base
                     return location
