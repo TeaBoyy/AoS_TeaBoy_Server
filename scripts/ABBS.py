@@ -3512,6 +3512,14 @@ try:
                 
                 return closest_point
 
+            # TODO:
+            def my_get_random_spawn_location(self, x, y):
+                x1 = max(0, x - SPAWN_RADIUS)
+                y1 = max(0, y - SPAWN_RADIUS)
+                x2 = min(512, x + SPAWN_RADIUS)
+                y2 = min(512, y + SPAWN_RADIUS)
+                return self.protocol.get_random_location(True, (x1, y1, x2, y2))
+
             def get_spawn_location(self):
                 if self.protocol.game_mode != TC_MODE:
                     return connection.get_spawn_location(self)
@@ -3638,7 +3646,9 @@ try:
                         return (0, 0, 0)
 
                     spawn_pos, _ = least_manned_attack_vector 
-                    print ("Spawning at spawn_pos: ", spawn_pos)
+                    x1, y1, _ = spawn_pos
+                    final_position = self.my_get_random_spawn_location(x1, y1)
+                    print ("Spawning at least_manned_attack_vector pos: ", spawn_pos, ". Randomized pos: ", final_position)
                     return spawn_pos
                         
 
