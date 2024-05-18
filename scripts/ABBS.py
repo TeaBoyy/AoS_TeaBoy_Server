@@ -3649,7 +3649,7 @@ try:
                     x1, y1, _ = spawn_pos
                     final_position = self.my_get_random_spawn_location(x1, y1)
                     print ("Spawning at least_manned_attack_vector pos: ", spawn_pos, ". Randomized pos: ", final_position)
-                    return spawn_pos
+                    return final_position
                         
 
                     # TODO: see which attack vectors match actual attack vectors, how many players per each vector assigned.
