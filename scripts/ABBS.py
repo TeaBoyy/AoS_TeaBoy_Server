@@ -57,7 +57,7 @@ try:
     # TODO: but stil can't join team with bots and 1 human, need to join team with 0 humans first
     BOT_ADD_PATTERN = 2
 
-    BOT_ADD_NUM		= 20
+    BOT_ADD_NUM		= 24
     LITE_MODE       = False    
     LV_AUTO_ADJUST  = 0       # 0:off 1:human vs bot   2:blue vs green 3:both human/bot and blue/green
     BOT_NUM_NAME    = True    
@@ -3513,11 +3513,11 @@ try:
                 return closest_point
 
             # TODO:
-            def my_get_random_spawn_location(self, x, y):
-                x1 = max(0, x - SPAWN_RADIUS)
-                y1 = max(0, y - SPAWN_RADIUS)
-                x2 = min(512, x + SPAWN_RADIUS)
-                y2 = min(512, y + SPAWN_RADIUS)
+            def my_get_random_spawn_location(self, x, y, radius):
+                x1 = max(0, x - radius)
+                y1 = max(0, y - radius)
+                x2 = min(512, x + radius)
+                y2 = min(512, y + radius)
                 return self.protocol.get_random_location(True, (x1, y1, x2, y2))
 
             def get_spawn_location(self):
@@ -3587,6 +3587,7 @@ try:
                         print("CRITICAL: empty enemy_frontline_entities_points or rear_frontline_entities_positions")
                         return (0, 0, 0)
 
+                    no_match_vector_count = 0
                     for player in self.protocol.players.values():
                         if player.team is not self.team:
                             continue
@@ -3596,13 +3597,20 @@ try:
                             continue
 
                         # TODO: only search closest for now
-                        target = copy(player.assigned_position)
-                        if target is None:
-                            print ("Searching for target")
-                            target = self.get_closest_point(enemy_frontline_entities_points, player_obj.position.get())
-                        if target is None:
-                            print("CRITICAL: couldn't find target")
-                            return (0, 0, 0)
+                        target = None
+                        # TODO: don't forget this is tent, not position
+                        #target = copy(player.assigned_position)
+                        #if player.assigned_position is not None:
+                        #    target = copy(player.assigned_position.get())
+                        
+                        #if target is None:
+                        #    print ("Searching for target")
+                        #    target = self.get_closest_point(enemy_frontline_entities_points, player_obj.position.get())
+                        #if target is None:
+                        #    print("CRITICAL: couldn't find target")
+                        #    return (0, 0, 0)
+
+                        print("Player position: ", player_obj.position.get())
 
                         print ("Searching for origin")
                         origin = self.get_closest_point(rear_frontline_entities_positions, player_obj.position.get())
@@ -3610,19 +3618,31 @@ try:
                             print("CRITICAL: Player attack vector origin is not found")
                             return (0, 0, 0)
 
-                        print("Player position: ", player_obj.position.get())
+                        if target is None:
+                            print ("Searching for target based on origin")
+                            target = self.get_closest_point(enemy_frontline_entities_points, origin)
+                        if target is None:
+                            print("CRITICAL: couldn't find target")
+                            return (0, 0, 0)
 
+                        # TODO: maybe search target relative to rear, but then real target will be ignore?
                         player_attack_vector = (origin, target)
                         if player_attack_vector in attack_vectors_dict:
                             attack_vectors_dict[player_attack_vector] += 1
                             
                             origin, target = player_attack_vector
                             print("Found 1 more player at attack vector: (", origin, ") -> (", target, ")", " -> player count: ", attack_vectors_dict[player_attack_vector])
-                        #else:
+                        else:
+                            no_match_vector_count += 1
+                            #print("Found 1 player with no matching attack vector")
                             #attack_vectors_dict[player_attack_vector] = 1
                             #
                             #origin, target = player_attack_vector
                             #print("Set 1 player count at attack vector: (", origin, ") -> (", target, ")", " -> player count: ", attack_vectors_dict[player_attack_vector])
+
+                    if no_match_vector_count > 0:
+                        # TODO: a lot, like once got 11 playes with no match
+                        print("Found ", no_match_vector_count, " players with no matching attack vector")
 
                     for attack_vector in attack_vectors_dict:
                         origin, target = attack_vector
@@ -3630,6 +3650,7 @@ try:
 
                     # TODO: bug? Looks like race condition, not always collecting valid map since previous not yet spawned, and didn't update count
                     # TODO: bug. Somehow attack vectors size grows from 3 to 4 after entering game (at least as spectator)
+                    # TODO: bug? Started to show kinda low numbers across frontline.. on map much more bots really. They have their own separate targets?
 
                     # TODO: now find least manned attack vector and spawn there
                     least_manned_attack_vector = None
@@ -3647,8 +3668,11 @@ try:
 
                     spawn_pos, _ = least_manned_attack_vector 
                     x1, y1, _ = spawn_pos
-                    final_position = self.my_get_random_spawn_location(x1, y1)
+
+                    # TODO: looks like big spread causes them to use not targets that are expected (closest)
+                    final_position = self.my_get_random_spawn_location(x1, y1, 8)
                     print ("Spawning at least_manned_attack_vector pos: ", spawn_pos, ". Randomized pos: ", final_position)
+                    
                     return final_position
                         
 
