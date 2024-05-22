@@ -148,9 +148,7 @@
         "daycycle",
         "log_player_count",
         "spawn_protect",
-        "mines",
-        "snowflakes",
-        "snow"
+        "mines"
     ],
 
     "squad_respawn_time" : 32,
