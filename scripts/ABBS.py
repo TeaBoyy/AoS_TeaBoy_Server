@@ -1393,6 +1393,8 @@ try:
                 else:
                     home_bases = self.protocol.blue_home_bases
 
+                #home_bases = []
+                # TODO: with new balancing, can try disable this and just see how works if spreading evenly only
                 for entity in home_bases:
                     if entity.team != self.team or entity.capturing_team == self.team.other:
                         d = self.distance_calc(entity.get(),self.world_object.position.get())
@@ -3451,9 +3453,9 @@ try:
                                     # Case for corner
                                     possibilities = ((x2 + 0, y2 + y1), (x2 + x1, y2 + 0))
 
-                                    # TODO: don't randomize for now to help spawning evenly
-                                    #chosen = random.choice(possibilities)
-                                    chosen = possibilities[0]
+                                    ## TODO: don't randomize for now to help spawning evenly
+                                    chosen = random.choice(possibilities)
+                                    #chosen = possibilities[0]
 
                                     x2, y2 = chosen
                                     z2 = self.protocol.map.get_z(x2, y2)
@@ -3519,6 +3521,15 @@ try:
                 x2 = min(512, x + radius)
                 y2 = min(512, y + radius)
                 return self.protocol.get_random_location(True, (x1, y1, x2, y2))
+
+            # TODO:
+            def get_protocol_teammates_count(self):
+                count = 0
+                for player in self.protocol.players.values():
+                    if player.team is self.team:
+                        count += 1
+
+                return count
 
             def get_spawn_location(self):
                 if self.protocol.game_mode != TC_MODE:
@@ -3653,15 +3664,86 @@ try:
                     # TODO: bug? Started to show kinda low numbers across frontline.. on map much more bots really. They have their own separate targets?
 
                     # TODO: now find least manned attack vector and spawn there
+                    
                     least_manned_attack_vector = None
+
+                    ############
+                    home_retake_attack_vectors = []
                     for attack_vector in attack_vectors_dict:
-                        assigned_player_count = attack_vectors_dict[attack_vector]
-                        if least_manned_attack_vector is None:
-                            least_manned_attack_vector = attack_vector
+                        _, attack_vector_target = attack_vector
+
+                        home_bases = None
+                        if self.team == self.protocol.green_team:
+                            home_bases = self.protocol.green_home_bases
                         else:
-                            if assigned_player_count < attack_vectors_dict[least_manned_attack_vector]:
+                            home_bases = self.protocol.blue_home_bases
+
+                        if attack_vector_target in home_bases:
+                            print("Found home retake attack vector")
+                            home_retake_attack_vectors.append(attack_vector)
+
+                    if len(home_retake_attack_vectors) > 0:
+                        # Assuming enemies have equal tresholds for now
+                        teammates_count = self.get_protocol_teammates_count()
+                        even_spread_teammates_per_spawn_point = teammates_count / len(rear_frontline_entities)
+
+                        capture_superiority_quota = even_spread_teammates_per_spawn_point * 1.7
+                        defend_quota = even_spread_teammates_per_spawn_point * 0.7
+
+                        non_home_attack_vectors = len(attack_vectors_dict) - len(home_retake_attack_vectors)
+                        forces_left = int(teammates_count - (non_home_attack_vectors * defend_quota))
+                        capture_superiority_count = capture_superiority_quota * even_spread_teammates_per_spawn_point
+                        available_to_retake_homes_count = int(forces_left / (len(home_retake_attack_vectors) * capture_superiority_count))
+
+                        # TODO: looks like for now can only retake 1 home at any case, just cause with 18 bots it's not enough for more, unless reducing defend_quota
+
+                        print("Now can try to retake ", available_to_retake_homes_count, " home bases")
+
+                        count = 0
+                        for home_retake_attack_vector in home_retake_attack_vectors:
+                            if count >= available_to_retake_homes_count:
+                                break
+
+                            assigned_player_count = attack_vectors_dict[home_retake_attack_vector]
+                            if assigned_player_count < capture_superiority_count:
+                                least_manned_attack_vector = home_retake_attack_vector
+                                break
+
+
+                    ############
+                    # TODO: redo this stuff so that basically there's ratio - for defending, for attacking
+                    # TODO: use ratio (idk 5 vs 3) to attack to restore home bases
+                    # TODO: rest, whatever is left, evenly. Can just fill up homes quota, then rest - least manned like before
+                    # TODO: but once got too much homes to retake, what to do? Set minimal defending ratio i guess, see how much can spare on homes
+                    # TODO: basically when frontline = 3 homes, then nothing can be done... unless pick random direction and push there, any home that allows to establish ratio
+                    
+                    if least_manned_attack_vector is None:
+                        for attack_vector in attack_vectors_dict:
+                            if attack_vector in home_retake_attack_vectors:
+                                continue
+
+                            assigned_player_count = attack_vectors_dict[attack_vector]
+
+                            if least_manned_attack_vector is None:
                                 least_manned_attack_vector = attack_vector
+                            else:
+                                if assigned_player_count < attack_vectors_dict[least_manned_attack_vector]:
+                                    least_manned_attack_vector = attack_vector
                         
+                    # TOOD: Search for least defended home base
+
+                    #if least_manned_attack_vector not in prioritized_home_vectors:
+                        #for prioritized_home_vector in prioritized_home_vectors:
+                            # TODO: maybe here also check home bases, and add like 25% more forces here, idk which percentage and how
+                            # TODO: but could be multiple of those
+                            #teammates_count = self.get_protocol_teammates_count()
+                            #average_teammates_per_spawn_point = teammates_count / len(rear_frontline_entities)
+                            #threshold = int(average_teammates_per_spawn_point * 1.35)
+
+                            #if assigned_player_count < threshold:
+                                #print("Is home base, prioritize spawn")
+                    ############
+
                     if least_manned_attack_vector is None:
                         print("[CRITICAL] Couldn't find least manned attack vector to spawn on")
                         return (0, 0, 0)

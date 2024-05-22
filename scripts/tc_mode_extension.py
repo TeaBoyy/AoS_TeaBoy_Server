@@ -90,7 +90,7 @@ def apply_script(protocol, connection, config):
             if scale_x > 1.0:
                 j /= scale_x
 
-            test_y_offset = 8
+            test_y_offset = 0
 
             count = 0
             row_count = 0
@@ -107,7 +107,7 @@ def apply_script(protocol, connection, config):
                 y2 -= offset_y
 
                 # TODO:
-                offset_gray = -4
+                offset_gray = 0
                 if i < territory_count / 2:
                     x1 -= offset_gray
                     x2 -= offset_gray
