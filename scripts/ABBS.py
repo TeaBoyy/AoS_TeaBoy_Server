@@ -453,13 +453,14 @@ try:
                 return protocol.on_game_end(self)
 
             def get_cp_entities(self):
-                entities=[]
-                tentpos=[]
-                for i in range(TENTNUM):
-                    entity=Territory(i,self,0,0,0)
-                    entity.team=None
-                    entities.append(entity)
-                return entities
+                return protocol.get_cp_entities(self)
+                #entities=[]
+                #tentpos=[]
+                #for i in range(TENTNUM):
+                #    entity=Territory(i,self,0,0,0)
+                #    entity.team=None
+                #    entities.append(entity)
+                #return entities
 
             def bot_think(self):
                 for bot in self.bots:
