@@ -159,10 +159,5 @@
     "afk_time_limit" : 20,
     "spawn_protect_time" : 1,
     "medkits" : 1,
-    "medkit_heal_amount" : 40,
-    "snowflakes_amount" : 1500,
-    "snowflakes_height_start" : 35,
-    "snow_enabled" : true,
-    "snow_exclude_maps" : ["scandinavia", "Prauda"],
-    "snowflakes_exclude_maps" : []
+    "medkit_heal_amount" : 40
 }
