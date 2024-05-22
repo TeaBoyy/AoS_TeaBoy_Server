@@ -72,7 +72,7 @@ try:
 
     DEBUG_VIRTUAL_HIT=False 
 
-    AI_mode = 1
+    AI_mode = 6
 
     # 0: TOW
     # 1: TDM
