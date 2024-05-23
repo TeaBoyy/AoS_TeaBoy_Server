@@ -147,7 +147,6 @@
         "medkit",
         "daycycle",
         "log_player_count",
-        "spawn_protect",
         "mines"
     ],
 
