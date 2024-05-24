@@ -147,7 +147,8 @@
         "medkit",
         "daycycle",
         "log_player_count",
-        "mines"
+        "mines",
+        "capture_reporter"
     ],
 
     "squad_respawn_time" : 32,
