@@ -148,7 +148,8 @@
         "daycycle",
         "log_player_count",
         "mines",
-        "capture_reporter"
+        "capture_reporter",
+        "weaponcontrol"
     ],
 
     "squad_respawn_time" : 32,
