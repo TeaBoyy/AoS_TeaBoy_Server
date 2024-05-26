@@ -994,12 +994,6 @@ try:
                 weapon_rdm = random.random()
                 self.z_add= gauss(0.3,0.5/3) #���̒��S����Ȃ��Ď኱���Ƃ����_���Ƃ�
                 self.battlecrouching=False
-                
-                # TODO: use another script to disable non-Rifle weapons globally on server
-                # Always select rifle
-                if weapon_rdm < 0.5:
-                    weapon_rdm = 0.5
-
                 if weapon_rdm>0.4:
                     self.set_weapon(RIFLE_WEAPON, True)
                     self.battle_distance = uniform(30,110)
