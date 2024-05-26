@@ -152,6 +152,14 @@
         "weaponcontrol"
     ],
 
+    "weapons" : {
+        "spade" : true,
+        "rifle" : true,
+        "smg" : false,
+        "shotgun" : false,
+        "grenades" : true
+    },
+
     "squad_respawn_time" : 32,
     "squad_size" : 4,
     "auto_squad" : false,
