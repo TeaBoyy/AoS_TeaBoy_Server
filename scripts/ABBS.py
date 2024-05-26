@@ -3055,6 +3055,11 @@ try:
                                                         elif 1.2<= z < 2.3:# z axis asi shot:
                                                             if not (min(hidariutiasi,migiutiasi) < y < max(hidariutiasi,migiutiasi)):
                                                                  hit = 3
+                                    
+                                    # Modification - disable headshots
+                                    if hit == 1:
+                                        hit = 2
+                                    
                                     if hit==1:
                                         if self.weapon == RIFLE_WEAPON:
                                             dmg = 100
