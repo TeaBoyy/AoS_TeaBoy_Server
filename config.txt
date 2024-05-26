@@ -43,7 +43,7 @@
     "maps" : ["Kowang-San(Hill355)", "hiesville", "longbridge", "classicgen", "burbs", "icebridge", "urara", "normandie"],
     "random_rotation" : false,
 
-    "respawn_time" : 16,
+    "respawn_time" : 10,
     "respawn_waves" : true,
     "friendly_fire" : false,
     "grief_friendly_fire_time" : 255,
