@@ -7,10 +7,19 @@ def apply_script(protocol, connection, config):
         
         tents_grid = []
 
+        blue_team_home_bases = []
+        green_team_home_bases = []
+
         def reset_tc(self):
             self.tents_grid = []
+            self.blue_team_home_bases = []
+            self.green_team_home_bases = []
+
             protocol.reset_tc(self)
 
+            if not self.tents_grid or not self.blue_team_home_bases or not self.green_team_home_bases:
+                print("Warning: missing tents grid or home bases list")
+            
         # TODO:
         def get_cp_entities(self): 
             max_entities_count = 16
@@ -46,8 +55,10 @@ def apply_script(protocol, connection, config):
                     tent = Territory(counter, self, *(point_x, point_y, self.map.get_z(point_x, point_y)))
                     if x < grid_width / 2:
                         tent.team = self.blue_team
+                        self.blue_team_home_bases.append(tent)
                     elif x > (grid_width - 1) / 2:
                         tent.team = self.green_team
+                        self.green_team_home_bases.append(tent)
                     else:
                         # Neutral
                         tent.team = None
