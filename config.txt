@@ -149,7 +149,8 @@
         "log_player_count",
         "mines",
         "capture_reporter",
-        "weaponcontrol"
+        "weaponcontrol",
+        "blood"
     ],
 
     "weapons" : {
