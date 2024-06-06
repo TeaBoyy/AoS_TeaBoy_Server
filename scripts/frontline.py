@@ -8,8 +8,8 @@ def apply_script(protocol, connection, config):
         tents_grid = []
 
         def reset_tc(self):
-            protocol.reset_tc(self)
             self.tents_grid = []
+            protocol.reset_tc(self)
 
         # TODO:
         def get_cp_entities(self): 
