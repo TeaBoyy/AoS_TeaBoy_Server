@@ -10,6 +10,7 @@ def apply_script(protocol, connection, config):
         def reset_tc(self):
             protocol.reset_tc(self)
             self.tents_grid = []
+
         # TODO:
         def get_cp_entities(self): 
             max_entities_count = 16
@@ -21,14 +22,18 @@ def apply_script(protocol, connection, config):
                 print("Exceeding 16 tents limit")
                 return []
 
-            offset_x = 512 / (grid_width + 1)
-            offset_y = 512 / (grid_height + 1)
+            extra_fallback_tent_count = 1
+
+            offset_x = 512 / (grid_width + extra_fallback_tent_count)
+            offset_y = 512 / (grid_height + extra_fallback_tent_count)
 
             for i in range(grid_height):
                 self.tents_grid.append([None for i in range(grid_width)])
+
             # Skip one tent distance
             start_x = offset_x
             start_y = offset_y
+
             entities = []
             counter = 0 
             for x in range(0, grid_width):
@@ -51,13 +56,6 @@ def apply_script(protocol, connection, config):
                     entities.append(tent)
                     counter += 1
 
-            return entities
-
-            #return protocol.get_cp_entities(self)
-            #entities = []
-            #flag = FrontlineTerritory(i, self, *self.get_random_location(zone = (x1, y1, x2, y2)))
-            
-            #entities.append(flag)
             return entities
 
     return TCExtensionProtocol, connection
