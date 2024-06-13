@@ -4,7 +4,8 @@ from pyspades.server import Territory
 MAX_ENTITIES_COUNT = 16
 
 def apply_script(protocol, connection, config):
-    class TCExtensionProtocol(protocol):
+    class FrontlineConnection(connection):
+    class FrontlineProtocol(protocol):
         game_mode = TC_MODE
         
         tents_grid = []
@@ -68,4 +69,4 @@ def apply_script(protocol, connection, config):
 
             return entities
 
-    return TCExtensionProtocol, connection
+    return FrontlineProtocol, FrontlineConnection
