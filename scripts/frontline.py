@@ -5,6 +5,9 @@ MAX_ENTITIES_COUNT = 16
 
 def apply_script(protocol, connection, config):
     class FrontlineConnection(connection):
+        def get_spawn_location(self):
+            return connection.get_spawn_location(self)
+
     class FrontlineProtocol(protocol):
         game_mode = TC_MODE
         
