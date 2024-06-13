@@ -1,6 +1,8 @@
 from pyspades.constants import MAX_TERRITORY_COUNT, MIN_TERRITORY_COUNT, TC_MODE
 from pyspades.server import Territory
 
+MAX_ENTITIES_COUNT = 16
+
 def apply_script(protocol, connection, config):
     class TCExtensionProtocol(protocol):
         game_mode = TC_MODE
@@ -20,15 +22,12 @@ def apply_script(protocol, connection, config):
             if not self.tents_grid or not self.blue_team_home_bases or not self.green_team_home_bases:
                 print("Warning: missing tents grid or home bases list")
             
-        # TODO:
         def get_cp_entities(self): 
-            max_entities_count = 16
-
             grid_width = 4
             grid_height = 3
 
-            if (grid_width * grid_height > max_entities_count):
-                print("Exceeding 16 tents limit")
+            if (grid_width * grid_height > MAX_ENTITIES_COUNT):
+                print("Error: exceeding {} tents limit".format(MAX_ENTITIES_COUNT))
                 return []
 
             extra_fallback_tent_count = 1
