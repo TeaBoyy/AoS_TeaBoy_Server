@@ -5,29 +5,6 @@ MAX_ENTITIES_COUNT = 16
 
 def apply_script(protocol, connection, config):
     class FrontlineConnection(connection):
-            def get_spawn_location(self):
-                team_nodes = []
-                opposite_team_nodes = []
-
-                for entity in self.protocol.entities:
-                    if entity.team == self.team:
-                        team_nodes.append(entity)
-                    elif entity.team == self.team.other:
-                        opposite_team_nodes.append(entity)
-
-                team_frontline_nodes = self.protocol.get_colliding_grid_nodes(team_nodes, opposite_team_nodes)
-
-                remaining_opposite_team_nodes = []
-                for node in opposite_team_nodes:
-                    if node not in team_frontline_nodes:
-                        remaining_opposite_team_nodes.append(node)
-
-                team_safe_spawn_points = self.protocol.get_colliding_grid_nodes(team_frontline_nodes, remaining_opposite_team_nodes)
-
-                return team_safe_spawn_points[0].get_spawn_location()
-
-                #return connection.get_spawn_location(self)
-        
     class FrontlineProtocol(protocol):
         game_mode = TC_MODE
         
@@ -91,13 +68,5 @@ def apply_script(protocol, connection, config):
                     counter += 1
 
             return entities
-
-        def get_colliding_grid_nodes(self, nodesA, nodesB):
-            if nodesA is None or nodesB is None:
-                return []
-
-            #for node in nodesA:
-            
-            return []
 
     return FrontlineProtocol, FrontlineConnection
