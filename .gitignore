@@ -1,2 +1,4 @@
 scripts/*.pyo
 maps/*.txto
+logs/*
+player_count_log.txt
