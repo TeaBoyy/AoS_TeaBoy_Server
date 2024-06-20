@@ -355,6 +355,10 @@ try:
             bot_level_average=50
             bot_level_adjust=[0,0]
             bot_level_average_change=0
+
+            # Modification (frontline gamemode)
+            blue_team_home_bases = []
+            green_team_home_bases = []
         
             def kasoku(self):
                 if ARENAmode:
@@ -825,6 +829,20 @@ try:
                     else:
                         green_human+=1
                 return blue_human, blue_bot, green_human, green_bot
+
+            # Modification (frontline gamemode)
+            def reset_tc(self):
+                self.blue_team_home_bases = []
+                self.green_team_home_bases = []
+
+                protocol.reset_tc(self)
+
+                # TODO: handle neutral teams maybe
+                for entity in self.entities:
+                    if entity.team == self.blue_team:
+                        self.blue_team_home_bases.append(entity)
+                    elif entity.team == self.green_team:
+                        self.green_team_home_bases.append(entity)
         
         class BotConnection(connection):
             has_intel = False
@@ -1348,15 +1366,33 @@ try:
                         self.assigned_position = self.protocol.entities[n-1]
                     self.enitity_add_remove(tgt_entity)
 
+                # TODO: add new mode and at least prioritize home bases
                 elif DOMINE_FULLmode:
                     dist = 9999
                     tgt_entity=None
+
+                    # TODO: priorize defending home bases over attacking
+                    home_bases = None
+                    if self.team == self.protocol.blue_team:
+                        home_bases = self.protocol.blue_team_home_bases
+                    else:
+                        home_bases = self.protocol.green_team_home_bases
+
                     for entity in self.protocol.entities:
-                        if entity.team != self.team or entity.capturing_team == self.team.other:
+                        if (entity.team != self.team or entity.capturing_team == self.team.other) and entity in home_bases:
                             d = self.distance_calc(entity.get(),self.world_object.position.get())
                             if d < dist:
                                 tgt_entity=entity
                                 dist=d
+
+                    if tgt_entity == None:
+                        for entity in self.protocol.entities:
+                            if entity.team != self.team or entity.capturing_team == self.team.other:
+                                d = self.distance_calc(entity.get(),self.world_object.position.get())
+                                if d < dist:
+                                    tgt_entity=entity
+                                    dist=d
+                                    
                     if tgt_entity == None:
                         tgt_entity = choice(self.protocol.entities)
                     self.assigned_position = tgt_entity
