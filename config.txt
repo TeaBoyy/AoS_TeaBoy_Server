@@ -1,0 +1,180 @@
+{
+    "name" : "test u can't join",
+    "motd" : [
+        "Welcome to %(server_name)s",
+        "Map: %(map_name)s by %(map_author)s",
+        "Game mode: %(game_mode)s",
+        "Your gun is now a GRENADE LAUNCHER with INFINITE ammo!",
+		"Use your grenade launcher to CAPTURE ALL OBJECTIVES!",
+		"You cannot damage yourself or your teammates! Leverage this to DIG CAVES!",
+        "Hint for OpenSpades: DISABLE \"CAMERA SHAKE\" in \"SETUP\" menu for BETTER EXPERIENCE!",
+        "Performance note: this runs smoother on lower-end clients like Build&Shoot!",
+        "NEW: Hold V (sneak) and SHOOT to RESTORE BLOCKS BACK IN TIME!"
+    ],
+    "help" : [
+        "Server name: %(server_name)s",
+        "Map: %(map_name)s by %(map_author)s",
+        "Game mode: %(game_mode)s",
+        "Use your grenade launcher to CAPTURE ALL OBJECTIVES!",
+        "Press N (or M) to open the map! You can see the OBJECTIVES and TEAMMATES on it!",
+        "NEW: Hold V (sneak) and SHOOT to RESTORE BLOCKS BACK IN TIME!",
+        "Hint for OpenSpades: disable \"Camera Shake\" in \"Setup\" menu for better experience!",
+        "Watch out for reports of enemy attacks on objectives! They're displayed in chat!",
+        "Commands (press T to start typing them):",
+        "/ADMIN     Send a message to admins",
+		"/NEXT      Start a vote to advance to the next map",
+        "/M         Use medkit to heal yourself. Medkit is given once per spawn",
+        "/VOTEKICK  Start a vote to temporarily ban a disruptive player",
+        "/TIME      Remaining time until forced map reset",
+		"/STREAK    Shows how many kills in a row you got without dying"
+    ],
+    "tips" : [
+        "Tip: (NEW!) Hold V (sneak) and SHOOT to RESTORE BLOCKS BACK IN TIME!",
+        "Tip: Type /NEXT to start a vote to advance to the next map. Type /HELP for more info",
+        "Hint for OpenSpades: DISABLE \"CAMERA SHAKE\" in \"SETUP\" menu for BETTER EXPERIENCE!",
+        "Press N (or M) to open the MAP and locate enemy TENTS!",
+        "Watch out for reports of enemy attacks on objectives! They're displayed in chat!"
+    ],
+    "tip_frequency" : 5,
+    "rules" : [
+        "Cheating isn't welcome. Griefing is frowned upon. Have fun!"
+    ],
+    "master" : false,
+    "max_players" : 32,
+    "max_connections_per_ip" : 2,
+    "port" : 32887,
+    "network_interface" : "",
+
+    "game_mode" : "mini-tc",
+    "cap_limit" : 10,
+    "default_time_limit" : 300,
+    "advance_on_win" : true,
+    "maps" : ["hiesville", "longbridge", "classicgen", "burbs", "Kowang-San(Hill355)", "icebridge", "urara", "normandie"],
+    "random_rotation" : false,
+
+    "respawn_time" : 10,
+    "respawn_waves" : true,
+    "friendly_fire" : false,
+    "grief_friendly_fire_time" : 5,
+    "spade_teamkills_on_grief" : false,
+    "balanced_teams" : 2,
+    "teamswitch_interval" : 0,
+
+    "speedhack_detect" : false,
+    "votekick_percentage" : 60,
+    "votekick_ban_duration" : 30,
+    "votekick_public_votes" : true,
+    "votemap_public_votes" : false,
+    "votemap_extension_time" : 15,
+    "votemap_player_driven" : false,
+    "votemap_autoschedule" : false,
+    "votemap_time" : 120,
+    "votemap_percentage" : 80,
+
+    "melee_damage" : 80,
+    "fall_damage" : true,
+    "user_blocks_only" : false,
+    "set_god_build" : true,
+    "server_prefix" : "",
+    "time_announcements" : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 30, 60, 120],
+    "login_retries" : 2,
+    "default_ban_duration" : 1440,
+
+    "logfile" : "./logs/log.txt",
+    "rotate_daily" : true,
+    "debug_log" : false,
+    "profile" : false,
+
+    "team1" : {
+        "name" : "Blue",
+        "color" : [0, 0, 255]
+    },
+    "team2" : {
+        "name" : "Green",
+        "color" : [0, 255, 0]
+    },
+   "passwords" : {
+        "admin" : ["replaceme"],
+        "moderator" : ["replaceme"],
+        "guard" : ["replaceme"],
+        "trusted" : ["replaceme"]
+    },
+    "rights" : {
+        "moderator" : ["advance", "cancel", "dban", "fog", "from", "goto", "hackinfo", "hban", "invisible", "ip", "kick", "kickafk", "kill", "map", "master", "move", "mute", "resetgame", "switch", "teleport", "teleport_other", "tpsilent", "togglebuild", "togglekill", "togglevotekick", "trust", "undoban", "unmute", "unstick", "where", "whowas"],
+        "guard" : ["cancel", "fog", "from", "goto", "hackinfo", "hban", "ip", "kick", "kickafk", "kill", "move", "mute", "switch", "teleport", "teleport_other", "togglebuild", "togglekill", "togglevotekick", "trust", "unmute", "unstick", "where", "whowas"]
+    },
+    "ssh" : {
+        "enabled" : false,
+        "port" : 32887,
+        "users" : {
+            "user" : "ssh_pass_change_this"
+        }
+    },
+    "status_server" : {
+        "enabled" : false,
+        "port" : 32886
+    },
+    "ban_publish" : {
+        "enabled" : false,
+        "port" : 32885
+    },
+    "ban_subscribe" : {
+        "enabled" : true,
+        "urls" : [
+            ["http://www.blacklist.spadille.net/subscribe.json", []]
+        ]
+    },
+    "irc" : {
+        "enabled" : false,
+        "nickname" : "PySnip",
+        "username" : "PySnip",
+        "realname" : "PySnip",
+        "server" : "irc.quakenet.org",
+        "port" : 6667,
+        "channel" : "#MyServerChannel",
+        "password" : "",
+        "commandprefix" : "!",
+        "chatprefix" : "."
+    },
+    "scripts" : [
+	    "grenade_launchers",
+		"spawn_protect",
+        "map_extensions",
+        "disco",
+        "votekick",
+        "trusted",
+        "ratio",
+        "passreload",
+        "blockinfo",
+        "afk",
+		"daycycle",
+		"votenext",
+        "medkit",
+        "allow_kill",
+		"log_player_count",
+        "memcheck",
+        "build_height",
+        "reloadconfig",
+        "tc_mode_extension"
+    ],
+
+    "squad_respawn_time" : 32,
+    "squad_size" : 4,
+    "auto_squad" : false,
+    "load_saved_map" : false,
+    "rollback_on_game_end" : false,
+    "afk_time_limit" : 10,
+	"spawn_protect_time" : 2,
+    "medkits" : 1,
+    "medkit_heal_amount" : 40,
+    "nade_launcher_restore_blocks" : true,
+    "nade_launcher_restore_blocks_grayscale" : false,
+    "nade_launcher_restore_blocks_size": 5,
+    "nade_launcher_extra_destruction" : true,
+    "nade_launcher_extra_destruction_size" : 2,
+    "nade_launcher_extra_destruction_sound" : 2,
+    "nade_launcher_extra_destruction_weapons" : ["rifle", "shotgun"],
+    "nade_launcher_extra_destruction_sound_weapons" : ["rifle", "shotgun"],
+    "mini_tc_scale_x" : 1.5,
+    "mini_tc_scale_y" : 1.2
+}
