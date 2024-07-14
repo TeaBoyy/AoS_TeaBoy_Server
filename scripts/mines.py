@@ -213,13 +213,19 @@ def apply_script(protocol, connection, config):
 				self.mine_determine(self.get_location(), True)
 			if self.mine_amount < 0:
 				self.mine_amount = 0
-	
+
+		# TODO: sometimes even if close to mine, it just destroys block without exploding it
+		# TODO: looks like real problem is that if im too fare and shoot nade, it won't explode or trigger any adjacent explosions
 		def mine_explode(self, minepos, mineinfo):
+			print("mine_explode")
 			x,y,z = minepos
 			if babel == False or babel == True and ((mineinfo[1] == self.protocol.blue_team.id and minepos[0] >= 288) or (mineinfo[1] == self.protocol.green_team.id and minepos[0] <= 224)):
-				for nade_x in xrange(x - 1, x + 2):
-					for nade_y in xrange(y - 1, y + 2):
-						for nade_z in xrange(z - 1, z + 2):
+				# TODO: maybe can change adjacency here
+				start_shift = -1
+				end_shift = 2
+				for nade_x in xrange(x - start_shift, x + end_shift):
+					for nade_y in xrange(y - start_shift, y + end_shift):
+						for nade_z in xrange(z - start_shift, z + end_shift):
 							if self.protocol.map.destroy_point(nade_x, nade_y, nade_z):
 								self.on_block_removed(nade_x, nade_y, nade_z)
 								destroyBlock(self, nade_x, nade_x, nade_x)
@@ -246,14 +252,18 @@ def apply_script(protocol, connection, config):
 				self.mine_killmine = None
 				
 			for minepos, mineinfo in self.protocol.mine_info.iteritems():
+				print("iterating over mines...")
 				try:
 					mineOwner = get_player(self.protocol, "#%s" % mineinfo[2])
 				except InvalidPlayer:
 					mineOwner = None
 				if self.hp is not None:
+					#print("self.hp is OK")
 					if walk == True:
 						if (minepos[0]-xyz[0] > -3 and minepos[0]-xyz[0] < 3) and (minepos[1]-xyz[1] > -3 and minepos[1]-xyz[1] < 3) and (minepos[2]-xyz[2] > -3 and minepos[2]-xyz[2] < 5):
 							if self.team.id != mineinfo[1]:
+
+								# TODO: 3rd - means active or not
 								if mineinfo[3]:
 									if mineOwner is not None:
 										self.mine_killmine = (mineinfo[0], mineinfo[2], mineOwner)
@@ -263,9 +273,19 @@ def apply_script(protocol, connection, config):
 										self.mine_explode(minepos, mineinfo)
 									callLater(2.0, __killmineoff)
 									local_pop[minepos] = mineinfo
-									
+					# TODO:
 					elif grenade == True:
-						if (minepos[0]-xyz[0] > -3 and minepos[0]-xyz[0] < 3) and (minepos[1]-xyz[1] > -3 and minepos[1]-xyz[1] < 3) and (minepos[2]-xyz[2] > -3 and minepos[2]-xyz[2] < 3):
+						print("elif grenade == True:")
+						
+						#offset = 3
+						#offset = 5
+						offset = 4
+
+						# TODO: oh maybe it checks only neighbors, not in Z axis? or it does? confusing
+						# TODO: oh it's actually checks like 3 blocks or what, their coords? so can't just increase offset?
+						if (minepos[0]-xyz[0] > -offset and minepos[0]-xyz[0] < offset) and (minepos[1]-xyz[1] > -offset and minepos[1]-xyz[1] < offset) and (minepos[2]-xyz[2] > -offset and minepos[2]-xyz[2] < offset):
+						#if True:
+							print("minepos is OK")
 							if mineinfo[3]:
 								if mineOwner is not None:
 									self.mine_killmine = (mineinfo[0], mineinfo[2], mineOwner)
@@ -273,8 +293,15 @@ def apply_script(protocol, connection, config):
 								else:
 									self.mine_killmine = (mineinfo[0], mineinfo[2], None)
 									self.mine_explode(minepos, mineinfo)
+
+								print("callLater(2.0, __killmineoff)")
 								callLater(2.0, __killmineoff)
 								local_pop[minepos] = mineinfo
+							else:
+								# TODO: try remove not activated mines, tho likely doesn't reset their count and likely prints nothing
+								local_pop[minepos] = mineinfo
+								print("Remove not activated mine")
+
 					elif not walk and not grenade and minepos == xyz:
 						if self.tool != SPADE_TOOL:
 							if mineinfo[3]:
@@ -304,6 +331,7 @@ def apply_script(protocol, connection, config):
 						local_pop[minepos] = mineinfo
 					
 			for popposition, mineinfo in local_pop.iteritems():
+				print("pop mine...")
 				self.protocol.mine_info.pop(popposition, None)
 			del local_pop
 			
@@ -330,12 +358,44 @@ def apply_script(protocol, connection, config):
 						setBlockColor(self, x, y, z, MINE_COLOR_DOCILE)
 						mineinfo = self.protocol.mine_info[(x, y, z)] = (self.name, self.team.id, self.player_id, False) # 4th arg: active
 
+						# TODO: so, maybe can check if solid here, not active if not solid, just remove it?
+						# TODO: though of course could be another block unrelated that will end up mined in 2.5s
+						# TODO: activated one should be in map too, just not armed yet. Ye it's actually added, but i guess not removed?
 						def activateMine():
 							if (x, y, z) in self.protocol.mine_info.iterkeys():
+								"""
+								# TODO:
+								is_solid = self.protocol.map.get_solid(x, y, z)
+								if is_solid == False:
+									self.protocol.mine_info.pop((x, y, z), None)
+									return
+								# TODO:
+								"""
+
 								if self.team is not None:
 									try:
 										if not mineinfo[3]:
-											setBlockColor(self, x, y, z, MINE_COLOR_ACTIVE[mineinfo[1]])
+											
+											# TODO: red and blue teams would work better, not natural colors, so can't mistake with grass. Meaning can make more subtle
+											# TODO: try some subtle change in color related to original
+											# TODO: but need to not overflow 250!
+											# TODO: but really weird, dark areas clearly see, white not so much. Maybe constant is better after all
+											r, g, b = originalBlockColor
+											newR, newG, newB = MINE_COLOR_ACTIVE[mineinfo[1]]
+
+											#multiplier = 0.35 # TODO: good for green and blue
+											multiplier = 0.25 # TODO: might be good for red and blue
+
+											#myColor = (min(int(r + newR*multiplier), 255), min(int(g + newG*multiplier), 255), min(int(b + newB*multiplier), 255))
+
+											# TODO: with constant, non 1.0 values, might have real block with same/close color, so maybe do multiply with original one, idk
+											constant_multiplier = 0.5
+											myColor = (int(newR*multiplier), int(newG*constant_multiplier), int(newB*constant_multiplier))
+
+											setBlockColor(self, x, y, z, myColor)
+											#setBlockColor(self, x, y, z, MINE_COLOR_ACTIVE[mineinfo[1]])
+											# TODO:
+
 											self.protocol.mine_info[(x, y, z)] = (mineinfo[0], mineinfo[1], mineinfo[2], True, originalBlockColor)
 									except KeyError:
 										pass
@@ -378,12 +438,23 @@ def apply_script(protocol, connection, config):
 			return connection.on_secondary_fire_set(self, secondary)
 		
 		def on_block_destroy(self, x, y, z, mode):
+			mode_str = "Unknown"
+			if mode == GRENADE_DESTROY:
+				mode_str = "GRENADE_DESTROY"
+			elif mode == SPADE_DESTROY:
+				mode_str = "SPADE_DESTROY"
+
+			print("on_block_destroy. mode: ", mode_str)
 			if self.canExplodeAdjacent == True and self.protocol.mine_adjacency_explode == True:
 				if mode == GRENADE_DESTROY:
+					# TODO: looks like too late to explode mine.. since it already got destroyed (block)!
+					print("callLater(0.3, lambda: self.mine_determine")
 					callLater(0.3, lambda: self.mine_determine((x, y, z), False, True))
 				else:
+					print("self.mine_determine((x, y, z))")
 					self.mine_determine((x, y, z))
 			else:
+				print("not adjancency enabled")
 				self.mine_determine((x, y, z))
 			
 			return connection.on_block_destroy(self, x, y, z, mode)
@@ -406,13 +477,20 @@ def apply_script(protocol, connection, config):
 		def __init__(self, *arg, **kw):
 			protocol.__init__(self, *arg, **kw)
 			self.mine_info = {}
-			self.clearLoop = LoopingCall(self.clearInvMines)
-			self.clearLoop.start(self.clearInterval)
+			#self.clearLoop = LoopingCall(self.clearInvMines)
+			#self.clearLoop.start(self.clearInterval)
 		
+		# TODO: maybe can keep this logic, but explode them instead of removing only? Though maybe it causes some chain reactios or whatever, that breaks it
+		# TODO: oh what am I saying, it will explode twice then for destroyed mine...
+		# TODO: just really not sure why it exists, maybe some cases where block destroyed, yet mine didn't explode/react..
+		# TODO: maybe can detect broken mines while iterating over? maybe can explode them before real explosion happens, then remove from list? Idk
+
+		# TODO: Maybe found the bug, or not. Until mine is armed, can destroy block, but later real mine appears. And it can hang in air and stuff
 		def clearInvMines(self):
 			mine_pop = []
 			#print("server refresh")
 			for minepos, mineinfo in self.mine_info.iteritems():
+				# TODO: oh so if destroyed, then mine is popped here, before it can explode and cause chain reaction
 				is_solid = self.map.get_solid(minepos[0], minepos[1], minepos[2])
 				if is_solid == False:
 					mine_pop.append(minepos)
