@@ -72,10 +72,27 @@ def apply_script(protocol, connection, config):
             for line in HELP:
                 self.send_chat(line)
             return connection.on_spawn(self, pos)
+
+        # TODO: ok so config 10s resapwn + no waves works not too bad. But now seems like its getting empties faster.
+        # TODO: likely need own wave system, to just over time decrease reinforcements. After taking objective, reset spawn timer for team that lost it i guess?
+        # TODO: goal is to make it challanging but eventually possible to clear and take tent.
+        # TODO: really, just waves after waves should decrease amount of incoming reinforncements, it's like reducing 9vs9 to 3vs3 or so
+
+        # TODO: ok i guess bug with leaked capturers exists still. Maybe my home bases stuff. Maybe not. Clearly blue got it and surround it, but smh invisble green took it for a bit
+
+        # TODO:
+        #def on_kill(self, killer, type, grenade):
+        #    self.respawn_time = 15 # TODO: maybe if just bots take longer to respawn, it would be better
+        #    # TODO: at 30s respawn seems like its much calmer with 18 bots
+        #    return connection.on_kill(self, killer, type, grenade)
             
+    # TOOD: in general looks like coold idea. Diagonal pattern, TOW, balanced respawn time, Rifle only, maybe mines.
+    # TODO: encourages to build fortifications and mines to protect agains other team, yet trying to push themselves
+
     class TugProtocol(protocol):
         game_mode = TC_MODE
-        
+        # TODO: careful on edge of maps can be stuff floaiting in sky. UPD - for green on cowang it still can spawn on that square, so shrink somehow
+        # TODO: maybe like decrease distance for last points? Accelerating? Idk
         def get_cp_entities(self):
             # generate positions
             
@@ -84,15 +101,48 @@ def apply_script(protocol, connection, config):
             green_cp = []
 
             magnitude = 10
-            angle = random.uniform(START_ANGLE, END_ANGLE)
-            x, y = (0, random.randrange(64, 512 - 64))
+            #angle = random.uniform(START_ANGLE, END_ANGLE)
+            angle = START_ANGLE
+
+            #x, y = (0, random.randrange(64, 512 - 64))
+            x, y = (0, 128)
             
             points = []
+
+
+            # TODO: maybe just generate 6 positions in a line, just shift y for each to get diagonal
             
+            # TODO: this is pretty good diagonal. But might add some X to have them further apart. Or reduce amount of tents
+            #x, y = (32, 32)
+            #for i in range(CP_EXTRA_COUNT):
+            #    points.append((int(x), int(y)))
+            #    x += 64
+            #    y += 64
+            #    print("added")
+
+            # TODO: interesting but too far now
+            #x, y = (32, 32)
+            #for i in range(CP_EXTRA_COUNT):
+            #    points.append((int(x), int(y)))
+            #    x += 96
+            #    y += 96
+            #    print("added")
+
+
+            # TODO:
+            extra_offset = 0
+            x, y = (32 - extra_offset * 2, 32 - extra_offset * 2)
+            for i in range(CP_EXTRA_COUNT):
+                points.append((int(x), int(y)))
+                x += 64 + extra_offset
+                y += 64 + extra_offset
+                print("added")
+
             square_1 = xrange(128)
             square_2 = xrange(512 - 128, 512)
             
-            while 1:
+            # TODO:
+            while False:
                 top = int(y) in square_1
                 bottom = int(y) in square_2
                 if top:
@@ -100,8 +150,13 @@ def apply_script(protocol, connection, config):
                 elif bottom:
                     angle = limit_angle(angle - FIX_ANGLE)
                 else:
-                    angle = limit_angle(angle + random_up_down(DELTA_ANGLE))
-                magnitude += random_up_down(2)
+                    #diff = random_up_down(DELTA_ANGLE)
+                    diff = DELTA_ANGLE
+                    angle = limit_angle(angle + diff)
+
+                #magnitude += random_up_down(2)
+                magnitude += 2
+
                 magnitude = min(15, max(5, magnitude))
                 x2, y2 = get_point(x, y, magnitude, angle)
                 if x2 >= 511:
@@ -109,21 +164,27 @@ def apply_script(protocol, connection, config):
                 x, y = x2, y2
                 points.append((int(x), int(y)))
             
-            move = 512 / CP_EXTRA_COUNT
-            offset = move / 2
+            #move = 512 / CP_EXTRA_COUNT
+            #offset = move / 2
             
             for i in xrange(CP_EXTRA_COUNT):
-                index = 0
-                while 1:
-                    p_x, p_y = points[index]
-                    index += 1
-                    if p_x >= offset:
-                        break
+                
+                #index = 0
+                #while 1:
+                #    print("index: " + str(index))
+                #    p_x, p_y = points[index]
+                #    index += 1
+                #    if p_x >= offset:
+                #        break
+                p_x, p_y = points[i]
                 if i < CP_EXTRA_COUNT / 2:
                     blue_cp.append((p_x, p_y))
+                    print("tent spawn - blue")
                 else:
                     green_cp.append((p_x, p_y))
-                offset += move
+                    print("tent spawn - green")
+                #offset += move
+                #index += 1
             
             # make entities
             
@@ -137,8 +198,12 @@ def apply_script(protocol, connection, config):
                     self.blue_team.last_spawn = entity
                     entity.id = -1
                 else:
+                    # TODO:
+                    #if i % 2 == 0:
+                    #    continue
                     entities.append(entity)
                     index += 1
+
             
             self.blue_team.cp = entities[-1]
             self.blue_team.cp.disabled = False
@@ -151,6 +216,10 @@ def apply_script(protocol, connection, config):
                     self.green_team.last_spawn = entity
                     entity.id = index
                 else:
+                    # TODO:
+                    #if i % 2 == 0:
+                    #    continue
+
                     entities.append(entity)
                     index += 1
 

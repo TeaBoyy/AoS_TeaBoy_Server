@@ -36,7 +36,7 @@
     "port" : 32887,
     "network_interface" : "",
 
-    "game_mode" : "tc",
+    "game_mode" : "tow",
     "cap_limit" : 10,
     "default_time_limit" : 180,
     "advance_on_win" : true,
@@ -44,7 +44,7 @@
     "random_rotation" : false,
 
     "respawn_time" : 10,
-    "respawn_waves" : true,
+    "respawn_waves" : false,
     "friendly_fire" : false,
     "grief_friendly_fire_time" : 255,
     "spade_teamkills_on_grief" : false,
@@ -148,7 +148,6 @@
         "daycycle",
         "log_player_count",
         "mines",
-        "frontline",
         "capture_reporter",
         "weaponcontrol",
         "blood"

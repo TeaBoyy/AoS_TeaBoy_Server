@@ -8,7 +8,7 @@ from pyspades.constants import *
 from pyspades.server import *
 from pyspades.common import *
    
-MAX_BLOOD = 75 * 1000
+MAX_BLOOD = 75 * 250
 BLOOD_COLOR = (175, 17, 28) 
 COLOR_OFFSET = 10 #can not be higher than the lowest BLOOD_COLOR RGB value 
    
