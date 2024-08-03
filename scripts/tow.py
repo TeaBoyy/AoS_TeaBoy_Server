@@ -130,14 +130,18 @@ def apply_script(protocol, connection, config):
 
 
             # TODO:
-            extra_offset = 0
-            x, y = (32 - extra_offset * 2, 32 - extra_offset * 2)
+            #extra_offset = -4
+            #x, y = (32 - extra_offset * 2, 32 - extra_offset * 2)
+
+            # TODO: hardcode matches 46 from start, and 46 at end
+            x, y = (46, 46)
+
             for i in range(CP_EXTRA_COUNT):
                 points.append((int(x), int(y)))
-                x += 64 + extra_offset
-                y += 64 + extra_offset
-                print("added")
-
+                print("added point: x -> ", x, ", y -> ", y)
+                x += 60 
+                y += 60
+                
             square_1 = xrange(128)
             square_2 = xrange(512 - 128, 512)
             
