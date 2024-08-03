@@ -352,7 +352,7 @@ def apply_script(protocol, connection, config):
                 self.reset_tickets_call.cancel()
                 self.reset_tickets_call = None
 
-            delay = 15
+            delay = 30
             self.reset_tickets_call = reactor.callLater(delay, self.reset_players_respawn_tickets)
 
             team = territory.team
