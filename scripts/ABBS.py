@@ -1359,11 +1359,19 @@ try:
                     for n in range(16):
                         if self.protocol.entities[n].team != hidari_team:break
                     if self.team == hidari_team:
-                        tgt_entity = self.protocol.entities[n]
-                        self.assigned_position = self.protocol.entities[n]
+                        if self.protocol.entities[n-1].capturing_team == self.team.other or self.protocol.entities[n-1].progress > 0:
+                            tgt_entity = self.protocol.entities[n-1]
+                            self.assigned_position = self.protocol.entities[n-1]
+                        else:
+                            tgt_entity = self.protocol.entities[n]
+                            self.assigned_position = self.protocol.entities[n]
                     else:
-                        tgt_entity = self.protocol.entities[n-1]
-                        self.assigned_position = self.protocol.entities[n-1]
+                        if self.protocol.entities[n].capturing_team == self.team.other or self.protocol.entities[n].progress < 1: 
+                            tgt_entity = self.protocol.entities[n]
+                            self.assigned_position = self.protocol.entities[n]
+                        else:
+                            tgt_entity = self.protocol.entities[n-1]
+                            self.assigned_position = self.protocol.entities[n-1]
                     self.enitity_add_remove(tgt_entity)
 
                 # TODO: add new mode and at least prioritize home bases
