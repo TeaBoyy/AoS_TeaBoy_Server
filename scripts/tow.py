@@ -11,6 +11,8 @@ import random
 import math
 from math import pi
 
+from twisted.internet import reactor
+
 CP_COUNT = 6
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
 ANGLE = 65
@@ -68,9 +70,52 @@ def apply_script(protocol, connection, config):
                 base = self.team.spawn_cp
             return base.get_spawn_location()
             
+        # TODO: reset on game end and stuff
+        last_spawn_time = None
+        cooldown_time = None
+        times_spawned = 0
         def on_spawn(self, pos):
             for line in HELP:
                 self.send_chat(line)
+
+            current_time = reactor.seconds()
+
+            alive_cooldown = 75
+            if self.last_spawn_time != None and current_time > self.last_spawn_time and current_time - self.last_spawn_time > alive_cooldown:
+                #self.times_spawned = 0
+                print("[HEY] It's been " + str(alive_cooldown) + "s of alive, drop by 1s")
+                if self.times_spawned >= 1:
+                    self.times_spawned -= 1
+
+            if self.cooldown_time != None and current_time > self.cooldown_time and self.cooldown_time - self.cooldown_time > 60 * 5:
+                # Try drop after 5 mins regardless of how long player lived last time
+                self.cooldown_time = current_time
+                print("[HEY] It's been 5mins in total, drop by 1s")
+                if self.times_spawned >= 1:
+                    self.times_spawned -= 1
+
+            if self.times_spawned == 0:
+                self.cooldown_time = current_time
+
+            self.last_spawn_time = current_time
+
+
+
+            final_respawn_time = int(min(5 + self.times_spawned * 1.5, 16))
+            random_offset = random.randrange(-3, 3)
+            if random_offset < 0 and final_respawn_time < random_offset * -1:
+                random_offset = 0
+
+            final_respawn_time += random_offset
+
+            self.respawn_time = final_respawn_time + random.randrange(-2, 2)
+            print("my respawn_time -> ", self.respawn_time)
+
+            self.times_spawned += 1
+
+            if self.times_spawned > 16 / 1.5:
+                self.times_spawned = 16 / 1.5
+            
             return connection.on_spawn(self, pos)
 
         # TODO: ok so config 10s resapwn + no waves works not too bad. But now seems like its getting empties faster.
