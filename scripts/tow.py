@@ -337,6 +337,9 @@ def apply_script(protocol, connection, config):
             for player in self.players.values():
                 player.reset_respawn_tickets()
 
+        # TODO: feels like some hits on me, or at bots are actually doing no damage?
+
+        # TODO: ABBS bug - even if 5+ blues standing on tent, i as green can easily cap it. It doesn't check presense, only can add them for target
         reset_tickets_call = None
 
         def on_cp_capture(self, territory):
@@ -347,10 +350,10 @@ def apply_script(protocol, connection, config):
             # TODO: case if got even further, would it reset?
             if self.reset_tickets_call != None and self.reset_tickets_call.active():
                 self.reset_tickets_call.cancel()
-                self.reset_tickets_call - None
+                self.reset_tickets_call = None
 
             delay = 15
-            self.reset_tickets_call = callLater(delay, self.reset_players_respawn_tickets)
+            self.reset_tickets_call = reactor.callLater(delay, self.reset_players_respawn_tickets)
 
             team = territory.team
             if team.id:
