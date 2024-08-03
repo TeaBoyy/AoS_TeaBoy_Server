@@ -74,6 +74,13 @@ def apply_script(protocol, connection, config):
         last_spawn_time = None
         cooldown_time = None
         times_spawned = 0
+
+        def reset_respawn_tickets(self):
+            print("reset_respawn_tickets")
+            self.last_spawn_time = None
+            self.cooldown_time = None
+            self.times_spawned = 0
+
         def on_spawn(self, pos):
             for line in HELP:
                 self.send_chat(line)
@@ -102,20 +109,62 @@ def apply_script(protocol, connection, config):
 
 
             final_respawn_time = int(min(5 + self.times_spawned * 1.5, 16))
-            random_offset = random.randrange(-3, 3)
+            random_offset = random.randrange(-1, 2)
             if random_offset < 0 and final_respawn_time < random_offset * -1:
                 random_offset = 0
 
-            final_respawn_time += random_offset
+            # TODO: no random for now for more consistent results
+            #final_respawn_time += random_offset
 
-            self.respawn_time = final_respawn_time + random.randrange(-2, 2)
-            print("my respawn_time -> ", self.respawn_time)
+            self.respawn_time = final_respawn_time
+            #print("my respawn_time -> ", self.respawn_time)
 
             self.times_spawned += 1
 
             if self.times_spawned > 16 / 1.5:
                 self.times_spawned = 16 / 1.5
-            
+
+            # TODO: just log total and average respawn time for teams
+            blue_data = []
+            green_data = []
+            for player in self.protocol.players.values():
+                if player.team == self.protocol.blue_team:
+                    blue_data.append(player.respawn_time)
+                else:
+                    green_data.append(player.respawn_time)
+
+            blue_total = None
+            for data in blue_data:
+                if blue_total == None:
+                    blue_total = data
+                    continue
+                
+                blue_total += data
+
+            blue_avg = None
+            if len(blue_data) > 0:
+                blue_avg = blue_total / len(blue_data)
+
+            green_total = None
+            for data in green_data:
+                if green_total == None:
+                    green_total = data
+                    continue
+                
+                green_total += data
+
+            green_avg = None
+            if len(green_data) > 0:
+                green_avg = green_total / len(green_data)
+
+            print("[HEY] BLUE STATS. TOTAL: " + str(blue_total) + "s, AVERAGE: " + str(blue_avg) + "s")
+            print("[HEY] GREEN STATS. TOTAL: " + str(green_total) + "s, AVERAGE: " + str(green_avg) + "s")
+
+            if blue_total < green_total:
+                print("[HEY] BLUE SEEMS TO HAVE DOING BETTER THAN GREEN NOW")
+            else:
+                print("[HEY] GREEN SEEMS TO HAVE DOING BETTER THAN BLUE NOW")
+
             return connection.on_spawn(self, pos)
 
         # TODO: ok so config 10s resapwn + no waves works not too bad. But now seems like its getting empties faster.
@@ -130,6 +179,12 @@ def apply_script(protocol, connection, config):
         #    self.respawn_time = 15 # TODO: maybe if just bots take longer to respawn, it would be better
         #    # TODO: at 30s respawn seems like its much calmer with 18 bots
         #    return connection.on_kill(self, killer, type, grenade)
+
+        def on_reset(self):
+            print("on_reset")
+            self.reset_respawn_tickets()
+            return connection.on_reset(self)
+
             
     # TOOD: in general looks like coold idea. Diagonal pattern, TOW, balanced respawn time, Rifle only, maybe mines.
     # TODO: encourages to build fortifications and mines to protect agains other team, yet trying to push themselves
@@ -278,7 +333,25 @@ def apply_script(protocol, connection, config):
             
             return entities
     
+        def reset_players_respawn_tickets(self):
+            for player in self.players.values():
+                player.reset_respawn_tickets()
+
+        reset_tickets_call = None
+
         def on_cp_capture(self, territory):
+
+            print("on_cp_capture")
+
+            # TODO: hold for at least N seconds before can start more action all over again
+            # TODO: case if got even further, would it reset?
+            if self.reset_tickets_call != None and self.reset_tickets_call.active():
+                self.reset_tickets_call.cancel()
+                self.reset_tickets_call - None
+
+            delay = 15
+            self.reset_tickets_call = callLater(delay, self.reset_players_respawn_tickets)
+
             team = territory.team
             if team.id:
                 move = -1
