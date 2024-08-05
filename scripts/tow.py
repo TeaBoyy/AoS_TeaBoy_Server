@@ -71,6 +71,12 @@ def apply_script(protocol, connection, config):
         def on_spawn(self, pos):
             for line in HELP:
                 self.send_chat(line)
+            # TODO: see what happens if equal LVLs, but diff spawn time. Then same but with diff LVLs
+            if self.team == self.protocol.green_team:
+                self.respawn_time = 5
+            else:
+                self.respawn_time = 15
+
             return connection.on_spawn(self, pos)
             
     class TugProtocol(protocol):

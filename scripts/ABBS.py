@@ -61,7 +61,12 @@ try:
     LITE_MODE       = True    
     LV_AUTO_ADJUST  = 0       # 0:off 1:human vs bot   2:blue vs green 3:both human/bot and blue/green
     BOT_NUM_NAME    = True    
-    CPU_LV          = [85,5]  
+    #CPU_LV          = [85,5]  
+
+    CPU_LV_GREEN          = [100,0]  
+    #CPU_LV_GREEN          = [85,0]  
+    CPU_LV_BLUE          = [85,0]  
+
     BOTMUTE         = True    # bot chat off
     DANSA_CALC_NUM  = 5        
     KEIRO_TANSAKU_NUM = 5      
@@ -340,7 +345,7 @@ try:
             kill_score=0
             levelchange=[0,0]
             reflesh_bot=False
-            teamcpulv=[copy(CPU_LV),copy(CPU_LV)] #blue green
+            teamcpulv=[copy(CPU_LV_BLUE),copy(CPU_LV_GREEN)] #blue green
             noise_blue=[]
             noise_green=[]
             exp_position=[]		
