@@ -36,7 +36,7 @@
     "port" : 32887,
     "network_interface" : "",
 
-    "game_mode" : "tc",
+    "game_mode" : "tow",
     "cap_limit" : 10,
     "default_time_limit" : 180,
     "advance_on_win" : true,
