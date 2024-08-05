@@ -1339,7 +1339,8 @@ try:
                         elif pl != None:
                             self.assigned_position = pl.world_object.position
 
-
+                # TODO: modified. 
+                # TODO: need to cover case when both teams try cap/hold but can't see each other and game softlocks
                 elif TOWmode:
                     n = 0
                     hidari_team = self.protocol.entities[n].team
