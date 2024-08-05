@@ -44,7 +44,7 @@
     "random_rotation" : false,
 
     "respawn_time" : 16,
-    "respawn_waves" : true,
+    "respawn_waves" : false,
     "friendly_fire" : false,
     "grief_friendly_fire_time" : 255,
     "spade_teamkills_on_grief" : false,
