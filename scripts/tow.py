@@ -75,8 +75,67 @@ def apply_script(protocol, connection, config):
             
     class TugProtocol(protocol):
         game_mode = TC_MODE
-        
+
         def get_cp_entities(self):
+            map = self.map
+            points = []
+
+            # TODO: builds diagonal. Need to unhardcode offsets
+            # TODO: add random direction of diagonal, random offset, random angle
+            x, y = (46, 46)
+
+            blue_cp = []
+            green_cp = []
+
+            for i in range(CP_EXTRA_COUNT):
+                points.append((int(x), int(y)))
+                x += 60 
+                y += 60
+            
+            for i in range(CP_EXTRA_COUNT):
+                p_x, p_y = points[i]
+                if i < CP_EXTRA_COUNT / 2:
+                    blue_cp.append((p_x, p_y))
+                else:
+                    green_cp.append((p_x, p_y))
+
+            # Note: copy/past from otiginal TOW
+            index = 0
+            entities = []
+            
+            for i, (x, y) in enumerate(blue_cp):
+                entity = TugTerritory(index, self, *(x, y, map.get_z(x, y)))
+                entity.team = self.blue_team
+                if i == 0:
+                    self.blue_team.last_spawn = entity
+                    entity.id = -1
+                else:
+                    entities.append(entity)
+                    index += 1
+
+            
+            self.blue_team.cp = entities[-1]
+            self.blue_team.cp.disabled = False
+            self.blue_team.spawn_cp = entities[-2]
+                
+            for i, (x, y) in enumerate(green_cp):
+                entity = TugTerritory(index, self, *(x, y, map.get_z(x, y)))
+                entity.team = self.green_team
+                if i == len(green_cp) - 1:
+                    self.green_team.last_spawn = entity
+                    entity.id = index
+                else:
+                    entities.append(entity)
+                    index += 1
+
+            self.green_team.cp = entities[-CP_COUNT/2]
+            self.green_team.cp.disabled = False
+            self.green_team.spawn_cp = entities[-CP_COUNT/2 + 1]
+            
+            return entities
+
+        # Original algorithm without modification. Unused
+        def original_tow_get_cp_entities(self):
             # generate positions
             
             map = self.map
