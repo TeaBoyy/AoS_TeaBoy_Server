@@ -68,19 +68,97 @@ def apply_script(protocol, connection, config):
                 base = self.team.spawn_cp
             return base.get_spawn_location()
             
+        # TODO:
+        def on_kill(self, killer, type, grenade):
+            # Every 10 kills for team increase own team respawn time by 2s, decrease other team respawn time by 2
+
+            # TODO: at first just adding/removing didnt seem to work, but over time blue (weaker) reached 10s vs 2s spawn time
+            # TODO: so, maybe no need to check for leading team first?
+            # TODO: also, should maybe reset at some point? Like, if diff is big, and players leave, like, might not be possible to balance the kills anymore
+            # TODO: just it must be possible to push diff back and start bleeding the other team respawn time
+
+            # TODO: in general POC kinda works, green overkills blue so blue respawn time gets to max (12s), though maybe kinda fast.
+            # TODO: so far not sure if or how long it takes for green to capture tent. Ok with 12s not much but with 14s faster, maybe up to 7mins?
+
+            # TODO: kills_per_update should control how fast shift happens, how much kills needed to progress
+
+            diff_respawn_time = 2
+            max_respawn_time = 14
+            kills_per_update = 5
+            if killer != None and killer != self:
+
+                # TODO: margin must be different based on amount of players, 5diff for 2-4 players is too much, while for 20 players not really
+                kills_diff_margin = 5
+
+                # TODO: check if neither is leading too
+                kills_diff = self.protocol.green_team.kills - self.protocol.blue_team.kills
+
+                if kills_diff > -kills_diff_margin and kills_diff < kills_diff_margin:
+                    print("Neither is leading")
+                    return connection.on_kill(self, killer, type, grenade)
+
+                green_is_leading = (self.protocol.green_team.kills - self.protocol.blue_team.kills - kills_diff_margin) >= 0
+
+                print("Is green leading -> ", green_is_leading, "; green kills -> ", self.protocol.green_team.kills , "; blue kills -> ", self.protocol.blue_team.kills)
+
+                if green_is_leading and killer.team == self.protocol.green_team:
+                    kills = self.protocol.green_team.kills
+                    if kills != 0 and kills % kills_per_update == 0:
+
+                        if self.protocol.green_respawn_time > diff_respawn_time:
+                            if self.protocol.green_respawn_time - diff_respawn_time >= 2:
+                                self.protocol.green_respawn_time -= diff_respawn_time
+                                print("Reduced green spawn time by: ", diff_respawn_time, ", it's now: ", self.protocol.green_respawn_time)
+
+                        if self.protocol.blue_respawn_time + diff_respawn_time > max_respawn_time:
+                            self.protocol.blue_respawn_time = max_respawn_time
+                            print("Blue spawn time reached maximum: ", max_respawn_time)
+                        else:
+                            self.protocol.blue_respawn_time += diff_respawn_time
+                            print("Increased blue spawn time by: ", diff_respawn_time, ", it's now: ", self.protocol.blue_respawn_time)
+
+                        print("Green: +%d kills", kills_per_update)
+
+                if not green_is_leading and killer.team == self.protocol.blue_team:
+                    kills = self.protocol.blue_team.kills
+                    if kills != 0 and kills % kills_per_update == 0:
+
+                        if self.protocol.blue_respawn_time > diff_respawn_time:
+                            if self.protocol.blue_respawn_time - diff_respawn_time >= 2:
+                                self.protocol.blue_respawn_time -= diff_respawn_time
+                                print("Reduced blue spawn time by: ", diff_respawn_time, ", it's now: ", self.protocol.blue_respawn_time)
+
+                        if self.protocol.green_respawn_time + diff_respawn_time > max_respawn_time:
+                            self.protocol.green_respawn_time = max_respawn_time
+                            print("Blue spawn time reached maximum: ", max_respawn_time)
+                        else:
+                            self.protocol.green_respawn_time += diff_respawn_time
+                            print("Increased green spawn time by: ", diff_respawn_time, ", it's now: ", self.protocol.green_respawn_time)
+                    
+                        print("Blue: +%d kills", kills_per_update)
+            else:
+                print("killer is None or self")
+
+            return connection.on_kill(self, killer, type, grenade)
+
+        # TODO:
         def on_spawn(self, pos):
             for line in HELP:
                 self.send_chat(line)
-            # TODO: see what happens if equal LVLs, but diff spawn time. Then same but with diff LVLs
-            if self.team == self.protocol.green_team:
-                self.respawn_time = 5
+
+            if self.team == self.protocol.blue_team:
+                self.respawn_time = self.protocol.blue_respawn_time
             else:
-                self.respawn_time = 15
+                self.respawn_time = self.protocol.green_respawn_time
 
             return connection.on_spawn(self, pos)
             
     class TugProtocol(protocol):
         game_mode = TC_MODE
+
+        # TODO:
+        green_respawn_time = 2
+        blue_respawn_time = 2
 
         def get_cp_entities(self):
             map = self.map
