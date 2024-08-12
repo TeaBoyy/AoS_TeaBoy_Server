@@ -143,7 +143,6 @@
         "reloadconfig",
         "votenext",
         "allow_kill",
-        "airstrike",
         "medkit",
         "daycycle",
         "log_player_count",
