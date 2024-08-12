@@ -94,6 +94,11 @@ def apply_script(protocol, connection, config):
             
             return self.protocol.get_random_location(True, (x1, y1, x2, y2))
 
+        # TODO: read more https://foxhole.fandom.com/wiki/Respawning
+
+        # TODO: issue - only watching for total kills diff, so like even if it stays 15 vs 10 kills, it's still 5 kills, so we keep thinking one side made +5 kills
+        # TODO: but it's still playable. Tho if u push too hard, then alone won't be able to easily to shift scales back, making 40kills for example is hard with 14s respawn time
+        # TODO: can try and test on 16vs16 for fun but need correponding respawn time for this, which is like twice, so 24-30s will have to be
         def on_kill(self, killer, type, grenade):
             # Every 10 kills for team increase own team respawn time by 2s, decrease other team respawn time by 2
 
@@ -120,6 +125,8 @@ def apply_script(protocol, connection, config):
 
                 if kills_diff > -kills_diff_margin and kills_diff < kills_diff_margin:
                     print("Neither is leading")
+
+                    # TODO: then restore back not leading team's respawn time somehow over time
                     return connection.on_kill(self, killer, type, grenade)
 
                 green_is_leading = (self.protocol.green_team.kills - self.protocol.blue_team.kills - kills_diff_margin) >= 0
@@ -155,7 +162,7 @@ def apply_script(protocol, connection, config):
 
                         if self.protocol.green_respawn_time + diff_respawn_time > max_respawn_time:
                             self.protocol.green_respawn_time = max_respawn_time
-                            print("Blue spawn time reached maximum: ", max_respawn_time)
+                            print("Green spawn time reached maximum: ", max_respawn_time)
                         else:
                             self.protocol.green_respawn_time += diff_respawn_time
                             print("Increased green spawn time by: ", diff_respawn_time, ", it's now: ", self.protocol.green_respawn_time)
