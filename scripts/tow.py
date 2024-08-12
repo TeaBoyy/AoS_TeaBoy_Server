@@ -124,7 +124,7 @@ def apply_script(protocol, connection, config):
                 kills_diff = self.protocol.green_team.kills - self.protocol.blue_team.kills
 
                 if kills_diff > -kills_diff_margin and kills_diff < kills_diff_margin:
-                    print("Neither is leading")
+                    print("Neither is leading; green kills -> ", self.protocol.green_team.kills , "; blue kills -> ", self.protocol.blue_team.kills)
 
                     # TODO: then restore back not leading team's respawn time somehow over time
                     return connection.on_kill(self, killer, type, grenade)
@@ -189,8 +189,10 @@ def apply_script(protocol, connection, config):
         game_mode = TC_MODE
 
         # TODO:
-        green_respawn_time = 2
-        blue_respawn_time = 2
+        initial_respawn_time = 2
+        green_respawn_time = initial_respawn_time
+        blue_respawn_time = initial_respawn_time
+
 
         def get_cp_entities(self):
             map = self.map
@@ -336,6 +338,13 @@ def apply_script(protocol, connection, config):
             return entities
     
         def on_cp_capture(self, territory):
+            print("on_cp_capture -> reset team kills")
+            self.green_team.kills = 0
+            self.blue_team.kills = 0
+
+            self.blue_respawn_time = self.initial_respawn_time
+            self.green_respawn_time = self.initial_respawn_time
+
             team = territory.team
             if team.id:
                 move = -1
