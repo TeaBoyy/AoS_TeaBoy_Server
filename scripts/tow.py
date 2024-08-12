@@ -66,9 +66,34 @@ def apply_script(protocol, connection, config):
                 base = self.team.last_spawn
             else:
                 base = self.team.spawn_cp
-            return base.get_spawn_location()
+
+            return self.my_get_spawn_location(base.x, base.y)
+            #return base.get_spawn_location()
             
-        # TODO:
+        def my_get_spawn_location(self, x, y):
+
+            # TODO:
+            if self.team == self.protocol.green_team:
+                offset_x = 0
+                offset_y = 0
+            else:
+                offset_x = -32
+                offset_y = -32
+
+            # TODO:
+            #x -= offset_x
+            #y -= offset_y
+
+            # TODO: this is not bad. X is same, but reduce Y so that don't spawn closer than needed.
+            # TODO: tho stuck at 2nd tent so idk
+            my_radius = 32
+            x1 = max(0, x - my_radius)
+            y1 = max(0, y - 8)
+            x2 = min(512, x + my_radius)
+            y2 = min(512, y + 8)
+            
+            return self.protocol.get_random_location(True, (x1, y1, x2, y2))
+
         def on_kill(self, killer, type, grenade):
             # Every 10 kills for team increase own team respawn time by 2s, decrease other team respawn time by 2
 
