@@ -99,6 +99,8 @@ def apply_script(protocol, connection, config):
 
         # TODO: read more https://foxhole.fandom.com/wiki/Respawning
 
+        # TODO: note - classicgen with big hills and 2vs20s respawn time dominating team capped at least 2 tents (2nd too fast, so maybe reduce reset timer from 60s to idk 30s)
+
         # TODO: issue - only watching for total kills diff, so like even if it stays 15 vs 10 kills, it's still 5 kills, so we keep thinking one side made +5 kills
         # TODO: but it's still playable. Tho if u push too hard, then alone won't be able to easily to shift scales back, making 40kills for example is hard with 14s respawn time
         # TODO: can try and test on 16vs16 for fun but need correponding respawn time for this, which is like twice, so 24-30s will have to be
@@ -116,7 +118,11 @@ def apply_script(protocol, connection, config):
             # TODO: kills_per_update should control how fast shift happens, how much kills needed to progress
 
             diff_respawn_time = 2
-            max_respawn_time = 14
+
+            #max_respawn_time = 14
+            #max_respawn_time = 20
+            max_respawn_time = 18
+
             kills_per_update = 5
             if killer != None and killer != self:
 
@@ -362,7 +368,7 @@ def apply_script(protocol, connection, config):
                 self.reset_kills_and_respawn_time_call.cancel()
                 self.reset_kills_and_respawn_time_call = None
 
-            delay = 60
+            delay = 45
             self.reset_kills_and_respawn_time_call = reactor.callLater(delay, self.reset_kills_and_respawn_time)
 
             # TODO: smh blue make more kills after reset. Maybe its lack of airstike.py or modifying protocol values flips teams, idk. Why 1st push is ok though?
