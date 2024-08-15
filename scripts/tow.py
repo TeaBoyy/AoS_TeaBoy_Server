@@ -368,7 +368,7 @@ def apply_script(protocol, connection, config):
                 self.reset_kills_and_respawn_time_call.cancel()
                 self.reset_kills_and_respawn_time_call = None
 
-            delay = 45
+            delay = 20
             self.reset_kills_and_respawn_time_call = reactor.callLater(delay, self.reset_kills_and_respawn_time)
 
             # TODO: smh blue make more kills after reset. Maybe its lack of airstike.py or modifying protocol values flips teams, idk. Why 1st push is ok though?
