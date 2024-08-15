@@ -196,6 +196,10 @@ def apply_script(protocol, connection, config):
         green_respawn_time = initial_respawn_time
         blue_respawn_time = initial_respawn_time
 
+        def on_game_end(self):
+            print("Game end")
+            self.reset_kills_and_respawn_time()
+            return protocol.on_game_end(self)
 
         def get_cp_entities(self):
             map = self.map
