@@ -11,6 +11,9 @@ import random
 import math
 from math import pi
 
+# TODO:
+from twisted.internet import reactor
+
 CP_COUNT = 6
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
 ANGLE = 65
@@ -336,14 +339,29 @@ def apply_script(protocol, connection, config):
             self.green_team.spawn_cp = entities[-CP_COUNT/2 + 1]
             
             return entities
-    
-        def on_cp_capture(self, territory):
-            print("on_cp_capture -> reset team kills")
+
+        reset_kills_and_respawn_time_call = None
+
+        # TODO:
+        def reset_kills_and_respawn_time(self):
+            # TODO: just resetting actual protocol values seems to work
+            print("reset_kills_and_respawn_time")
             self.green_team.kills = 0
             self.blue_team.kills = 0
 
             self.blue_respawn_time = self.initial_respawn_time
             self.green_respawn_time = self.initial_respawn_time
+    
+        def on_cp_capture(self, territory):
+            # TODO: issue - somehow this reverses balance, so try to call later and see if helps
+            if self.reset_kills_and_respawn_time_call != None and self.reset_kills_and_respawn_time_call.active():
+                self.reset_kills_and_respawn_time_call.cancel()
+                self.reset_kills_and_respawn_time_call = None
+
+            delay = 60
+            self.reset_kills_and_respawn_time_call = reactor.callLater(delay, self.reset_kills_and_respawn_time)
+
+            # TODO: smh blue make more kills after reset. Maybe its lack of airstike.py or modifying protocol values flips teams, idk. Why 1st push is ok though?
 
             team = territory.team
             if team.id:
