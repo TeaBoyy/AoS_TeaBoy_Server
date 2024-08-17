@@ -391,15 +391,27 @@ def apply_script(protocol, connection, config):
 
             self.blue_respawn_time = self.initial_respawn_time
             self.green_respawn_time = self.initial_respawn_time
+
+        last_captured_tent = None
     
         def on_cp_capture(self, territory):
-            # TODO: issue - somehow this reverses balance, so try to call later and see if helps
+            # TODO: neutral territories
+
+            delay = 20
+
+            reset_stats = True
             if self.reset_kills_and_respawn_time_call != None and self.reset_kills_and_respawn_time_call.active():
                 self.reset_kills_and_respawn_time_call.cancel()
                 self.reset_kills_and_respawn_time_call = None
 
-            delay = 20
-            self.reset_kills_and_respawn_time_call = reactor.callLater(delay, self.reset_kills_and_respawn_time)
+                if territory == self.last_captured_tent:
+                    reset_stats = False
+                    print("Took back tent under ", delay, " seconds, don't reset stats")
+
+            if reset_stats:
+                self.reset_kills_and_respawn_time_call = reactor.callLater(delay, self.reset_kills_and_respawn_time)
+
+            self.last_captured_tent = territory
 
             # TODO: smh blue make more kills after reset. Maybe its lack of airstike.py or modifying protocol values flips teams, idk. Why 1st push is ok though?
 
