@@ -135,8 +135,29 @@ def apply_script(protocol, connection, config):
                 if kills_diff > -kills_diff_margin and kills_diff < kills_diff_margin:
                     print("Neither is leading; green kills -> ", self.protocol.green_team.kills , "; blue kills -> ", self.protocol.blue_team.kills)
 
+                    # TODO: move on some other action/update or start a loop that doesn't rely on on_kill
+                    current_time = reactor.seconds() 
+                    stalemate_cooldown_seconds = (0.45 * player_count)
+
+                    if self.protocol.last_stalemate_cooldown_time == None:
+                        self.protocol.last_stalemate_cooldown_time = current_time
+
+                    if current_time - self.protocol.last_stalemate_cooldown_time > stalemate_cooldown_seconds:
+                        print("Cooldown. Passed ", current_time - self.protocol.last_stalemate_cooldown_time, " seconds, reducing both teams respawn time by ", diff_respawn_time)
+                        self.protocol.last_stalemate_cooldown_time = current_time
+                        if self.protocol.green_respawn_time > diff_respawn_time:
+                            if self.protocol.green_respawn_time - diff_respawn_time >= 2:
+                                self.protocol.green_respawn_time -= diff_respawn_time
+                                print("Reduced green spawn time by: ", diff_respawn_time, ", it's now: ", self.protocol.green_respawn_time)
+                        if self.protocol.blue_respawn_time > diff_respawn_time:
+                            if self.protocol.blue_respawn_time - diff_respawn_time >= 2:
+                                self.protocol.blue_respawn_time -= diff_respawn_time
+                                print("Reduced blue spawn time by: ", diff_respawn_time, ", it's now: ", self.protocol.blue_respawn_time)
+
                     # TODO: then restore back not leading team's respawn time somehow over time
                     return connection.on_kill(self, killer, type, grenade)
+                else:
+                    self.protocol.last_stalemate_cooldown_time = None
 
                 green_is_leading = (self.protocol.green_team.kills - self.protocol.blue_team.kills - kills_diff_margin) >= 0
 
@@ -201,6 +222,7 @@ def apply_script(protocol, connection, config):
         initial_respawn_time = 2
         green_respawn_time = initial_respawn_time
         blue_respawn_time = initial_respawn_time
+        last_stalemate_cooldown_time = None
 
         def on_game_end(self):
             print("Game end")
