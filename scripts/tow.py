@@ -123,7 +123,15 @@ def apply_script(protocol, connection, config):
             #max_respawn_time = 20
             max_respawn_time = 18
 
-            kills_per_update = 5
+            #kills_per_update = 5
+
+            player_count = len(self.protocol.players)
+
+            # The higher, the longer balance shift takes
+            kills_per_update_multipler = 1
+
+            kills_per_update = int((0.3 * player_count) * kills_per_update_multipler)
+
             if killer != None and killer != self:
 
                 # TODO: margin must be different based on amount of players, 5diff for 2-4 players is too much, while for 20 players not really
