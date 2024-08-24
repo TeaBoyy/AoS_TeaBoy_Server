@@ -76,24 +76,25 @@ def apply_script(protocol, connection, config):
         def my_get_spawn_location(self, x, y):
 
             # TODO:
+            offset = 20
             if self.team == self.protocol.green_team:
-                offset_x = 0
-                offset_y = 0
+                offset_x = offset
+                offset_y = offset
             else:
-                offset_x = -32
-                offset_y = -32
+                offset_x = -offset
+                offset_y = -offset
 
             # TODO:
-            #x -= offset_x
-            #y -= offset_y
+            x += offset_x
+            y += offset_y
 
             # TODO: this is not bad. X is same, but reduce Y so that don't spawn closer than needed.
             # TODO: tho stuck at 2nd tent so idk
-            my_radius = 32
+            my_radius = 28
             x1 = max(0, x - my_radius)
-            y1 = max(0, y - 8)
+            y1 = max(0, y - my_radius)
             x2 = min(512, x + my_radius)
-            y2 = min(512, y + 8)
+            y2 = min(512, y + my_radius)
             
             return self.protocol.get_random_location(True, (x1, y1, x2, y2))
 
