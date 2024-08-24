@@ -410,7 +410,8 @@ def apply_script(protocol, connection, config):
                 self.reset_kills_and_respawn_time_call.cancel()
                 self.reset_kills_and_respawn_time_call = None
 
-            delay = 20
+            # TODO: sometimes still too much, maybe immediately respawn some players, some later? But that could reverse roles too
+            delay = 30
             self.reset_kills_and_respawn_time_call = reactor.callLater(delay, self.reset_kills_and_respawn_time)
 
             # TODO: smh blue make more kills after reset. Maybe its lack of airstike.py or modifying protocol values flips teams, idk. Why 1st push is ok though?
@@ -435,5 +436,47 @@ def apply_script(protocol, connection, config):
             for entity in self.entities:
                 if not entity.disabled and entity not in cp:
                     entity.disable()
+
+            # TODO: what if bots are already alive, about to die? Do we reset respawn time for them? 
+            # TODO: actually even if we do respawn them, should reset their respawn time I guess?
+            # Instantly respawn some players to hold off advancing enemy
+            player_team_count = int(len(self.players) / 2.0)
+            random_players_count = int(0.25 * player_team_count)
+            print("Respawning instantly ", random_players_count, " players from the team that lost tent")
+            for random_player in self.select_random_players(random_players_count, False, territory.team.other):
+                random_player.respawn_time = self.initial_respawn_time
+                self.instant_respawn(random_player)
+
+        def select_random_players(self, count, isAlive = False, team = None):
+            selected_players = []
+
+            if count <= 0:
+                return selected_players
+
+            # TODO: really don't think copying is a good idea
+            players = []
+            for player in self.players.values():
+                alive_check = isAlive == True or player.world_object.dead
+                team_check = team == None or (team == True or player.team == team)
+                if alive_check and team_check:
+                    players.append(player)
+
+            if len(players) <= 0:
+                return selected_players
+
+            for _ in range(0, count):
+                random_player = random.choice(players)
+                selected_players.append(random_player)
+                players.remove(random_player)
+                
+            return selected_players
+
+        def instant_respawn(self, player):
+            print("instant_respawn")
+            delay = 0.1
+            if player != None and player.spawn_call != None:
+                print("Force-spawning player with respawn time: ", player.respawn_time)
+                player.spawn_call.cancel()
+                player.spawn_call = reactor.callLater(delay, player.spawn)
 
     return TugProtocol, TugConnection
