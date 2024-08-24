@@ -117,25 +117,30 @@ def apply_script(protocol, connection, config):
 
             # TODO: kills_per_update should control how fast shift happens, how much kills needed to progress
 
+            # TODO: maybe better grow by 1 second, but faster?
             diff_respawn_time = 2
 
             #max_respawn_time = 14
             #max_respawn_time = 20
-            max_respawn_time = 18
+            #max_respawn_time = 18
+            max_respawn_time = int(16)
 
             #kills_per_update = 5
 
             player_count = len(self.protocol.players)
 
             # The higher, the longer balance shift takes
-            kills_per_update_multipler = 1
+            kills_per_update_multipler = 1.0
+            kills_diff_margine_multipler = 1.0
+
+            stalemate_cooldown_seconds_multiplier = 1.0
 
             kills_per_update = int((0.3 * player_count) * kills_per_update_multipler)
 
             if killer != None and killer != self:
 
                 # TODO: margin must be different based on amount of players, 5diff for 2-4 players is too much, while for 20 players not really
-                kills_diff_margin = 5
+                kills_diff_margin = int(0.3 * player_count * kills_diff_margine_multipler)
 
                 # TODO: check if neither is leading too
                 kills_diff = self.protocol.green_team.kills - self.protocol.blue_team.kills
@@ -145,7 +150,9 @@ def apply_script(protocol, connection, config):
 
                     # TODO: move on some other action/update or start a loop that doesn't rely on on_kill
                     current_time = reactor.seconds() 
-                    stalemate_cooldown_seconds = (0.45 * player_count)
+
+                    # TODO: probably must be as high as entire domination time
+                    stalemate_cooldown_seconds = int(0.45 * 5.0 * player_count * stalemate_cooldown_seconds_multiplier)
 
                     if self.protocol.last_stalemate_cooldown_time == None:
                         self.protocol.last_stalemate_cooldown_time = current_time
