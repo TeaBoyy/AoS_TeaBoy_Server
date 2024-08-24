@@ -456,6 +456,9 @@ def apply_script(protocol, connection, config):
             # TODO: really don't think copying is a good idea
             players = []
             for player in self.players.values():
+                if player == None or player.world_object == None:
+                    continue
+
                 alive_check = isAlive == True or player.world_object.dead
                 team_check = team == None or (team == True or player.team == team)
                 if alive_check and team_check:
