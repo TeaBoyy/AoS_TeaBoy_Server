@@ -88,6 +88,8 @@ try:
     # 6: DOMINE
     # 7: kabadi
 
+    # Modification
+    MAX_AIM_DISTANCE=185
 
     if LITE_MODE:
         DANSA_CALC_NUM=2
@@ -2214,7 +2216,7 @@ try:
                                     phai,time = self.grenade_calc(self.enemy_lost_temp)
                                     if phai: self.grenade_toolchange()
                         if seconds() - self.toolchangetime > 0.5 and self.tool == WEAPON_TOOL and seconds() - self.sprinttime>0.5: # �ˌ��\����
-                                if distance_to_aim < 135:#�ڕW���F�\���� 
+                                if distance_to_aim < MAX_AIM_DISTANCE:#�ڕW���F�\���� 
                                     self.fire_weapon()	#�ˌ��w��
                         if self.battlecrouching and self.tool == WEAPON_TOOL:
                             cpos = Vertex3(pos.x,pos.y,pos.z+1.1)
