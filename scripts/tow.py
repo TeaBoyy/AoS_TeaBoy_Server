@@ -248,17 +248,22 @@ def apply_script(protocol, connection, config):
             map = self.map
             points = []
 
+            # TODO: hardcoded for CP_EXTRA_COUNT == 8
+
+            crutch_offset_ratio = 8.0/CP_EXTRA_COUNT
+            #crutch_offset_ratio = 1.0
+
             # TODO: builds diagonal. Need to unhardcode offsets
             # TODO: add random direction of diagonal, random offset, random angle
-            x, y = (46, 46)
+            x, y = (46 * crutch_offset_ratio, 46 * crutch_offset_ratio)
 
             blue_cp = []
             green_cp = []
 
             for i in range(CP_EXTRA_COUNT):
                 points.append((int(x), int(y)))
-                x += 60 
-                y += 60
+                x += 60 * crutch_offset_ratio
+                y += 60 * crutch_offset_ratio
             
             for i in range(CP_EXTRA_COUNT):
                 p_x, p_y = points[i]
