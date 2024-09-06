@@ -2150,7 +2150,9 @@ try:
                                                 self.jumptime=seconds()
                                                 self.input.add('jump')
                                     if random.random() < self.cpulevel**2/4-0.04: #���L���
-                                        crouchadd = True
+                                        # Modification - don't input additional crouches (too much), use battlecrouching only
+                                        #crouchadd = True
+                                        crouchadd = False
                                 if 0.1 > p_dot > 0.0:
                                     self.input.add('right')
                                 elif 0.0 > p_dot > -0.1:
