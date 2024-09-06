@@ -85,7 +85,7 @@
             "replaceme"
         ]
     },
-    "port": 8604,
+    "port": 32887,
     "profile": false,
     "random_rotation": false,
     "respawn_time": 8,
