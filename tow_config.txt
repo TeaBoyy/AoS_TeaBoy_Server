@@ -1,0 +1,276 @@
+{
+    "advance_on_win": true,
+    "afk_time_limit": 20,
+    "auto_squad": false,
+    "balanced_teams": 2,
+    "ban_publish": {
+        "enabled": false,
+        "port": 32885
+    },
+    "ban_subscribe": {
+        "enabled": true,
+        "urls": [
+            [
+                "http://www.blacklist.spadille.net/subscribe.json",
+                []
+            ]
+        ]
+    },
+    "cap_limit": 10,
+    "debug_log": false,
+    "default_ban_duration": 1440,
+    "default_time_limit": 180,
+    "fall_damage": true,
+    "friendly_fire": false,
+    "game_mode": "tow",
+    "grief_friendly_fire_time": 255,
+    "help": [
+        "Server name: %(server_name)s",
+        "Map: %(map_name)s by %(map_author)s",
+        "Game mode: %(game_mode)s",
+        "Pick MINES from any TENT. Select GRENADE and do a RIGHT CLICK to place MINES!",
+        "Press N (or M) to open the MAP and locate enemy TENTS!",
+        "Watch out for reports of enemy attacks on objectives! They're displayed in chat!",
+        "Commands (press T to start typing them):",
+        "/NEXT      Start a vote to advance to the next map",
+        "/M         Use medkit to heal yourself. Medkit is given once per spawn",
+        "/VOTEKICK  Start a vote to temporarily ban a disruptive player",
+        "/TIME      Remaining time until forced map reset",
+        "/STREAK    Shows how many kills in a row you got without dying"
+    ],
+    "irc": {
+        "channel": "#MyServerChannel",
+        "chatprefix": ".",
+        "commandprefix": "!",
+        "enabled": false,
+        "nickname": "PySnip",
+        "password": "",
+        "port": 6667,
+        "realname": "PySnip",
+        "server": "irc.quakenet.org",
+        "username": "PySnip"
+    },
+    "load_saved_map": false,
+    "logfile": "./logs/log.txt",
+    "login_retries": 2,
+    "maps": [
+        "trenches",
+        "classicgen",
+        "normandie"
+    ],
+    "master": true,
+    "max_connections_per_ip": 2,
+    "max_players": 50,
+    "medkit_heal_amount": 50,
+    "medkits": 1,
+    "melee_damage": 80,
+    "motd": [
+        "Welcome to %(server_name)s",
+        "Map: %(map_name)s by %(map_author)s",
+        "Game mode: %(game_mode)s"
+    ],
+    "name": "TEST Battlebots Tug Of War",
+    "network_interface": "",
+    "passwords": {
+        "admin": [
+            "replaceme"
+        ],
+        "guard": [
+            "replaceme"
+        ],
+        "moderator": [
+            "replaceme"
+        ],
+        "trusted": [
+            "replaceme"
+        ]
+    },
+    "port": 8604,
+    "profile": false,
+    "random_rotation": false,
+    "respawn_time": 8,
+    "respawn_waves": false,
+    "rights": {
+        "guard": [
+            "cancel",
+            "fog",
+            "from",
+            "goto",
+            "hackinfo",
+            "hban",
+            "ip",
+            "kick",
+            "kickafk",
+            "kill",
+            "move",
+            "mute",
+            "switch",
+            "teleport",
+            "teleport_other",
+            "togglebuild",
+            "togglekill",
+            "togglevotekick",
+            "trust",
+            "unmute",
+            "unstick",
+            "where",
+            "whowas"
+        ],
+        "moderator": [
+            "advance",
+            "cancel",
+            "dban",
+            "fog",
+            "from",
+            "goto",
+            "hackinfo",
+            "hban",
+            "invisible",
+            "ip",
+            "kick",
+            "kickafk",
+            "kill",
+            "map",
+            "master",
+            "move",
+            "mute",
+            "resetgame",
+            "switch",
+            "teleport",
+            "teleport_other",
+            "tpsilent",
+            "togglebuild",
+            "togglekill",
+            "togglevotekick",
+            "trust",
+            "undoban",
+            "unmute",
+            "unstick",
+            "where",
+            "whowas"
+        ]
+    },
+    "rollback_on_game_end": false,
+    "rotate_daily": true,
+    "rules": [
+        "Cheating isn't welcome. Griefing is frowned upon. Have fun!"
+    ],
+    "scripts": [
+        "ABBS",
+        "rollback",
+        "protect",
+        "map_extensions",
+        "disco",
+        "votekick",
+        "trusted",
+        "ratio",
+        "passreload",
+        "blockinfo",
+        "afk",
+        "memcheck",
+        "reloadconfig",
+        "votenext",
+        "allow_kill",
+        "airstrike",
+        "medkit",
+        "daycycle",
+        "log_player_count",
+        "capture_reporter",
+        "mines",
+        "blood",
+        "weaponcontrol"
+    ],
+    "server_prefix": "",
+    "set_god_build": false,
+    "snow_enabled": true,
+    "snow_exclude_maps": [
+        "scandinavia",
+        "Prauda"
+    ],
+    "snowflakes_amount": 1500,
+    "snowflakes_exclude_maps": [],
+    "snowflakes_height_start": 35,
+    "spade_teamkills_on_grief": false,
+    "spawn_protect_time": 1,
+    "speedhack_detect": false,
+    "squad_respawn_time": 32,
+    "squad_size": 4,
+    "ssh": {
+        "enabled": false,
+        "port": 32887,
+        "users": {
+            "user": "ssh_pass_change_this"
+        }
+    },
+    "status_server": {
+        "enabled": false,
+        "port": 32886
+    },
+    "team1": {
+        "color": [
+            0,
+            0,
+            255
+        ],
+        "name": "Blue"
+    },
+    "team2": {
+        "color": [
+            0,
+            255,
+            0
+        ],
+        "name": "Green"
+    },
+    "teamswitch_interval": 0,
+    "time_announcements": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        30,
+        60,
+        120,
+        180,
+        240,
+        300,
+        600,
+        900,
+        1200,
+        1800,
+        2400,
+        3000
+    ],
+    "tip_frequency": 5,
+    "tips": [
+        "You are playing %(game_mode)s on %(server_name)s",
+        "Type /NEXT to start a vote to advance to the next map. Type /HELP for more info",
+        "Pick MINES from any TENT. Select GRENADE and do a RIGHT CLICK to place MINES!",
+        "Press N (or M) to open the MAP and locate enemy TENTS!",
+        "Watch out for reports of enemy attacks on objectives! They're displayed in chat!",
+        "Server is a little unstable and might stop or disappear from the server list, but I'm restarting it manually from time to time"
+    ],
+    "user_blocks_only": false,
+    "votekick_ban_duration": 30,
+    "votekick_percentage": 60,
+    "votekick_public_votes": true,
+    "votemap_autoschedule": false,
+    "votemap_extension_time": 15,
+    "votemap_percentage": 80,
+    "votemap_player_driven": false,
+    "votemap_public_votes": true,
+    "votemap_time": 120,
+    "weapons": {
+        "grenades": true,
+        "rifle": true,
+        "shotgun": false,
+        "smg": false,
+        "spade": true
+    }
+}
