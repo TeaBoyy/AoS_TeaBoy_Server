@@ -1,0 +1,4 @@
+name = 'Hillfort'
+version = '1.0'
+author = 'tGM/helpers'
+description = 'A big hill with a fortress on top, a large INF map'
