@@ -61,7 +61,7 @@ try:
     LITE_MODE       = True    
     LV_AUTO_ADJUST  = 0       # 0:off 1:human vs bot   2:blue vs green 3:both human/bot and blue/green
     BOT_NUM_NAME    = True    
-    CPU_LV          = [80,2]  
+    CPU_LV          = [85,2]  
     BOTMUTE         = False    # bot chat off
     DANSA_CALC_NUM  = 5        
     KEIRO_TANSAKU_NUM = 5      
