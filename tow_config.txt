@@ -54,7 +54,7 @@
     "logfile": "./logs/log.txt",
     "login_retries": 2,
     "maps": [
-        "chestren",
+        "trenches",
         "NoMan`sLand",
         "classicgen",
         "normandie"
