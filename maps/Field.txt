@@ -1,0 +1,7 @@
+name = 'Field'
+version = '1.0'
+author = 'Lostmotel'
+extensions = {
+'right_mortars' : ((468, 161, 58), (468, 353, 57)),
+'left_mortars' :  ((41, 160, 55),  (43, 352, 53))
+}
