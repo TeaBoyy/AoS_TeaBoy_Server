@@ -251,11 +251,12 @@
     "tip_frequency": 5,
     "tips": [
         "You are playing %(game_mode)s on %(server_name)s",
-        "Type /NEXT to start a vote to advance to the next map. Type /HELP for more info",
+        "Type /NEXT to start a vote to advance to the next map",
         "Pick MINES from any TENT. Select GRENADE and do a RIGHT CLICK to place MINES!",
         "Press N (or M) to open the MAP and locate enemy TENTS!",
         "Watch out for reports of enemy attacks on objectives! They're displayed in chat!",
-        "Server is a little unstable and might stop or disappear from the server list, but I'm restarting it manually from time to time"
+        "Server is a little unstable and might stop or disappear from the server list, but I'm restarting it manually from time to time",
+        "Bots stuck? Type /NEXT to start a vote to advance to the next map!"
     ],
     "user_blocks_only": false,
     "votekick_ban_duration": 30,
