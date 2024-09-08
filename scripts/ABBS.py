@@ -90,7 +90,7 @@ try:
         #ENEMY_SEARCH_FPS  = 4
         ENEMY_SEARCH_FPS  = 2
         #BOT_UPDATE_RATE   = 2      #60/n FPS 
-        BOT_UPDATE_RATE   = 5      #60/n FPS 
+        BOT_UPDATE_RATE   = 4      #60/n FPS 
 
 
     ### vvvv DO NOT CHANGE HERE vvvv ###
