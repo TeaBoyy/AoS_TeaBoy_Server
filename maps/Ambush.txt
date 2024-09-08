@@ -1,0 +1,5 @@
+name = "Ambush"
+version = '1.0'
+author = 'Influx'
+description = ('Fictional WW2-based battle, where an American convoy'
+               'has been ambushed by German soldiers')
