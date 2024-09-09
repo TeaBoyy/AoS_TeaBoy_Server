@@ -11,6 +11,8 @@ import random
 import math
 from math import pi
 
+from twisted.internet import reactor
+
 CP_COUNT = 6
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
 ANGLE = 65
@@ -75,6 +77,8 @@ def apply_script(protocol, connection, config):
             
     class TugProtocol(protocol):
         game_mode = TC_MODE
+
+        on_cp_secure_call = None
         
         def get_cp_entities(self):
             # generate positions
@@ -161,11 +165,43 @@ def apply_script(protocol, connection, config):
             return entities
     
         def on_cp_capture(self, territory):
+            if self.on_cp_secure_call != None:
+                self.on_cp_secure(territory, False)
+                print("Defending team took the tent back! Back to normal!")
+                return
+
+            cooldown = 60
+            print("Attacked team took the tent! They need to hold for ", cooldown, " seconds before they can advance further!")
+
+            # Temporary disable all the tents except for the one needs to be secured by the attackers
+            for entity in self.entities:
+                if not entity.disabled and entity is not territory:
+                    entity.disable()
+
+            self.on_cp_secure_call = reactor.callLater(cooldown, self.on_cp_secure, territory)
+            
+            #return protocol.on_cp_capture(self, territory)
+
+        # TODO: probably when trying to cap disabled tents, let know what's going on
+        # TODO: announce how much left every few seconds
+        # TODO: and ideally print openspades/betterspades text on actual screen
+        def on_cp_secure(self, territory, is_secured = True):
+            if self.on_cp_secure_call != None:
+                if self.on_cp_secure_call.active():
+                    self.on_cp_secure_call.cancel()
+                self.on_cp_secure_call = None
+
+            print("Attacker team secured the tent! Now they can advance further!")
+
             team = territory.team
             if team.id:
                 move = -1
             else:
                 move = 1
+
+            if not is_secured:
+                move = 0
+
             for team in [self.blue_team, self.green_team]:
                 try:
                     team.cp = self.entities[get_index(team.cp.id + move)]
