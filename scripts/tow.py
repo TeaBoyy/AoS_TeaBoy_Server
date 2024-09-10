@@ -13,6 +13,7 @@ from math import pi
 
 from twisted.internet import reactor
 
+from pyspades.server import chat_message
 CP_COUNT = 6
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
 ANGLE = 65
@@ -22,7 +23,10 @@ DELTA_ANGLE = math.radians(30)
 FIX_ANGLE = math.radians(4)
 
 HELP = [
-    "In Tug of War, you capture your opponents' front CP to advance."
+    "In Tug of War,",
+    "you capture and hold",
+    "your opponents' front tent",
+    "to advance."
 ]
 
 class TugTerritory(Territory):
@@ -79,11 +83,16 @@ def apply_script(protocol, connection, config):
                 self.print_help(True)
             return connection.on_spawn(self, pos)
 
-        def print_help(self, show_ui = False):
-            for line in HELP:
-                if show_ui:
-                    line = "%% " + line
-                self.send_chat(line)
+        def print_help(self, show_ui = False, index = 0):
+            if show_ui:
+                chat_message.chat_type = 5
+                # 34 is guaranteed to be out of range!
+                chat_message.player_id = 35
+                chat_message.value = HELP[index]
+                self.send_contained(chat_message)
+
+                if index < 3:
+                    reactor.callLater(1.75, self.print_help, True, index + 1)
             
     class TugProtocol(protocol):
         game_mode = TC_MODE
