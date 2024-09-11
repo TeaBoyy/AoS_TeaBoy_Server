@@ -82,7 +82,8 @@ def apply_script(protocol, connection, config):
         def print_help(self, show_ui = False):
             for line in HELP:
                 if show_ui:
-                    line = "%% " + line
+                    # TODO: big text on top ("C% ") also looks interesting
+                    line = "N% " + line
                 self.send_chat(line)
             
     class TugProtocol(protocol):
