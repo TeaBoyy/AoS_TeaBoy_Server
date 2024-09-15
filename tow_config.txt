@@ -260,7 +260,7 @@
     ],
     "user_blocks_only": false,
     "votekick_ban_duration": 30,
-    "votekick_percentage": 60,
+    "votekick_percentage": 80,
     "votekick_public_votes": true,
     "votemap_autoschedule": false,
     "votemap_extension_time": 15,
