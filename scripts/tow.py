@@ -63,8 +63,6 @@ def get_point(x, y, magnitude, angle):
 
 def apply_script(protocol, connection, config):
     class TugConnection(connection):
-        spawned = False
-
         def get_spawn_location(self):
             if self.team.spawn_cp is None:
                 base = self.team.last_spawn
@@ -73,17 +71,9 @@ def apply_script(protocol, connection, config):
             return base.get_spawn_location()
             
         def on_spawn(self, pos):
-            self.print_help()
-            if not self.spawned:
-                self.spawned = True
-                self.print_help(True)
-            return connection.on_spawn(self, pos)
-
-        def print_help(self, show_ui = False):
             for line in HELP:
-                if show_ui:
-                    line = "%% " + line
                 self.send_chat(line)
+            return connection.on_spawn(self, pos)
             
     class TugProtocol(protocol):
         game_mode = TC_MODE
