@@ -617,24 +617,16 @@ try:
                 self.adj_calling=False
                 self.bot_adjusting = True
                 blue, green = self.bot_num_adjust_calc()
-                blue_human, blue_bot, green_human, green_bot = self.count_human_bot()
-                # TODO: shouldn't be any bots by the time enough humans join
-                total_human = blue_human + green_human
+                _, blue_bot, _, green_bot = self.count_human_bot()
                 if blue == 0 and green == 0:
                     self.bot_adjusting = False
                 else:
-                    if blue>0 and total_human < BOT_ADD_NUM:
+                    if blue>0:
                         self.addbot_taiki[0]=True
                         callLater(0.01, self.add_bot,self.blue_team)
-                    elif blue>0:
-                        self.bot_adjusting = False
-
-                    if green>0 and total_human < BOT_ADD_NUM:
+                    if green>0:
                         self.addbot_taiki[1]=True
                         callLater(0.01, self.add_bot,self.green_team)
-                    elif green>0:
-                        self.bot_adjusting = False
-
                     if blue<0 and blue_bot > 0:
                         if not self.bot_bottikick(self.blue_team):
                             self.disconnect_suru[0] = True
