@@ -3471,10 +3471,6 @@ try:
                         self.on_chat(message, global_message)
 
             def on_disconnect(self):
-                if self:
-                    if not self.local:
-                        callLater(0.1,self.protocol.bot_num_adjust,True)
-
                 for bot in self.protocol.bots:
                     if bot.aim_at is self:
                         bot.aim_at = None
