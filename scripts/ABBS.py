@@ -617,21 +617,35 @@ try:
                 self.adj_calling=False
                 self.bot_adjusting = True
                 blue, green = self.bot_num_adjust_calc()
+                blue_human, blue_bot, green_human, green_bot = self.count_human_bot()
+                # Note: shouldn't be any bots by the time enough humans join
+                total_human = blue_human + green_human
                 if blue == 0 and green == 0:
                     self.bot_adjusting = False
                 else:
-                    if blue>0:
+                    if blue>0 and total_human < BOT_ADD_NUM:
                         self.addbot_taiki[0]=True
                         callLater(0.01, self.add_bot,self.blue_team)
-                    if green>0:
+                    elif blue>0:
+                        self.bot_adjusting = False
+
+                    if green>0 and total_human < BOT_ADD_NUM:
                         self.addbot_taiki[1]=True
                         callLater(0.01, self.add_bot,self.green_team)
-                    if blue<0:
+                    elif green>0:
+                        self.bot_adjusting = False
+
+                    if blue<0 and blue_bot > 0:
                         if not self.bot_bottikick(self.blue_team):
                             self.disconnect_suru[0] = True
-                    if green<0:
+                    elif blue<0:
+                        self.bot_adjusting = False
+
+                    if green<0 and green_bot> 0:
                         if not self.bot_bottikick(self.green_team):
                             self.disconnect_suru[1] = True
+                    elif green<0:
+                        self.bot_adjusting = False
 
             def bot_bottikick(self, team):
                 yobi = None
@@ -3465,6 +3479,9 @@ try:
                         self.on_chat(message, global_message)
 
             def on_disconnect(self):
+                if self and not self.local:
+                    callLater(0.1,self.protocol.bot_num_adjust,True)
+
                 for bot in self.protocol.bots:
                     if bot.aim_at is self:
                         bot.aim_at = None
