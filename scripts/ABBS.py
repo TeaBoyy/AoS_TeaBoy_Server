@@ -617,7 +617,6 @@ try:
                 self.adj_calling=False
                 self.bot_adjusting = True
                 blue, green = self.bot_num_adjust_calc()
-                _, blue_bot, _, green_bot = self.count_human_bot()
                 if blue == 0 and green == 0:
                     self.bot_adjusting = False
                 else:
@@ -627,17 +626,12 @@ try:
                     if green>0:
                         self.addbot_taiki[1]=True
                         callLater(0.01, self.add_bot,self.green_team)
-                    if blue<0 and blue_bot > 0:
+                    if blue<0:
                         if not self.bot_bottikick(self.blue_team):
                             self.disconnect_suru[0] = True
-                    elif blue<0:
-                        self.bot_adjusting = False
-
-                    if green<0 and green_bot> 0:
+                    if green<0:
                         if not self.bot_bottikick(self.green_team):
                             self.disconnect_suru[1] = True
-                    elif green<0:
-                        self.bot_adjusting = False
 
             def bot_bottikick(self, team):
                 yobi = None
