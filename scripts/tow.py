@@ -11,11 +11,11 @@ import random
 import math
 from math import pi
 
-
 # TODO:
 try:
     import extended_chat
-except ImportError:
+except ImportError as error:
+    print("Optional module not imported. Error: " + str(error))
     extended_chat = None
 
 CP_COUNT = 6
@@ -85,9 +85,10 @@ def apply_script(protocol, connection, config):
         def print_help(self):
             for line in HELP:
                 self.send_chat(line)
+
             if extended_chat:
-                self.broadcast_chat_warning("Hello world!")
-            
+                self.send_chat_warning("Hello world!")
+
     class TugProtocol(protocol):
         game_mode = TC_MODE
         
