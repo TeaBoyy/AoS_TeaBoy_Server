@@ -213,7 +213,7 @@
             90,
             140
         ],
-        "name": "Blue"
+        "name": "Ocean"
     },
     "team2": {
         "color": [
@@ -221,7 +221,7 @@
             69,
             0
         ],
-        "name": "Green"
+        "name": "Earth"
     },
     "teamswitch_interval": 0,
     "time_announcements": [
