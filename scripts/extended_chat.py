@@ -1,6 +1,30 @@
 from pyspades.constants import CHAT_ALL
 from pyspades.server import chat_message
 
+from pyspades.loaders import Loader
+from pyspades.packet import load_client_packet
+from pyspades.bytes import ByteReader, ByteWriter
+
+class VersionResponse(Loader):
+    id = 34
+    
+    client = str()
+    version = tuple()
+    os_info = str() 
+
+    def read(self, reader):
+        magic_no = reader.readByte(True)
+        self.client = chr(magic_no)
+        self.version = (
+            reader.readByte(True),
+            reader.readByte(True),
+            reader.readByte(True),
+        )
+        self.os_info = decode(reader.readString())
+    
+    def write(self, reader):
+        writer.writeByte(self.id, True)
+
 # TODO: test
 from sys import version
 if version.startswith("2"):
@@ -11,7 +35,7 @@ else:
         return self.client_info["client"] in ("OpenSpades", "BetterSpades")
 
 # TODO:
-if not version.startswith("2"):
+if version.startswith("2"):
     def is_openspades_client(self):
         return is_client(self, "OpenSpades")
 
@@ -52,6 +76,40 @@ def apply_script(protocol, connection, config):
                 else:
                     print("Unknown client, don't print custom message: ", message)
 
+        """
+        def loader_received(self, loader):
+            print("TEST loader_received")
+            #if self.player_id is not None:
+            contained = load_client_packet(ByteReader(loader.data))
+            print("contained.id: ", contained.id)
+            if contained.id != VersionResponse.id:
+                return connection.loader_received(self, loader)
+
+            print("contained.client: ", contained.client)
+
+            # TODO: maybe only return if did nothing?
+            return connection.loader_received(self, loader)
+        """
 
     return protocol, ExtendedChatConnection
 
+"""
+def apply_script(protocol, connection, config):
+    class ExtendedChatConnection(connection):
+        def send_chat(self, value, global_message = None):
+            print("TEST REDIRECT send_chat. Value: ", value)
+            return
+    return protocol, ExtendedChatConnection
+"""
+
+"""
+chat_message = loaders.ChatMessage()
+    if custom_type > 2 and "client" in self.client_info:
+        if EXTENSION_CHATTYPE in self.proto_extensions:
+            chat_message.chat_type = custom_type
+        else:
+            value = OPENSPADES_CHATTYPES[custom_type] + value
+
+        chat_message.player_id = 35
+        prefix = ''
+"""
