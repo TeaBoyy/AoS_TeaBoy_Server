@@ -11,13 +11,6 @@ import random
 import math
 from math import pi
 
-
-# TODO:
-try:
-    import extended_chat
-except ImportError:
-    extended_chat = None
-
 CP_COUNT = 6
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
 ANGLE = 65
@@ -67,9 +60,6 @@ def get_point(x, y, magnitude, angle):
             limit_dimension(y + math.sin(angle) * magnitude))
 
 def apply_script(protocol, connection, config):
-    if extended_chat:
-        protocol, connection = extended_chat.apply_script(protocol, connection, config)
-
     class TugConnection(connection):
         def get_spawn_location(self):
             if self.team.spawn_cp is None:
@@ -79,14 +69,9 @@ def apply_script(protocol, connection, config):
             return base.get_spawn_location()
             
         def on_spawn(self, pos):
-            self.print_help()
-            return connection.on_spawn(self, pos)
-
-        def print_help(self):
             for line in HELP:
                 self.send_chat(line)
-            if extended_chat:
-                self.broadcast_chat_warning("Hello world!")
+            return connection.on_spawn(self, pos)
             
     class TugProtocol(protocol):
         game_mode = TC_MODE
