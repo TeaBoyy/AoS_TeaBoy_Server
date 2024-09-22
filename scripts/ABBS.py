@@ -1305,16 +1305,18 @@ try:
                             pattern = 888					
                 return pattern, AP,(dist+distf)
 
-            def enitity_add_remove(self,entity):
+            def enitity_add_remove(self,entity, unassign = True):
                 collides = vector_collision(entity, 
                     self.world_object.position, TC_CAPTURE_DISTANCE)
                 if self in entity.players:
-                    self.assigned_position = None
+                    if unassign:
+                        self.assigned_position = None
                     if not collides:
                         entity.remove_player(self)
                 else:
                     if collides:
-                        self.assigned_position = None
+                        if unassign:
+                            self.assigned_position = None
                         entity.add_player(self)
 
             def tgt_pos_update(self):
@@ -1369,7 +1371,11 @@ try:
                         else:
                             tgt_entity = self.protocol.entities[n-1]
                             self.assigned_position = self.protocol.entities[n-1]
-                    self.enitity_add_remove(tgt_entity)
+
+                    # Modification - check all tents, not just the target
+                    self.enitity_add_remove(tgt_entity, True)
+                    for tent in self.protocol.entities:
+                        self.enitity_add_remove(tent, False)
 
                 elif DOMINE_FULLmode:
                     dist = 9999
