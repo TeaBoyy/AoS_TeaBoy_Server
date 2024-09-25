@@ -19,6 +19,7 @@ from pyspades.bytes import ByteReader, ByteWriter
 from pyspades.server import block_action
 from commands import add, admin, name
 from twisted.internet.task import LoopingCall
+from twisted.internet import reactor
 
 from pyspades.common import decode
 
@@ -200,8 +201,8 @@ def apply_script(protocol, connection, config):
             ret = connection.on_spawn(self, pos)
 
             # TODO:
-            #if not "B" in self.name:
-            if True:
+            if not "B" in self.name:
+            #if True:
                 self.try_move_box()
             return ret
 
@@ -270,7 +271,12 @@ def apply_script(protocol, connection, config):
 
         # TODO:
         box_loop = None
-        box_loop_interval = 0.05 # Seconds
+        #box_loop_interval = 0.05 # Seconds
+        box_loop_interval = 0.2 # Seconds
+
+        player_pos_box_loop = None
+        player_pos_box_loop_interval = 0.2 # Seconds
+
         box_pos = None
 
         def change_block(self, x, y, z, action):
@@ -285,11 +291,21 @@ def apply_script(protocol, connection, config):
         #    self.change_block(x, y, z, BUILD_BLOCK)
 
         def iterate_box(self, x, y, z, action):
-            box_size = 3
+            #box_size = 3
+            #box_size = 50
+            box_size = 25
             for dx in range(0, box_size):
+                if dx % 3 == 0:
+                    continue
                 for dy in range(0, box_size):
-                    for dz in range(0, box_size):
-                        self.change_block(x + dx, y + dy, z + dz, action)
+                    if dy % 3 == 0:
+                        continue
+                    dz = 0
+                    #reactor.callLater(0.1, self.change_block, x + dx, y + dy, z + dz, action)
+                    self.change_block(x + dx, y + dy, z + dz, action)
+
+                    #for dz in range(0, box_size):
+                    #    self.change_block(x + dx, y + dy, z + dz, action)
 
         def destroy_box(self, x, y, z):
             self.iterate_box(x, y, z, DESTROY_BLOCK)
@@ -300,11 +316,13 @@ def apply_script(protocol, connection, config):
         def box_loop_call(self):
             if self.box_pos != None:
                 x, y, z = self.box_pos
-                offset = 3*3
+                #offset = 3*3
+                offset = 0
                 if x <= 0 + offset or x >= 512 - offset or y <= 0 + offset or y >= 512  - offset or z <= 0 + offset or z >=63 - offset:
                     print("Out of bounds, don't spawn box. Stop loop")
                     self.box_loop.stop()
                     self.box_loop = None
+                    self.box_pos = None
                     return
 
 
@@ -315,16 +333,27 @@ def apply_script(protocol, connection, config):
 
             if self.box_pos == None:
                 player_pos = self.world_object.position.copy()
-                self.box_pos = (player_pos.x + 5, player_pos.y + 5, player_pos.z - 5)
+                # player_pos.z - 5
+                self.box_pos = (player_pos.x + 5, player_pos.y + 5, 10)
             else:
                 x, y, z = self.box_pos
                 self.box_pos = (x + 1, y, z)
 
             self.create_box(*self.box_pos)
 
+            if False and self.box_pos != None:
+                self.destroy_box(*self.box_pos)
+
+        def player_pos_box_loop_call(self):
+            if self.box_pos == None:
+                self.player_pos_box_loop.stop()
+                print("Stopped player pos loop")
+                return
+
             x, y, z = self.box_pos
 
-            self.set_location((x, y, self.protocol.map.get_z(x, y)))
+            # self.protocol.map.get_z(x, y)
+            self.set_location((x, y, z - 2))
 
         # TOOD:
         def try_move_box(self):
@@ -333,8 +362,16 @@ def apply_script(protocol, connection, config):
                 self.box_pos = None
                 print("Stopped loop")
 
+            if self.player_pos_box_loop != None and self.player_pos_box_loop.running:
+                self.player_pos_box_loop.stop()
+                print("Stopped player pos loop")
+
             self.box_loop = LoopingCall(self.box_loop_call)
             self.box_loop.start(self.box_loop_interval)
+
+            self.player_pos_box_loop = LoopingCall(self.player_pos_box_loop_call)
+            #self.player_pos_box_loop.start(self.player_pos_box_loop_interval)
+
             print("Started loop")
             
     class TugProtocol(protocol):
