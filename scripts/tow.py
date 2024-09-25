@@ -274,6 +274,8 @@ def apply_script(protocol, connection, config):
         #box_loop_interval = 0.05 # Seconds
         box_loop_interval = 0.2 # Seconds
 
+        box_move = 0
+
         player_pos_box_loop = None
         player_pos_box_loop_interval = 0.2 # Seconds
 
@@ -293,15 +295,15 @@ def apply_script(protocol, connection, config):
         def iterate_box(self, x, y, z, action):
             #box_size = 3
             #box_size = 50
-            box_size = 25
-            for dx in range(0, box_size):
-                if dx % 3 == 0:
-                    continue
-                for dy in range(0, box_size):
-                    if dy % 3 == 0:
-                        continue
+            box_size = 32
+            for dx in range(0, box_size, 2):
+                #if dx % 2 == 0:
+                #    continue
+                for dy in range(0, box_size, 4):
+                    #if dy % 2 == 0:
+                    #    continue
                     dz = 0
-                    #reactor.callLater(0.1, self.change_block, x + dx, y + dy, z + dz, action)
+                    #reactor.callLater(0.1 * dx + dy + dz, self.change_block, x + dx, y + dy, z + dz, action)
                     self.change_block(x + dx, y + dy, z + dz, action)
 
                     #for dz in range(0, box_size):
@@ -309,9 +311,11 @@ def apply_script(protocol, connection, config):
 
         def destroy_box(self, x, y, z):
             self.iterate_box(x, y, z, DESTROY_BLOCK)
+            #self.change_block(x, y, z, DESTROY_BLOCK)
 
         def create_box(self, x, y, z):
             self.iterate_box(x, y, z, BUILD_BLOCK)
+            #self.change_block(x, y, z, BUILD_BLOCK)
 
         def box_loop_call(self):
             if self.box_pos != None:
@@ -334,10 +338,24 @@ def apply_script(protocol, connection, config):
             if self.box_pos == None:
                 player_pos = self.world_object.position.copy()
                 # player_pos.z - 5
-                self.box_pos = (player_pos.x + 5, player_pos.y + 5, 10)
+                self.box_pos = (player_pos.x + 0, player_pos.y + 0, 25)
             else:
                 x, y, z = self.box_pos
-                self.box_pos = (x + 1, y, z)
+                if self.box_move == 0:
+                    self.box_move = 1
+
+                self.box_pos = (x + self.box_move, y, z)
+
+                if self.box_move >= 1:
+                    self.box_move = -1
+                else:
+                    self.box_move = 1
+
+            # TODO:
+            if False and self.box_pos != None:
+                self.destroy_box(*self.box_pos)
+                x, y, z = self.box_pos
+                self.box_pos = (x - 25, y - 25, z)
 
             self.create_box(*self.box_pos)
 
