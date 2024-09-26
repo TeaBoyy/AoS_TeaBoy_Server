@@ -185,22 +185,9 @@ def apply_script(protocol, connection, config):
             return connection.on_spawn(self, pos)
 
         def spawn(self, pos = None):
-            print("spawn")
-
-            #self.protocol.send_contained(HandShakeInit())
-            #self.protocol.send_contained(HandShakeReturn())
-
-            #version_request_packet = VersionRequest()
-            #self.protocol.send_contained(version_request_packet)
-
-            if "B" in self.name:
-                print("Bot, don't deal with version")
-            else:
-                print("Request version")
-                self.protocol.send_contained(VersionRequest())
-
+            print("Spawn. Request version")
+            self.protocol.send_contained(VersionRequest())
             return connection.spawn(self, pos)
-
         
         def load_client_packet(self, data):
             return self.load_contained_packet(data, CLIENT_LOADERS)
@@ -211,41 +198,13 @@ def apply_script(protocol, connection, config):
 
         def loader_received(self, loader):
             contained = self.load_client_packet(ByteReader(loader.data))
-            if contained.id == 34 or contained.id == 33 or contained.id == 32 or contained.id == 31:
-                print ("Special contained.id is: ", contained.id)
-                if contained.id == VersionResponse.id:
-                    print("self.name: ", self.name, ", contained.client: ", contained.client)
-            else:
-                print("Test ignore")
-                return connection.loader_received(self, loader)
-            return
-            print("TEST loader_received")
-            #if self.player_id is not None:
-            contained = load_client_packet(ByteReader(loader.data))
-            #print("contained.id: ", contained.id)
-            
-            #if contained.id != VersionResponse.id:
-            if contained.id == 34 or contained.id == 33 or contained.id == 32 or contained.id == 31:
-                print ("Special contained.id is: ", contained.id)
-                return connection.loader_received(self, loader)
+            if contained.id == VersionResponse.id:
+                print("self.name: ", self.name, ", contained.client: ", contained.client)
+                return
 
-            #print("contained.client: ", contained.client)
-
-            # TODO: maybe only return if did nothing?
+            print("Test ignore")
             return connection.loader_received(self, loader)
 
-        def on_connect(self):
-            print("on_connect")
-
-            if False:
-                self.protocol.send_contained(HandShakeInit())
-                self.protocol.send_contained(HandShakeReturn())
-
-                version_request_packet = VersionRequest()
-                self.protocol.send_contained(version_request_packet)
-
-            return connection.on_connect(self)
-            
     class TugProtocol(protocol):
         game_mode = TC_MODE
         
