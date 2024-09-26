@@ -15,10 +15,6 @@ from pyspades.loaders import Loader
 from pyspades.packet import load_client_packet
 from pyspades.bytes import ByteReader, ByteWriter
 
-# TODO:
-from pyspades.server import block_action
-from commands import add, admin, name
-from twisted.internet.task import LoopingCall
 
 from pyspades.common import decode
 
@@ -174,17 +170,6 @@ def get_point(x, y, magnitude, angle):
     return (limit_dimension(x + math.cos(angle) * magnitude),
             limit_dimension(y + math.sin(angle) * magnitude))
 
-
-@admin
-def launch_box(connection, value = None):
-    print("Entering command")
-    try:
-        connection.try_move_box()
-    except Exception as ex:
-        print("Ex: ", ex)
-
-add(launch_box)
-
 def apply_script(protocol, connection, config):
     class TugConnection(connection):
         def get_spawn_location(self):
@@ -197,13 +182,7 @@ def apply_script(protocol, connection, config):
         def on_spawn(self, pos):
             for line in HELP:
                 self.send_chat(line)
-            ret = connection.on_spawn(self, pos)
-
-            # TODO:
-            #if not "B" in self.name:
-            if True:
-                self.try_move_box()
-            return ret
+            return connection.on_spawn(self, pos)
 
         def spawn(self, pos = None):
             print("spawn")
@@ -214,24 +193,23 @@ def apply_script(protocol, connection, config):
             #version_request_packet = VersionRequest()
             #self.protocol.send_contained(version_request_packet)
 
-            if False:
-                if "B" in self.name:
-                    print("Bot, don't deal with version")
-                else:
-                    print("Request version")
-                    self.protocol.send_contained(VersionRequest())
+            if "B" in self.name:
+                print("Bot, don't deal with version")
+            else:
+                print("Request version")
+                self.protocol.send_contained(VersionRequest())
 
             return connection.spawn(self, pos)
 
         
-        def test_load_client_packet(self, data):
+        def load_client_packet(self, data):
             return self.load_contained_packet(data, CLIENT_LOADERS)
 
-        def test_load_contained_packet(self, data, table):
+        def load_contained_packet(self, data, table):
             type = data.readByte(True)
             return table[type](data)
 
-        def test_loader_received(self, loader):
+        def loader_received(self, loader):
             contained = self.load_client_packet(ByteReader(loader.data))
             if contained.id == 34 or contained.id == 33 or contained.id == 32 or contained.id == 31:
                 print ("Special contained.id is: ", contained.id)
@@ -267,75 +245,6 @@ def apply_script(protocol, connection, config):
                 self.protocol.send_contained(version_request_packet)
 
             return connection.on_connect(self)
-
-        # TODO:
-        box_loop = None
-        box_loop_interval = 0.05 # Seconds
-        box_pos = None
-
-        def change_block(self, x, y, z, action):
-            block_action.x = x 
-            block_action.y = y 
-            block_action.z = z 
-            block_action.player_id = 32
-            block_action.value = action
-            return self.protocol.send_contained(block_action, save = True) 
-
-        #def place_block(self, x, y, z, action):
-        #    self.change_block(x, y, z, BUILD_BLOCK)
-
-        def iterate_box(self, x, y, z, action):
-            box_size = 3
-            for dx in range(0, box_size):
-                for dy in range(0, box_size):
-                    for dz in range(0, box_size):
-                        self.change_block(x + dx, y + dy, z + dz, action)
-
-        def destroy_box(self, x, y, z):
-            self.iterate_box(x, y, z, DESTROY_BLOCK)
-
-        def create_box(self, x, y, z):
-            self.iterate_box(x, y, z, BUILD_BLOCK)
-
-        def box_loop_call(self):
-            if self.box_pos != None:
-                x, y, z = self.box_pos
-                offset = 3*3
-                if x <= 0 + offset or x >= 512 - offset or y <= 0 + offset or y >= 512  - offset or z <= 0 + offset or z >=63 - offset:
-                    print("Out of bounds, don't spawn box. Stop loop")
-                    self.box_loop.stop()
-                    self.box_loop = None
-                    return
-
-
-            print("Creating the box")
-
-            if self.box_pos != None:
-                self.destroy_box(*self.box_pos)
-
-            if self.box_pos == None:
-                player_pos = self.world_object.position.copy()
-                self.box_pos = (player_pos.x + 5, player_pos.y + 5, player_pos.z - 5)
-            else:
-                x, y, z = self.box_pos
-                self.box_pos = (x + 1, y, z)
-
-            self.create_box(*self.box_pos)
-
-            x, y, z = self.box_pos
-
-            self.set_location((x, y, self.protocol.map.get_z(x, y)))
-
-        # TOOD:
-        def try_move_box(self):
-            if self.box_loop != None and self.box_loop.running:
-                self.box_loop.stop()
-                self.box_pos = None
-                print("Stopped loop")
-
-            self.box_loop = LoopingCall(self.box_loop_call)
-            self.box_loop.start(self.box_loop_interval)
-            print("Started loop")
             
     class TugProtocol(protocol):
         game_mode = TC_MODE
