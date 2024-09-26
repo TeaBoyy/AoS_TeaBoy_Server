@@ -272,7 +272,6 @@ def apply_script(protocol, connection, config):
         # TODO:
         box_loop = None
         #box_loop_interval = 0.05 # Seconds
-        #box_loop_interval = 0.2 * 1 # Seconds
         box_loop_interval = 0.2 * 1 # Seconds
 
         box_move = 0
@@ -300,19 +299,11 @@ def apply_script(protocol, connection, config):
         def iterate_box(self, x, y, z, action):
             #box_size = 3
             #box_size = 50
-            #box_size = 48
-
-            box_size = 8
-
-            # TODO: OS test
-            # density = 6
-
-            # TODO: BS test
-            density = 4
-            for dx in range(0, box_size, density):
+            box_size = 48
+            for dx in range(0, box_size, 6):
                 #if dx % 2 == 0:
                 #    continue
-                for dy in range(0, box_size, density):
+                for dy in range(0, box_size, 6):
                     #if dy % 2 == 0:
                     #    continue
                     dz = 0
@@ -352,13 +343,7 @@ def apply_script(protocol, connection, config):
             if self.box_pos == None:
                 player_pos = self.world_object.position.copy()
                 # player_pos.z - 5
-
-                # TODO: OS test
-                #height = 0
-
-                # TODO: BS test
-                height = 25
-                self.box_pos = (player_pos.x + 0, player_pos.y + 0, height)
+                self.box_pos = (player_pos.x + 0, player_pos.y + 0, 0)
             else:
                 x, y, z = self.box_pos
                 if self.box_move == 0:
