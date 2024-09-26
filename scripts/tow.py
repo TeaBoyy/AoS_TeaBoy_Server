@@ -11,6 +11,41 @@ import random
 import math
 from math import pi
 
+# TODO:
+from pyspades.loaders import Loader
+from pyspades.bytes import ByteReader
+from pyspades.common import decode
+
+class VersionRequest(Loader):
+    id = 33
+
+    def read(self, reader):
+        pass
+
+    def write(self, writer):
+        writer.writeByte(self.id, True)
+
+class VersionResponse(Loader):
+    id = 34
+    
+    client = str()
+    version = tuple()
+    os_info = str() 
+
+    def read(self, reader):
+        magic_no = reader.readByte(True)
+        self.client = chr(magic_no)
+        self.version = (
+            reader.readByte(True),
+            reader.readByte(True),
+            reader.readByte(True),
+        )
+        self.os_info = decode(reader.readString())
+    
+    def write(self, writer):
+        writer.writeByte(self.id, True)
+# TODO:
+
 CP_COUNT = 6
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
 ANGLE = 65
@@ -68,11 +103,44 @@ def apply_script(protocol, connection, config):
                 base = self.team.spawn_cp
             return base.get_spawn_location()
             
+        # TODO:
+        client_info = {}
+
         def on_spawn(self, pos):
             for line in HELP:
                 self.send_chat(line)
+
+            # TODO: takes time to get version response so available only later
+            if self.client_info and "client" in self.client_info:
+                print("self.name: ", self.name, ", client: ", self.client_info["client"])
+
             return connection.on_spawn(self, pos)
-            
+
+        def spawn(self, pos = None):
+            value = connection.spawn(self, pos)
+            if not self.client_info:
+                self.protocol.send_contained(VersionRequest())
+            return value
+
+        def version_load_contained_packet(self, data):
+            return VersionResponse(data) if data.readByte(True) == VersionResponse.id else None
+
+        def parse_client_info(self, contained):
+            if contained.client == 'o':
+                return "OpenSpades"
+            elif contained.client == 'B':
+                return "BetterSpades"
+            elif contained.client == 'a':
+                return "ACE"
+            return "Unknown({})".format(contained.client)
+
+        def loader_received(self, loader):
+            contained = self.version_load_contained_packet(ByteReader(loader.data))
+            if contained != None and contained.id == VersionResponse.id:
+                self.client_info["client"] = self.parse_client_info(contained)
+                return
+            return connection.loader_received(self, loader)
+
     class TugProtocol(protocol):
         game_mode = TC_MODE
         
