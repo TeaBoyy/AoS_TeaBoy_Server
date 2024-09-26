@@ -11,12 +11,19 @@ import random
 import math
 from math import pi
 
+# TODO:
 from pyspades.loaders import Loader
-from pyspades.packet import load_client_packet
-from pyspades.bytes import ByteReader, ByteWriter
-
-
+from pyspades.bytes import ByteReader
 from pyspades.common import decode
+
+class VersionRequest(Loader):
+    id = 33
+
+    def read(self, reader):
+        pass
+
+    def write(self, writer):
+        writer.writeByte(self.id, True)
 
 class VersionResponse(Loader):
     id = 34
@@ -37,90 +44,7 @@ class VersionResponse(Loader):
     
     def write(self, writer):
         writer.writeByte(self.id, True)
-
-
-
-        
-class HandShakeInit(Loader):
-    id = 31
-
-    def read(self, reader):
-        pass
-
-    def write(self, writer):
-        writer.writeByte(self.id, True)
-        writer.writeInt(42, True)
-
-class HandShakeReturn(Loader):
-    id = 32
-
-    def read(self, reader):
-        self.success = int(reader.readInt(True) == 42)
-
-    def write(self, writer):
-        writer.writeByte(self.id, True)
-
-
-        
-class VersionRequest(Loader):
-    id = 33
-
-    def read(self, reader):
-        pass
-
-    def write(self, writer):
-        writer.writeByte(self.id, True)
-
-
-from pyspades import contained
-
-CONTAINED_LIST = [
-    contained.PositionData,
-    contained.OrientationData,
-    contained.WorldUpdate,
-    contained.InputData,
-    contained.WeaponInput,
-    contained.HitPacket,
-    contained.GrenadePacket,
-    contained.SetTool,
-    contained.SetColor,
-    contained.ExistingPlayer,
-    contained.ShortPlayerData,
-    contained.MoveObject,
-    contained.CreatePlayer,
-    contained.BlockAction,
-    contained.BlockLine,
-    contained.StateData,
-    contained.KillAction,
-    contained.ChatMessage,
-    contained.MapStart,
-    contained.MapChunk,
-    contained.PlayerLeft,
-    contained.TerritoryCapture,
-    contained.ProgressBar,
-    contained.IntelCapture,
-    contained.IntelPickup,
-    contained.IntelDrop,
-    contained.Restock,
-    contained.FogColor,
-    contained.WeaponReload,
-    contained.ChangeTeam,
-    contained.ChangeWeapon,
-    # TODO: NEW
-    HandShakeInit,
-    HandShakeReturn,
-    VersionRequest,
-    VersionResponse
-]
-
-CONTAINED_LOADERS = {}
-
-for item in CONTAINED_LIST:
-    CONTAINED_LOADERS[item.id] = item
-
-CLIENT_LOADERS = CONTAINED_LOADERS.copy()
-for item in (contained.HitPacket,):
-    CLIENT_LOADERS[item.id] = item
+# TODO:
 
 CP_COUNT = 6
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
@@ -179,30 +103,42 @@ def apply_script(protocol, connection, config):
                 base = self.team.spawn_cp
             return base.get_spawn_location()
             
+        # TODO:
+        client_info = {}
+
         def on_spawn(self, pos):
             for line in HELP:
                 self.send_chat(line)
+
+            # TODO: takes time to get version response so available only later
+            if self.client_info and "client" in self.client_info:
+                print("self.name: ", self.name, ", client: ", self.client_info["client"])
+
             return connection.on_spawn(self, pos)
 
         def spawn(self, pos = None):
-            print("Spawn. Request version")
-            self.protocol.send_contained(VersionRequest())
-            return connection.spawn(self, pos)
-        
-        def load_client_packet(self, data):
-            return self.load_contained_packet(data, CLIENT_LOADERS)
+            value = connection.spawn(self, pos)
+            if not self.client_info:
+                self.protocol.send_contained(VersionRequest())
+            return value
 
-        def load_contained_packet(self, data, table):
-            type = data.readByte(True)
-            return table[type](data)
+        def version_load_contained_packet(self, data):
+            return VersionResponse(data) if data.readByte(True) == VersionResponse.id else None
+
+        def parse_client_info(self, contained):
+            if contained.client == 'o':
+                return "OpenSpades"
+            elif contained.client == 'B':
+                return "BetterSpades"
+            elif contained.client == 'a':
+                return "ACE"
+            return "Unknown({})".format(contained.client)
 
         def loader_received(self, loader):
-            contained = self.load_client_packet(ByteReader(loader.data))
-            if contained.id == VersionResponse.id:
-                print("self.name: ", self.name, ", contained.client: ", contained.client)
+            contained = self.version_load_contained_packet(ByteReader(loader.data))
+            if contained != None and contained.id == VersionResponse.id:
+                self.client_info["client"] = self.parse_client_info(contained)
                 return
-
-            print("Test ignore")
             return connection.loader_received(self, loader)
 
     class TugProtocol(protocol):
