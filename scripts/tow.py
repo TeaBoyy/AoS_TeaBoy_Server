@@ -16,7 +16,7 @@ from pyspades.packet import load_client_packet
 from pyspades.bytes import ByteReader, ByteWriter
 
 # TODO:
-from pyspades.server import block_action, set_color, make_color
+from pyspades.server import block_action
 from commands import add, admin, name
 from twisted.internet.task import LoopingCall
 from twisted.internet import reactor
@@ -272,7 +272,7 @@ def apply_script(protocol, connection, config):
         # TODO:
         box_loop = None
         #box_loop_interval = 0.05 # Seconds
-        box_loop_interval = 0.2 * 1 # Seconds
+        box_loop_interval = 0.2 # Seconds
 
         box_move = 0
 
@@ -282,16 +282,12 @@ def apply_script(protocol, connection, config):
         box_pos = None
 
         def change_block(self, x, y, z, action):
-            set_color.value = make_color(*(0, 0, 96)) 
-            set_color.player_id = 32
-            self.protocol.send_contained(set_color, save = True) 
-
             block_action.x = x 
             block_action.y = y 
             block_action.z = z 
             block_action.player_id = 32
             block_action.value = action
-            self.protocol.send_contained(block_action, save = True) 
+            return self.protocol.send_contained(block_action, save = True) 
 
         #def place_block(self, x, y, z, action):
         #    self.change_block(x, y, z, BUILD_BLOCK)
@@ -299,11 +295,11 @@ def apply_script(protocol, connection, config):
         def iterate_box(self, x, y, z, action):
             #box_size = 3
             #box_size = 50
-            box_size = 48
-            for dx in range(0, box_size, 6):
+            box_size = 32
+            for dx in range(0, box_size, 2):
                 #if dx % 2 == 0:
                 #    continue
-                for dy in range(0, box_size, 6):
+                for dy in range(0, box_size, 4):
                     #if dy % 2 == 0:
                     #    continue
                     dz = 0
@@ -326,8 +322,7 @@ def apply_script(protocol, connection, config):
                 x, y, z = self.box_pos
                 #offset = 3*3
                 offset = 0
-                #if x <= 0 + offset or x >= 512 - offset or y <= 0 + offset or y >= 512  - offset or z <= 0 + offset or z >=63 - offset:
-                if x <= 0 + offset or x >= 512 - offset or y <= 0 + offset or y >= 512  - offset:
+                if x <= 0 + offset or x >= 512 - offset or y <= 0 + offset or y >= 512  - offset or z <= 0 + offset or z >=63 - offset:
                     print("Out of bounds, don't spawn box. Stop loop")
                     self.box_loop.stop()
                     self.box_loop = None
@@ -343,7 +338,7 @@ def apply_script(protocol, connection, config):
             if self.box_pos == None:
                 player_pos = self.world_object.position.copy()
                 # player_pos.z - 5
-                self.box_pos = (player_pos.x + 0, player_pos.y + 0, 0)
+                self.box_pos = (player_pos.x + 0, player_pos.y + 0, 25)
             else:
                 x, y, z = self.box_pos
                 if self.box_move == 0:
@@ -364,8 +359,8 @@ def apply_script(protocol, connection, config):
 
             self.create_box(*self.box_pos)
 
-            if True and self.box_pos != None:
-                reactor.callLater(0.05, self.destroy_box, *self.box_pos)
+            if False and self.box_pos != None:
+                self.destroy_box(*self.box_pos)
 
         def player_pos_box_loop_call(self):
             if self.box_pos == None:
