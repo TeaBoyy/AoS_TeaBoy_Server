@@ -78,7 +78,7 @@ def apply_script(protocol, connection, config):
     class TugProtocol(protocol):
         game_mode = TC_MODE
 
-        on_cp_secure_call = None
+        on_cp_finalize_call = None
         
         def get_cp_entities(self):
             # generate positions
@@ -165,34 +165,32 @@ def apply_script(protocol, connection, config):
             return entities
     
         def on_cp_capture(self, territory):
-            if self.on_cp_secure_call != None:
-                self.on_cp_secure(territory, False)
+            if self.on_cp_finalize_call != None:
+                self.on_cp_finalize(territory, False)
                 print("Defending team took the tent back! Back to normal!")
                 return
 
+            # TODO: read from config
             cooldown = 60
-            print("Attacked team took the tent! They need to hold for ", cooldown, " seconds before they can advance further!")
+
+            print("Attacker team took the tent! They need to hold for ", cooldown, " seconds before they can advance further!")
 
             # Temporary disable all the tents except for the one needs to be secured by the attackers
             for entity in self.entities:
                 if not entity.disabled and entity is not territory:
                     entity.disable()
 
-            self.on_cp_secure_call = reactor.callLater(cooldown, self.on_cp_secure, territory)
-            
-            #return protocol.on_cp_capture(self, territory)
+            self.on_cp_finalize_call = reactor.callLater(cooldown, self.on_cp_finalize, territory)
 
         # TODO: probably when trying to cap disabled tents, let know what's going on
         # TODO: announce how much left every few seconds
         # TODO: and ideally print openspades/betterspades text on actual screen
-        def on_cp_secure(self, territory, is_secured = True):
-            if self.on_cp_secure_call != None:
-                if self.on_cp_secure_call.active():
-                    self.on_cp_secure_call.cancel()
-                self.on_cp_secure_call = None
-
+        def on_cp_finalize(self, territory, is_secured = True):
             print("Attacker team secured the tent! Now they can advance further!")
 
+            self.reset_cp_finalize_call()
+
+            # Original tow code
             team = territory.team
             if team.id:
                 move = -1
@@ -217,5 +215,22 @@ def apply_script(protocol, connection, config):
             for entity in self.entities:
                 if not entity.disabled and entity not in cp:
                     entity.disable()
+
+        def reset_cp_finalize_call(self):
+            print("self.reset_cp_finalize_call()")
+            if self.on_cp_finalize_call != None:
+                if self.on_cp_finalize_call.active():
+                    self.on_cp_finalize_call.cancel()
+                self.on_cp_finalize_call = None
+
+        def on_map_change(self, map):
+            print("on_map_change")
+            self.reset_cp_finalize_call()
+            protocol.on_map_change(self, map)
+            
+        def reset_tc(self):
+            print("reset_tc")
+            self.reset_cp_finalize_call()
+            protocol.reset_tc(self)
 
     return TugProtocol, TugConnection
