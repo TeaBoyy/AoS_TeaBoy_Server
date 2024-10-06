@@ -13,9 +13,16 @@ from math import pi
 
 from twisted.internet import reactor
 
+# TODO:
+#CP_COUNT = 6
 CP_COUNT = 6
+#CP_COUNT = 7
+
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
-ANGLE = 65
+
+#ANGLE = 65
+ANGLE = 0
+
 START_ANGLE = math.radians(-ANGLE)
 END_ANGLE = math.radians(ANGLE)
 DELTA_ANGLE = math.radians(30)
@@ -30,7 +37,17 @@ class TugTerritory(Territory):
     
     def add_player(self, player):
         if self.disabled:
+            # TODO: spams every second
+            # TODO: can actually use update_rate, and just keep proxy list of players, use it but assign to real player list for base class only when enabled
+            # TODO: yet better to leave this logic alone, and proly just store last pair of tent&time on connection/player and check against it
+            # TODO: this way no need to test and no need to worry, and less changes to the original
+            #print("DISABLED")
             return
+
+        # TODO: do something to not start with 0.5 progress
+        #if self.team == None:
+        #    self.progress = float(player.team.other.id)
+
         Territory.add_player(self, player)
     
     def enable(self):
@@ -97,6 +114,22 @@ def apply_script(protocol, connection, config):
             return points
         
         def get_cp_entities(self):
+            # TODO:
+            """
+            points = self.generate_spawn_points(512, CP_EXTRA_COUNT, 32, 0)
+
+            entities = []
+
+            for i in range(len(points)):
+                if i < CP_EXTRA_COUNT / 2:
+                    x, y = points[i]
+                    entity = TugTerritory(i, self, *(x, y, map.get_z(x, y)))
+                    entity.team = self.green_team
+                    entities.append(entity)
+
+            return entities
+            """
+
             # generate positions
             
             map = self.map
@@ -112,7 +145,9 @@ def apply_script(protocol, connection, config):
             square_1 = xrange(128)
             square_2 = xrange(512 - 128, 512)
             
-            while 1:
+            # TODO:
+            # while 1:
+            while False:
                 top = int(y) in square_1
                 bottom = int(y) in square_2
                 if top:
@@ -128,22 +163,38 @@ def apply_script(protocol, connection, config):
                     break
                 x, y = x2, y2
                 points.append((int(x), int(y)))
+
+            # TODO:
+            # TODO: test neutral one
+            points = self.generate_spawn_points(512, CP_EXTRA_COUNT + 1, 32, 0)
+            print("len(points): ", len(points))
+            for x, y in points:
+                print("x: ", x, ", y: ", y)
             
             move = 512 / CP_EXTRA_COUNT
             offset = move / 2
             
-            for i in xrange(CP_EXTRA_COUNT):
-                index = 0
-                while 1:
-                    p_x, p_y = points[index]
-                    index += 1
-                    if p_x >= offset:
-                        break
+            # TODO: 
+            neutral_cp = []
+
+            for i in xrange(len(points)):
+                #index = 0
+                #while 1:
+                #    p_x, p_y = points[index]
+                #    index += 1
+                #    if p_x >= offset:
+                #        break
+                p_x, p_y = points[i]
                 if i < CP_EXTRA_COUNT / 2:
                     blue_cp.append((p_x, p_y))
-                else:
+                    print("Blue point added - x: ", p_x, ", y: ", p_y)
+                elif i > CP_EXTRA_COUNT / 2:
                     green_cp.append((p_x, p_y))
-                offset += move
+                    print("Green point added - x: ", p_x, ", y: ", p_y)
+                else:
+                    print("Neutral one")
+                    neutral_cp.append((p_x, p_y))
+                #offset += move
             
             # make entities
             
@@ -156,13 +207,18 @@ def apply_script(protocol, connection, config):
                 if i == 0:
                     self.blue_team.last_spawn = entity
                     entity.id = -1
+                    print("Blue last spawn set")
                 else:
                     entities.append(entity)
                     index += 1
             
             self.blue_team.cp = entities[-1]
-            self.blue_team.cp.disabled = False
+            #self.blue_team.cp.disabled = False
+            self.blue_team.cp.disabled = True
+
+            # TODO:
             self.blue_team.spawn_cp = entities[-2]
+            #self.blue_team.spawn_cp = entities[-3]
                 
             for i, (x, y) in enumerate(green_cp):
                 entity = TugTerritory(index, self, *(x, y, map.get_z(x, y)))
@@ -170,17 +226,48 @@ def apply_script(protocol, connection, config):
                 if i == len(green_cp) - 1:
                     self.green_team.last_spawn = entity
                     entity.id = index
+                    print("Green last spawn set")
                 else:
                     entities.append(entity)
                     index += 1
 
             self.green_team.cp = entities[-CP_COUNT/2]
-            self.green_team.cp.disabled = False
+            #self.green_team.cp.disabled = False
+            self.green_team.cp.disabled = True
+
+            # TODO:
             self.green_team.spawn_cp = entities[-CP_COUNT/2 + 1]
+            #self.green_team.spawn_cp = entities[-CP_COUNT/2 + 2]
+
+            # TODO:
+            for i, (x, y) in enumerate(neutral_cp):
+                entity = TugTerritory(index, self, *(x, y, map.get_z(x, y)))
+                entity.team = None
+
+                #entity.disabled = False
+                entity.disabled = True
+
+                #entity.progress = 0.5
+                entities.append(entity)
+
+                #entities[len(blue_cp) - 1].disabled = False
+                entities[len(blue_cp) - 1].disabled = True
+
+                #entities[len(blue_cp) - 1].progress = 0.5
+                index += 1
             
             return entities
     
         def on_cp_capture(self, territory):
+            # TODO: try and send like its now neutral, not blue/green, with test delay to see if works
+            #territory.team = None
+            #territory.update()
+
+            #return
+
+            # TODO:
+            return self.on_cp_finalize(territory)
+
             if self.on_cp_finalize_call != None:
                 self.on_cp_finalize(territory, False)
                 print("Defending team took the tent back! Back to normal!")
@@ -209,9 +296,13 @@ def apply_script(protocol, connection, config):
             # Original tow code
             team = territory.team
             if team.id:
+                # TODO:
                 move = -1
+                #move = -2
             else:
+                # TODO:
                 move = 1
+                #move = 2
 
             if not is_secured:
                 move = 0
