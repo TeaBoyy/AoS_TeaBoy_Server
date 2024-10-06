@@ -79,6 +79,22 @@ def apply_script(protocol, connection, config):
         game_mode = TC_MODE
 
         on_cp_finalize_call = None
+
+        def generate_spawn_points(self, world_size, N, M, K):
+            points = []
+            center = world_size // 2
+            step = int((world_size - 2 * M) / (N - 1))  # Calculate the step based on the world size and number of points
+
+            # Generate points along the diagonal with the offset K
+            for i in range(N):
+                x = M + i * step + (i - N // 2) * K  # Apply custom offset K relative to the center
+                y = x  # For diagonal, x == y
+
+                # Ensure points stay within bounds
+                if 0 <= x < world_size and 0 <= y < world_size:
+                    points.append((x, y))
+
+            return points
         
         def get_cp_entities(self):
             # generate positions
