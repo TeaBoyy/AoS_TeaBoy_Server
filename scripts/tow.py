@@ -85,7 +85,17 @@ def apply_script(protocol, connection, config):
                 base = self.team.last_spawn
             else:
                 base = self.team.spawn_cp
-            return base.get_spawn_location()
+            # TODO:
+            location = base.get_spawn_location()
+
+            random_offset = random.choice((-64, -32, 0, 32, 64))
+            #random_offset = random.choice((-64, 0, 64))
+
+            x, y, _ = location
+            y += random_offset
+
+            location = (x, y, self.protocol.map.get_z(x, y))
+            return location
             
         def on_spawn(self, pos):
             for line in HELP:
@@ -166,7 +176,7 @@ def apply_script(protocol, connection, config):
 
             # TODO:
             # TODO: test neutral one
-            points = self.generate_spawn_points(512, CP_EXTRA_COUNT + 1, 32, 0)
+            points = self.generate_spawn_points(512, CP_EXTRA_COUNT, 32, 0)
             print("len(points): ", len(points))
             for x, y in points:
                 print("x: ", x, ", y: ", y)
@@ -175,7 +185,7 @@ def apply_script(protocol, connection, config):
             offset = move / 2
             
             # TODO: 
-            neutral_cp = []
+            #neutral_cp = []
 
             for i in xrange(len(points)):
                 #index = 0
@@ -185,15 +195,20 @@ def apply_script(protocol, connection, config):
                 #    if p_x >= offset:
                 #        break
                 p_x, p_y = points[i]
+
+                # TODO:
+                p_y = 256
+
                 if i < CP_EXTRA_COUNT / 2:
                     blue_cp.append((p_x, p_y))
                     print("Blue point added - x: ", p_x, ", y: ", p_y)
-                elif i > CP_EXTRA_COUNT / 2:
+                #elif i > CP_EXTRA_COUNT / 2:
+                else:
                     green_cp.append((p_x, p_y))
                     print("Green point added - x: ", p_x, ", y: ", p_y)
-                else:
-                    print("Neutral one")
-                    neutral_cp.append((p_x, p_y))
+                #else:
+                #    print("Neutral one")
+                #    neutral_cp.append((p_x, p_y))
                 #offset += move
             
             # make entities
@@ -213,12 +228,12 @@ def apply_script(protocol, connection, config):
                     index += 1
             
             self.blue_team.cp = entities[-1]
-            #self.blue_team.cp.disabled = False
-            self.blue_team.cp.disabled = True
+            self.blue_team.cp.disabled = False
+            #self.blue_team.cp.disabled = True
 
             # TODO:
-            self.blue_team.spawn_cp = entities[-2]
-            #self.blue_team.spawn_cp = entities[-3]
+            #self.blue_team.spawn_cp = entities[-2]
+            self.blue_team.spawn_cp = entities[-3]
                 
             for i, (x, y) in enumerate(green_cp):
                 entity = TugTerritory(index, self, *(x, y, map.get_z(x, y)))
@@ -232,13 +247,14 @@ def apply_script(protocol, connection, config):
                     index += 1
 
             self.green_team.cp = entities[-CP_COUNT/2]
-            #self.green_team.cp.disabled = False
-            self.green_team.cp.disabled = True
+            self.green_team.cp.disabled = False
+            #self.green_team.cp.disabled = True
 
             # TODO:
-            self.green_team.spawn_cp = entities[-CP_COUNT/2 + 1]
-            #self.green_team.spawn_cp = entities[-CP_COUNT/2 + 2]
+            #self.green_team.spawn_cp = entities[-CP_COUNT/2 + 1]
+            self.green_team.spawn_cp = entities[-CP_COUNT/2 + 2]
 
+            """
             # TODO:
             for i, (x, y) in enumerate(neutral_cp):
                 entity = TugTerritory(index, self, *(x, y, map.get_z(x, y)))
@@ -255,6 +271,7 @@ def apply_script(protocol, connection, config):
 
                 #entities[len(blue_cp) - 1].progress = 0.5
                 index += 1
+            """
             
             return entities
     
