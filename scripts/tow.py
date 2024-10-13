@@ -88,8 +88,28 @@ def apply_script(protocol, connection, config):
             # TODO:
             location = base.get_spawn_location()
 
-            random_offset = random.choice((-64, -32, 0, 32, 64))
+            #random_offset = random.choice((-64, -32, 0, 32, 64))
             #random_offset = random.choice((-64, 0, 64))
+            #random_offset = random.choice((-96, -64, -32, 0, 32, 64, 96))
+
+            offsets = [0, -32, 32, -64, 64, -96, 96]
+
+            random_offset = None
+
+            if self.team == self.protocol.blue_team:
+                random_offset = offsets[self.protocol.spawn_location_counter_blue]
+
+                if self.protocol.spawn_location_counter_blue >= len(offsets) - 1:
+                    self.protocol.spawn_location_counter_blue = 0
+                else:  
+                    self.protocol.spawn_location_counter_blue += 1
+            else:
+                random_offset = offsets[self.protocol.spawn_location_counter_green]
+
+                if self.protocol.spawn_location_counter_green >= len(offsets) - 1:
+                    self.protocol.spawn_location_counter_green = 0
+                else:  
+                    self.protocol.spawn_location_counter_green += 1
 
             x, y, _ = location
             y += random_offset
@@ -106,6 +126,10 @@ def apply_script(protocol, connection, config):
         game_mode = TC_MODE
 
         on_cp_finalize_call = None
+
+        # TODO:
+        spawn_location_counter_blue = 0
+        spawn_location_counter_green = 0
 
         def generate_spawn_points(self, world_size, N, M, K):
             points = []
