@@ -92,7 +92,9 @@ def apply_script(protocol, connection, config):
             #random_offset = random.choice((-64, 0, 64))
             #random_offset = random.choice((-96, -64, -32, 0, 32, 64, 96))
 
-            offsets = [0, -32, 32, -64, 64, -96, 96]
+            #offsets = [0, -32, 32, -64, 64, -96, 96]
+            offsets = [0, -32, 32, -64, 64]
+            #offsets = [0, -32, 32, -48, 48]
 
             random_offset = None
 
@@ -112,7 +114,23 @@ def apply_script(protocol, connection, config):
                     self.protocol.spawn_location_counter_green += 1
 
             x, y, _ = location
-            y += random_offset
+
+            # TODO:
+            x, y, _ = base.get()
+
+            if self.team == self.protocol.blue_team:
+                y -= 16
+            else:
+                y += 16
+
+            # TODO: was here for line
+            #y += random_offset
+            
+            # TODO: this try for diagonal
+            x += random_offset
+
+            # TODO: try shift Y by diagonal
+            y -= random_offset / 2
 
             location = (x, y, self.protocol.map.get_z(x, y))
             return location
@@ -140,6 +158,9 @@ def apply_script(protocol, connection, config):
             for i in range(N):
                 x = M + i * step + (i - N // 2) * K  # Apply custom offset K relative to the center
                 y = x  # For diagonal, x == y
+
+                # TODO: reduce/increase angle
+                y -= int(i * 8)
 
                 # Ensure points stay within bounds
                 if 0 <= x < world_size and 0 <= y < world_size:
@@ -200,7 +221,7 @@ def apply_script(protocol, connection, config):
 
             # TODO:
             # TODO: test neutral one
-            points = self.generate_spawn_points(512, CP_EXTRA_COUNT, 32, 0)
+            points = self.generate_spawn_points(512, CP_EXTRA_COUNT, 32, -8)
             print("len(points): ", len(points))
             for x, y in points:
                 print("x: ", x, ", y: ", y)
@@ -220,8 +241,8 @@ def apply_script(protocol, connection, config):
                 #        break
                 p_x, p_y = points[i]
 
-                # TODO:
-                p_y = 256
+                # TODO: test for middle
+                #p_y = 256
 
                 if i < CP_EXTRA_COUNT / 2:
                     blue_cp.append((p_x, p_y))
@@ -256,8 +277,8 @@ def apply_script(protocol, connection, config):
             #self.blue_team.cp.disabled = True
 
             # TODO:
-            #self.blue_team.spawn_cp = entities[-2]
-            self.blue_team.spawn_cp = entities[-3]
+            self.blue_team.spawn_cp = entities[-2]
+            #self.blue_team.spawn_cp = entities[-3]
                 
             for i, (x, y) in enumerate(green_cp):
                 entity = TugTerritory(index, self, *(x, y, map.get_z(x, y)))
@@ -275,8 +296,8 @@ def apply_script(protocol, connection, config):
             #self.green_team.cp.disabled = True
 
             # TODO:
-            #self.green_team.spawn_cp = entities[-CP_COUNT/2 + 1]
-            self.green_team.spawn_cp = entities[-CP_COUNT/2 + 2]
+            self.green_team.spawn_cp = entities[-CP_COUNT/2 + 1]
+            #self.green_team.spawn_cp = entities[-CP_COUNT/2 + 2]
 
             """
             # TODO:
