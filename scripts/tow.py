@@ -98,6 +98,19 @@ def apply_script(protocol, connection, config):
             
     class TugProtocol(protocol):
         game_mode = TC_MODE
+
+        def generate_spawn_points(self, world_size, N, M, K):
+            points = []
+            center = world_size // 2
+            step = int((world_size - 2 * M) / (N - 1))  # Calculate the step based on the world size and number of points
+            # Generate points along the diagonal with the offset K
+            for i in range(N):
+                x = M + i * step + (i - N // 2) * K  # Apply custom offset K relative to the center
+                y = x  # For diagonal, x == y
+                # Ensure points stay within bounds
+                if 0 <= x < world_size and 0 <= y < world_size:
+                    points.append((x, y))
+            return points
         
         def get_cp_entities(self):
             # generate positions
@@ -106,6 +119,16 @@ def apply_script(protocol, connection, config):
             blue_cp = []
             green_cp = []
 
+            offset_point = -32
+            points = self.generate_spawn_points(512, CP_EXTRA_COUNT, 32, int(offset_point))
+
+            entities = []
+            for i in range(len(points)):    
+                if i < CP_EXTRA_COUNT / 2:
+                    blue_cp.append(points[i])
+                else:
+                    green_cp.append(points[i])
+            
             magnitude = 10
             angle = random.uniform(START_ANGLE, END_ANGLE)
             x, y = (0, random.randrange(64, 512 - 64))
@@ -115,6 +138,7 @@ def apply_script(protocol, connection, config):
             square_1 = xrange(128)
             square_2 = xrange(512 - 128, 512)
             
+            """
             while 1:
                 top = int(y) in square_1
                 bottom = int(y) in square_2
@@ -153,6 +177,10 @@ def apply_script(protocol, connection, config):
             index = 0
             entities = []
             
+            """
+
+            index = 0
+
             for i, (x, y) in enumerate(blue_cp):
                 entity = TugTerritory(index, self, *(x, y, map.get_z(x, y)))
                 entity.team = self.blue_team
