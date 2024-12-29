@@ -79,6 +79,9 @@ def apply_script(protocol, connection, config):
             location = self.my_get_spawn_location(base)
             spawn_point_offset = 48
             x, y, z = location
+            if self.protocol.round_just_started:
+                spawn_point_offset = 0
+
             if self.team != self.protocol.blue_team:
                 spawn_point_offset = -spawn_point_offset
 
@@ -99,6 +102,25 @@ def apply_script(protocol, connection, config):
     class TugProtocol(protocol):
         game_mode = TC_MODE
 
+        round_just_started = False
+        round_just_started_timeout = 10
+
+        def on_map_change(self, map):
+            self.setup_round_just_started()
+            protocol.on_map_change(self, map)
+
+        def setup_round_just_started(self):
+            self.round_just_started = True
+
+            if len(self.connections) <= 0:
+                reactor.callLater(1.0, self.setup_round_just_started)
+                print("[setup_round_just_started] Wait for more players to join")
+                return
+           
+            reactor.callLater(self.round_just_started_timeout, self.reset_round_just_started)
+
+        def reset_round_just_started(self):
+            self.round_just_started = False
         def generate_spawn_points(self, world_size, N, M, K):
             points = []
             center = world_size // 2
