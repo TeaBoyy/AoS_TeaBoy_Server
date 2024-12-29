@@ -1011,7 +1011,7 @@ try:
                 self.battlecrouching=False
                 if weapon_rdm>0.4:
                     self.set_weapon(RIFLE_WEAPON, True)
-                    self.battle_distance = 20
+                    self.battle_distance = 40
                     if random.random()<0.2:
                         self.battlecrouching=True
                     if weapon_rdm>0.7 or random.random()<self.cpulevel:
