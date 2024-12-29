@@ -2144,7 +2144,20 @@ try:
                     self.aim -= pos
                     distance_to_aim = self.aim.normalize()
                     if self.battle_distance < distance_to_aim:#�ڕW�����Ȃ�i��
-                        self.input.add('up')	
+                        if self.assigned_position != None:
+                            x_coord_a, y_coord_a, z_coord_a = self.assigned_position.get()
+                            direction = 1
+                            if self.team == self.protocol.blue_team:
+                                direction = 1
+                            else:
+                                direction = -1
+                            
+                            my_x, my_y, _ = self.world_object.position.get()
+                            x_correct = (x_coord_a - my_x) * direction > 0
+                            if x_correct:
+                                self.input.add('up')
+                        else:
+                            self.input.add('up')
                     if self.grenade_keeping and self.tool == GRENADE_TOOL:	#grenade�s�������ێ���
                         if self.enemy_lost_temp ==None or distance_to_aim<15 or random.random()<0.005:#�ڕW15bk���ڋ�or��m��
                             obj.set_orientation(*self.grenade_throw_orienation)
