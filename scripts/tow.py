@@ -61,12 +61,35 @@ def get_point(x, y, magnitude, angle):
 
 def apply_script(protocol, connection, config):
     class TugConnection(connection):
+
+        def my_get_spawn_location(self, base):
+            radius = 24
+
+            x1 = max(0, base.x - radius)
+            y1 = max(0, base.y - radius)
+            x2 = min(512, base.x + radius)
+            y2 = min(512, base.y + radius)
+            return self.protocol.get_random_location(True, (x1, y1, x2, y2))
+
         def get_spawn_location(self):
             if self.team.spawn_cp is None:
                 base = self.team.last_spawn
             else:
                 base = self.team.spawn_cp
-            return base.get_spawn_location()
+            location = self.my_get_spawn_location(base)
+            spawn_point_offset = 48
+            x, y, z = location
+            if self.team != self.protocol.blue_team:
+                spawn_point_offset = -spawn_point_offset
+
+            x -= spawn_point_offset
+            y -= spawn_point_offset
+
+            z = self.protocol.map.get_z(x, y)
+
+            location = (x, y, z)
+                
+            return location
             
         def on_spawn(self, pos):
             for line in HELP:
