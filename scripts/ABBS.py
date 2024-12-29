@@ -1999,7 +1999,8 @@ try:
                 
             def inputcrouch(self, crouchadd, defcrouch):
                 inputedtime = seconds() - self.crouchinputed
-                lostime = 0.7-(self.cpulevel/2)
+                lostime = 4.0
+                #lostime = 0.7-(self.cpulevel/2)
                 if inputedtime > lostime:
                     if crouchadd:
                         if not defcrouch:
@@ -2171,8 +2172,8 @@ try:
                                                 self.input.add('jump')
                                     if random.random() < self.cpulevel**2/4-0.04: #���L���
                                         # Modification - don't input additional crouches (too much), use battlecrouching only
-                                        #crouchadd = True
-                                        crouchadd = False
+                                        crouchadd = True
+                                        #crouchadd = False
                                 if 0.1 > p_dot > 0.0:
                                     self.input.add('right')
                                 elif 0.0 > p_dot > -0.1:
