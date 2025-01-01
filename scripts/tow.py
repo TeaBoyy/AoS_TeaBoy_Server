@@ -11,6 +11,9 @@ import random
 import math
 from math import pi
 
+from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
+
 CP_COUNT = 6
 CP_EXTRA_COUNT = CP_COUNT + 2 # PLUS last 'spawn'
 ANGLE = 65
@@ -79,11 +82,20 @@ def apply_script(protocol, connection, config):
             location = self.my_get_spawn_location(base)
             spawn_point_offset = 48
             x, y, z = location
-            if self.protocol.round_just_started:
-                spawn_point_offset = 0
+            tents_distance_hardcode = 16
+            attacker_offset = self.protocol.attacker_favor * tents_distance_hardcode
+            if attacker_offset < 0:
+                attacker_offset = -attacker_offset if self.team == self.protocol.blue_team else attacker_offset
+            elif attacker_offset > 0:
+                attacker_offset = attacker_offset if self.team != self.protocol.blue_team else -attacker_offset
+
+            spawn_point_offset -= attacker_offset
 
             if self.team != self.protocol.blue_team:
                 spawn_point_offset = -spawn_point_offset
+
+            if self.protocol.round_just_started:
+                spawn_point_offset = 0
 
             x -= spawn_point_offset
             y -= spawn_point_offset
@@ -102,12 +114,34 @@ def apply_script(protocol, connection, config):
     class TugProtocol(protocol):
         game_mode = TC_MODE
 
+        progress_reporter_loop = None
+        progress_reporter_loop_interval_seconds = 2.0
+
+        def progress_reporter_check(self):
+            attacker_favor = 0
+
+            for tent in self.entities:
+                if tent.disabled:
+                    continue
+
+                progress = tent.get_progress()
+                team = tent.team
+
+                attacker_favor += (progress > 0.5)*(1) if team == self.blue_team else (progress < 0.5)*(-1)
+            self.attacker_favor = attacker_favor
+
+            if self.attacker_favor != 0:
+                print("self.attacker_favor: ", self.attacker_favor)
+
         round_just_started = False
         round_just_started_timeout = 10
 
+        attacker_favor = 0
         def on_map_change(self, map):
-            self.setup_round_just_started()
             protocol.on_map_change(self, map)
+            self.setup_round_just_started()
+            self.progress_reporter_loop = LoopingCall(self.progress_reporter_check)
+            self.progress_reporter_loop.start(self.progress_reporter_loop_interval_seconds)
 
         def setup_round_just_started(self):
             self.round_just_started = True
