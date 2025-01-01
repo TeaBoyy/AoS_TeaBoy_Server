@@ -43,6 +43,47 @@ class TugTerritory(Territory):
         self.disabled = True
         self.progress = float(self.team.id)
 
+    def update_rate(self):
+        rate = 0
+        for player in self.players:
+            if player.team.id:
+                rate += 1
+            else:
+                rate -= 1
+        progress = self.progress
+        if ((progress == 1.0 and (rate > 0 or rate == 0)) or 
+           (progress == 0.0 and (rate < 0 or rate == 0))):
+            return
+
+        # Modification - more than N players cannot speed up capturing
+        rate = max(-4, min(rate, 4))
+
+        self.rate = rate
+        
+        self.rate_value = rate * TC_CAPTURE_RATE
+
+        # TODO: also reduce UI progress bar speed on client (add pauses to slow it down)
+        # Modification - reduce capture speed
+        rate_multiplier = 4
+        self.rate_value /= rate_multiplier
+        
+        if self.finish_call is not None:
+            self.finish_call.cancel()
+            self.finish_call = None
+        if rate != 0:
+            self.start = reactor.seconds()
+            rate_value = self.rate_value
+            if rate_value < 0:
+                self.capturing_team = self.protocol.blue_team
+                end_time = progress / -rate_value
+            else:
+                self.capturing_team = self.protocol.green_team
+                end_time = (1.0 - progress) / rate_value
+            if self.capturing_team is not self.team:
+                self.finish_call = reactor.callLater(end_time, self.finish)
+
+        self.send_progress()
+        
 def get_index(value):
     if value < 0:
         raise IndexError()
