@@ -123,7 +123,8 @@ def apply_script(protocol, connection, config):
             location = self.my_get_spawn_location(base)
             spawn_point_offset = 48
             x, y, z = location
-            tents_distance_hardcode = 16
+            # Shift by half the distance to equalize distance for both teams
+            tents_distance_hardcode = 32 / 2
             attacker_offset = self.protocol.attacker_favor * tents_distance_hardcode
             if attacker_offset < 0:
                 attacker_offset = -attacker_offset if self.team == self.protocol.blue_team else attacker_offset
