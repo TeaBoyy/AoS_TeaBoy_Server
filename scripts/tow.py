@@ -121,7 +121,7 @@ def apply_script(protocol, connection, config):
             else:
                 base = self.team.spawn_cp
             location = self.my_get_spawn_location(base)
-            spawn_point_offset = 48
+            spawn_point_offset = 48 + 16
             x, y, z = location
             # Shift by half the distance to equalize distance for both teams
             tents_distance_hardcode = 32 / 2
