@@ -194,47 +194,6 @@ def apply_script(protocol, connection, config):
             square_1 = xrange(128)
             square_2 = xrange(512 - 128, 512)
             
-            """
-            while 1:
-                top = int(y) in square_1
-                bottom = int(y) in square_2
-                if top:
-                    angle = limit_angle(angle + FIX_ANGLE)
-                elif bottom:
-                    angle = limit_angle(angle - FIX_ANGLE)
-                else:
-                    angle = limit_angle(angle + random_up_down(DELTA_ANGLE))
-                magnitude += random_up_down(2)
-                magnitude = min(15, max(5, magnitude))
-                x2, y2 = get_point(x, y, magnitude, angle)
-                if x2 >= 511:
-                    break
-                x, y = x2, y2
-                points.append((int(x), int(y)))
-            
-            move = 512 / CP_EXTRA_COUNT
-            offset = move / 2
-            
-            for i in xrange(CP_EXTRA_COUNT):
-                index = 0
-                while 1:
-                    p_x, p_y = points[index]
-                    index += 1
-                    if p_x >= offset:
-                        break
-                if i < CP_EXTRA_COUNT / 2:
-                    blue_cp.append((p_x, p_y))
-                else:
-                    green_cp.append((p_x, p_y))
-                offset += move
-            
-            # make entities
-            
-            index = 0
-            entities = []
-            
-            """
-
             index = 0
 
             for i, (x, y) in enumerate(blue_cp):
