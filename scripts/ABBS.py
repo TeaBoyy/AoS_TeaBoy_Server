@@ -2158,6 +2158,10 @@ try:
                                 self.input.add('up')
                         else:
                             self.input.add('up')
+                    if self.tool==WEAPON_TOOL:
+                        # Modification - force bots to aim down the sight to slow down their movement while shooting
+                        self.input.add('secondary_fire')
+
                     if self.grenade_keeping and self.tool == GRENADE_TOOL:	#grenade�s�������ێ���
                         if self.enemy_lost_temp ==None or distance_to_aim<15 or random.random()<0.005:#�ڕW15bk���ڋ�or��m��
                             obj.set_orientation(*self.grenade_throw_orienation)
