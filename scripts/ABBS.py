@@ -2187,23 +2187,7 @@ try:
                         
                         self.input.add('up')
 
-                        if False:
-                            if self.assigned_position != None:
-                                x_coord_a, y_coord_a, z_coord_a = self.assigned_position.get()
-                                direction = 1
-                                if self.team == self.protocol.blue_team:
-                                    direction = 1
-                                else:
-                                    direction = -1
-                                
-                                my_x, my_y, _ = self.world_object.position.get()
 
-                                x_correct = (x_coord_a - my_x) * direction > 0
-                                y_correct = True
-                                if x_correct:
-                                    self.input.add('up')
-                            else:
-                                self.input.add('up')
                     if self.tool==WEAPON_TOOL:
                         # Modification - force bots to aim down the sight to slow down their movement while shooting
                         self.input.add('secondary_fire')
