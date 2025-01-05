@@ -1319,6 +1319,25 @@ try:
                             self.assigned_position = None
                         entity.add_player(self)
 
+            def tow_get_target(self):
+                tgt_entity = None
+                n = 0
+                hidari_team = self.protocol.entities[n].team
+                for n in range(16):
+                    if self.protocol.entities[n].team != hidari_team:break
+                if self.team == hidari_team:
+                    if self.protocol.entities[n-1].capturing_team == self.team.other or self.protocol.entities[n-1].progress > 0:
+                        tgt_entity = self.protocol.entities[n-1]
+                    else:
+                        tgt_entity = self.protocol.entities[n]
+                else:
+                    if self.protocol.entities[n].capturing_team == self.team.other or self.protocol.entities[n].progress < 1: 
+                        tgt_entity = self.protocol.entities[n]
+                    else:
+                        tgt_entity = self.protocol.entities[n-1]
+
+                return tgt_entity
+
             def tgt_pos_update(self):
                 px,py,pzo = self.world_object.position.get()
 
@@ -2132,7 +2151,27 @@ try:
                         if self.distance_calc(self.avoiding_danger_gre,self.world_object.position.get())<30:
                             self.tgt_pos_update()
 
-                if self.aim_at and self.aim_at.world_object and not (self.gre_avoiding and not self.gre_ignore): #�ˌ��ΏۓG�v���C���[�F�����
+                is_in_tent_area = False
+                need_to_run_towards_tent = False
+                self.tgt_pos_update()
+                target_object = self.tow_get_target()
+                if self in target_object.players:
+                    is_in_tent_area = True
+                else:
+                    maxed_capture_rate = target_object.rate <= -4 if (self.team == self.protocol.blue_team) else target_object.rate >= 4
+                    if maxed_capture_rate:
+                        need_to_run_towards_tent = False
+                    else:
+                        bot_x, bot_y, bot_z = self.world_object.position.get()
+                        tent_x, tent_y, _ = target_object.get()
+                        xd = tent_x - bot_x
+                        yd = tent_y - bot_y
+                        dd = (xd**2 + yd**2)**(0.5)
+
+                        if dd < 32:
+                            need_to_run_towards_tent = True
+
+                if not need_to_run_towards_tent and self.aim_at and self.aim_at.world_object and not (self.gre_avoiding and not self.gre_ignore):
                     self.enemy_lost=None
                     crouchadd = False
                     defcrouch=False
@@ -2143,21 +2182,28 @@ try:
                     self.aim.set_vector(aim_at_pos)
                     self.aim -= pos
                     distance_to_aim = self.aim.normalize()
-                    if self.battle_distance < distance_to_aim:#�ڕW�����Ȃ�i��
-                        if self.assigned_position != None:
-                            x_coord_a, y_coord_a, z_coord_a = self.assigned_position.get()
-                            direction = 1
-                            if self.team == self.protocol.blue_team:
+                    
+                    if not is_in_tent_area and self.battle_distance < distance_to_aim:#�ڕW�����Ȃ�i��
+                        
+                        self.input.add('up')
+
+                        if False:
+                            if self.assigned_position != None:
+                                x_coord_a, y_coord_a, z_coord_a = self.assigned_position.get()
                                 direction = 1
+                                if self.team == self.protocol.blue_team:
+                                    direction = 1
+                                else:
+                                    direction = -1
+                                
+                                my_x, my_y, _ = self.world_object.position.get()
+
+                                x_correct = (x_coord_a - my_x) * direction > 0
+                                y_correct = True
+                                if x_correct:
+                                    self.input.add('up')
                             else:
-                                direction = -1
-                            
-                            my_x, my_y, _ = self.world_object.position.get()
-                            x_correct = (x_coord_a - my_x) * direction > 0
-                            if x_correct:
                                 self.input.add('up')
-                        else:
-                            self.input.add('up')
                     if self.tool==WEAPON_TOOL:
                         # Modification - force bots to aim down the sight to slow down their movement while shooting
                         self.input.add('secondary_fire')
